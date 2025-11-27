@@ -2,6 +2,7 @@ import * as openaiService from '../openai/openai.service';
 import * as mappingService from '../mapping/mapping.service';
 import * as agentService from '../aiAgents/agent.service';
 import * as jsonAdapter from '../storage/json.adapter';
+import * as templateService from './templateMessages.service';
 
 export interface Lead {
   id: string;
@@ -109,28 +110,22 @@ export async function processNewLead(lead: Lead): Promise<{ success: boolean; me
     const leadContext = buildLeadContext(lead);
     const welcomePrompt = `A new lead just submitted a form. Here's their information:\n${leadContext}\n\nGenerate a friendly, professional welcome message to send them via WhatsApp. Keep it concise (under 200 characters). Don't include any placeholders - write the actual message ready to send.`;
 
-    console.log(`[AutoReply] Generating message using agent: ${agent.name}`);
-    const aiResponse = await openaiService.generateAgentResponse(welcomePrompt, agent);
-
-    if (!aiResponse) {
-      return { success: false, error: 'Failed to generate AI response' };
-    }
-
     const formattedPhone = formatPhoneNumber(phoneNumber);
-    console.log(`[AutoReply] Sending WhatsApp to: ${formattedPhone}`);
+    console.log(`[AutoReply] Sending WhatsApp template to: ${formattedPhone}`);
     
-    const sendResult = await sendWhatsAppMessage(formattedPhone, aiResponse);
+    const sendResult = await templateService.sendHelloWorldTemplate(formattedPhone);
 
     if (sendResult.success) {
+      const templateMessage = 'Welcome message sent via WhatsApp template';
       lead.autoReplySent = true;
-      lead.autoReplyMessage = aiResponse;
+      lead.autoReplyMessage = templateMessage;
       lead.autoReplySentAt = new Date().toISOString();
       await updateLead(lead);
 
-      console.log(`[AutoReply] Successfully sent to ${formattedPhone}`);
-      return { success: true, message: aiResponse };
+      console.log(`[AutoReply] Successfully sent template to ${formattedPhone}`);
+      return { success: true, message: templateMessage };
     } else {
-      console.error(`[AutoReply] Failed to send: ${sendResult.error}`);
+      console.error(`[AutoReply] Failed to send template: ${sendResult.error}`);
       return { success: false, error: sendResult.error };
     }
 
@@ -174,11 +169,11 @@ export async function sendManualReply(leadId: string, message: string): Promise<
   }
 
   const formattedPhone = formatPhoneNumber(phoneNumber);
-  const result = await sendWhatsAppMessage(formattedPhone, message);
+  const result = await templateService.sendHelloWorldTemplate(formattedPhone);
 
   if (result.success) {
     lead.autoReplySent = true;
-    lead.autoReplyMessage = message;
+    lead.autoReplyMessage = 'Welcome message sent via WhatsApp template';
     lead.autoReplySentAt = new Date().toISOString();
     await updateLead(lead);
   }
