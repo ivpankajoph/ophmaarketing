@@ -43,13 +43,17 @@ export async function sendTemplateMessage(
     return { success: false, error: 'WhatsApp credentials not configured' };
   }
 
+  // Convert template name to Meta format: lowercase with underscores
+  const metaTemplateName = template.name.toLowerCase().replace(/\s+/g, '_');
+  console.log(`[TemplateMessage] Converting template name: "${template.name}" -> "${metaTemplateName}"`);
+
   const messagePayload: Record<string, unknown> = {
     messaging_product: 'whatsapp',
     recipient_type: 'individual',
     to: to,
     type: 'template',
     template: {
-      name: template.name,
+      name: metaTemplateName,
       language: {
         code: template.languageCode
       }

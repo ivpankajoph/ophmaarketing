@@ -219,7 +219,16 @@ export async function sendAIAgentMessage(phone: string, agentId: string, context
     return { success: false, error: 'Failed to generate AI message' };
   }
 
-  return await templateService.sendHelloWorldTemplate(formatPhoneNumber(phone));
+  // Try sending as custom message first (works within 24-hour window)
+  const customResult = await sendCustomMessage(phone, aiMessage);
+  
+  // If custom message fails (outside 24-hour window), fall back to hello_world template
+  if (!customResult.success && customResult.error?.includes('24')) {
+    console.log('[AIAgent] Custom message failed, falling back to hello_world template');
+    return await templateService.sendHelloWorldTemplate(formatPhoneNumber(phone));
+  }
+  
+  return customResult;
 }
 
 export async function sendBroadcast(

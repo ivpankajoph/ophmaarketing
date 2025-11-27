@@ -1,0 +1,481 @@
+{
+  "users": [
+    {
+      "id": "user-1",
+      "username": "admin",
+      "password": "admin123",
+      "name": "Admin User",
+      "email": "admin@example.com",
+      "role": "admin",
+      "createdAt": "2025-11-27T21:46:19.551Z"
+    }
+  ],
+  "contacts": [
+    {
+      "id": "contact-1",
+      "name": "John Smith",
+      "phone": "+1234567890",
+      "email": "john@email.com",
+      "tags": [
+        "Customer",
+        "VIP"
+      ],
+      "notes": "Regular customer",
+      "createdAt": "2025-11-27T21:46:19.551Z",
+      "updatedAt": "2025-11-27T21:46:19.551Z"
+    },
+    {
+      "id": "contact-2",
+      "name": "Sarah Johnson",
+      "phone": "+1234567891",
+      "email": "sarah@email.com",
+      "tags": [
+        "Hot Lead"
+      ],
+      "notes": "Interested in premium plan",
+      "createdAt": "2025-11-27T21:46:19.551Z",
+      "updatedAt": "2025-11-27T21:46:19.551Z"
+    },
+    {
+      "id": "contact-3",
+      "name": "Mike Wilson",
+      "phone": "+1234567892",
+      "email": "mike@email.com",
+      "tags": [
+        "Customer"
+      ],
+      "notes": "",
+      "createdAt": "2025-11-27T21:46:19.551Z",
+      "updatedAt": "2025-11-27T21:46:19.551Z"
+    },
+    {
+      "id": "contact-4",
+      "name": "Emily Brown",
+      "phone": "+1234567893",
+      "email": "emily@email.com",
+      "tags": [
+        "New Lead"
+      ],
+      "notes": "From Facebook campaign",
+      "createdAt": "2025-11-27T21:46:19.551Z",
+      "updatedAt": "2025-11-27T21:46:19.551Z"
+    },
+    {
+      "id": "contact-5",
+      "name": "David Lee",
+      "phone": "+1234567894",
+      "email": "david@email.com",
+      "tags": [
+        "Customer",
+        "Enterprise"
+      ],
+      "notes": "Enterprise client",
+      "createdAt": "2025-11-27T21:46:19.551Z",
+      "updatedAt": "2025-11-27T21:46:19.551Z"
+    }
+  ],
+  "messages": [
+    {
+      "id": "msg-1",
+      "contactId": "contact-1",
+      "content": "Hi, I need help with my order",
+      "type": "text",
+      "direction": "inbound",
+      "status": "read",
+      "timestamp": "2025-11-27T20:46:19.552Z"
+    },
+    {
+      "id": "msg-2",
+      "contactId": "contact-1",
+      "content": "Sure! Let me check that for you. Can you provide your order number?",
+      "type": "text",
+      "direction": "outbound",
+      "status": "delivered",
+      "timestamp": "2025-11-27T20:47:59.552Z",
+      "agentId": "user-1"
+    },
+    {
+      "id": "msg-3",
+      "contactId": "contact-1",
+      "content": "Order #12345",
+      "type": "text",
+      "direction": "inbound",
+      "status": "read",
+      "timestamp": "2025-11-27T20:49:39.552Z"
+    },
+    {
+      "id": "msg-4",
+      "contactId": "contact-2",
+      "content": "Hello! I saw your ad and I'm interested",
+      "type": "text",
+      "direction": "inbound",
+      "status": "read",
+      "timestamp": "2025-11-27T19:46:19.552Z"
+    },
+    {
+      "id": "msg-5",
+      "contactId": "contact-2",
+      "content": "Great to hear! What would you like to know more about?",
+      "type": "text",
+      "direction": "outbound",
+      "status": "delivered",
+      "timestamp": "2025-11-27T19:47:59.552Z",
+      "agentId": "user-1"
+    },
+    {
+      "id": "msg-6",
+      "contactId": "contact-3",
+      "content": "Thanks for the quick delivery!",
+      "type": "text",
+      "direction": "inbound",
+      "status": "read",
+      "timestamp": "2025-11-26T21:46:19.552Z"
+    },
+    {
+      "id": "msg-7",
+      "contactId": "contact-4",
+      "content": "Hi, can you tell me more about your services?",
+      "type": "text",
+      "direction": "inbound",
+      "status": "sent",
+      "timestamp": "2025-11-27T21:16:19.552Z"
+    }
+  ],
+  "campaigns": [
+    {
+      "id": "camp-1",
+      "name": "Black Friday Sale",
+      "message": "Hi {{name}}! Exclusive 50% off for our loyal customers. Use code BLACKFRIDAY50",
+      "contactIds": [
+        "contact-1",
+        "contact-3",
+        "contact-5"
+      ],
+      "status": "completed",
+      "sentCount": 3,
+      "deliveredCount": 3,
+      "readCount": 2,
+      "repliedCount": 1,
+      "createdAt": "2025-11-27T21:46:19.551Z",
+      "updatedAt": "2025-11-27T21:46:19.551Z"
+    },
+    {
+      "id": "camp-2",
+      "name": "New Product Launch",
+      "message": "Hi {{name}}! Introducing our new premium product line. Check it out!",
+      "contactIds": [
+        "contact-1",
+        "contact-2",
+        "contact-3",
+        "contact-4",
+        "contact-5"
+      ],
+      "status": "scheduled",
+      "scheduledAt": "2025-11-28T21:46:19.552Z",
+      "sentCount": 0,
+      "deliveredCount": 0,
+      "readCount": 0,
+      "repliedCount": 0,
+      "createdAt": "2025-11-27T21:46:19.551Z",
+      "updatedAt": "2025-11-27T21:46:19.551Z"
+    }
+  ],
+  "templates": [
+    {
+      "id": "tmpl-1",
+      "name": "Welcome Message",
+      "category": "utility",
+      "content": "Hello {{name}}! Welcome to our service. How can we help you today?",
+      "variables": [
+        "name"
+      ],
+      "status": "approved",
+      "createdAt": "2025-11-27T21:46:19.551Z",
+      "updatedAt": "2025-11-27T21:46:19.551Z"
+    },
+    {
+      "id": "tmpl-2",
+      "name": "Order Confirmation",
+      "category": "utility",
+      "content": "Hi {{name}}, your order #{{order_id}} has been confirmed. Expected delivery: {{delivery_date}}",
+      "variables": [
+        "name",
+        "order_id",
+        "delivery_date"
+      ],
+      "status": "approved",
+      "createdAt": "2025-11-27T21:46:19.551Z",
+      "updatedAt": "2025-11-27T21:46:19.551Z"
+    },
+    {
+      "id": "tmpl-3",
+      "name": "Special Offer",
+      "category": "marketing",
+      "content": "Hi {{name}}! Get {{discount}}% off on your next purchase. Valid until {{expiry}}",
+      "variables": [
+        "name",
+        "discount",
+        "expiry"
+      ],
+      "status": "pending",
+      "createdAt": "2025-11-27T21:46:19.551Z",
+      "updatedAt": "2025-11-27T21:46:19.551Z"
+    },
+    {
+      "name": "test",
+      "category": "marketing",
+      "content": "Hi {{name}} 👋,\n\nThank you for showing your interest in the prestigious Top Life Changer Awards 🏆—a national platform dedicated to recognizing exceptional achievers 🌟, inspiring leaders 💼, and impactful changemakers 🌍 from across the nation.\n\nThis is an exclusive, premium paid event 💎, designed to highlight your achievements on a national stage 🎤.\n\nBenefits of Top Life Changers Awards:\n\n🌟 National Recognition\n🏅 Award Received by Celebrity\n💼 Brand Credibility\n📰 Media Exposure\n🤝 Networking Opportunities\n👀 Increased Visibility\n💡 Inspire Your Industry & Followers\n👥 Employee Motivation\n📈 Business Growth\n🏁 Competitive Advantage\n✅ Professional Validation\n📣 Marketing Leverage\n🌟 Enhanced Reputation\n🎟️ Exclusive Event Access\n⏱️ 2–3 Minute Interview\n🔮 Future Opportunities\n🌐 Brand / Influencer Website Creation\n📸 Photos with Celebrity and Industry Leaders\n\nIf you are really interested to be part of this premium event ✨, then please reply to us back 📩.\n\nReply STOP to unsubscribe.",
+      "variables": [],
+      "id": "a7a70770-c1ac-4054-880a-0380fbdfac37",
+      "status": "rejected",
+      "createdAt": "2025-11-27T21:47:08.118Z",
+      "updatedAt": "2025-11-27T21:47:08.120Z"
+    },
+    {
+      "name": "awards_event_funtion",
+      "category": "marketing",
+      "content": "Limited Seats Available\nHi {{name}} 👋,\n\nThank you for showing your interest in the prestigious Top Life Changer Awards 🏆—a national platform dedicated to recognizing exceptional achievers 🌟, inspiring leaders 💼, and impactful changemakers 🌍 from across the nation.\n\nThis is an exclusive, premium paid event 💎, designed to highlight your achievements on a national stage 🎤.\n\nBenefits of Top Life Changers Awards:\n\n🌟 National Recognition\n\n🏅 Award Received by Celebrity\n\n💼 Brand Credibility\n\n📰 Media Exposure\n\n🤝 Networking Opportunities\n\n👀 Increased Visibility\n\n💡 Inspire Your Industry & Followers\n\n👥 Employee Motivation\n\n📈 Business Growth\n\n🏁 Competitive Advantage\n\n✅ Professional Validation\n\n📣 Marketing Leverage\n\n🌟 Enhanced Reputation\n\n🎟️ Exclusive Event Access\n\n⏱️ 2–3 Minute Interview\n\n🔮 Future Opportunities\n\n🌐 Brand / Influencer Website Creation\n\n📸 Photos with Celebrity and Industry Leaders\n\nIf you are really interested to be part of this premium event ✨, then please reply to us back 📩.",
+      "variables": [],
+      "id": "22c6f26f-0d8e-4436-8930-4ec46ed9d47a",
+      "status": "approved",
+      "createdAt": "2025-11-27T21:47:08.120Z",
+      "updatedAt": "2025-11-27T21:47:08.128Z"
+    },
+    {
+      "name": "awards_marketing_v2",
+      "category": "marketing",
+      "content": "Hi {{1}} 👋,\n\nThank you for showing your interest in the prestigious Top Life Changer Awards 🏆—a national platform dedicated to recognizing exceptional achievers 🌟, inspiring leaders 💼, and impactful changemakers 🌍 from across the nation.\n\nThis is an exclusive, premium paid event 💎, designed to highlight your achievements on a national stage 🎤.\n\nBenefits of Top Life Changers Awards:\n\n🌟 National Recognition\n🏅 Award Received by Celebrity\n💼 Brand Credibility\n📰 Media Exposure\n🤝 Networking Opportunities\n👀 Increased Visibility\n💡 Inspire Your Industry & Followers\n👥 Employee Motivation\n📈 Business Growth\n🏁 Competitive Advantage\n✅ Professional Validation\n📣 Marketing Leverage\n🌟 Enhanced Reputation\n🎟️ Exclusive Event Access\n⏱️ 2–3 Minute Interview\n🔮 Future Opportunities\n🌐 Brand / Influencer Website Creation\n📸 Photos with Celebrity and Industry Leaders\n\nIf you are really interested to be part of this premium event ✨, then please reply to us back 📩.\n\nReply STOP to unsubscribe.",
+      "variables": [
+        "var1"
+      ],
+      "id": "12b10457-56fa-49b6-87d0-5e7eea7f7556",
+      "status": "rejected",
+      "createdAt": "2025-11-27T21:47:08.136Z",
+      "updatedAt": "2025-11-27T21:47:08.137Z"
+    },
+    {
+      "name": "promo_offer_v2",
+      "category": "marketing",
+      "content": "Hi {{1}}, we have an update for you from SellersLogin. Check out the details below. Reply STOP to unsubscribe.",
+      "variables": [
+        "var1"
+      ],
+      "id": "230db6a4-47ee-4584-a354-50d70c50e53c",
+      "status": "rejected",
+      "createdAt": "2025-11-27T21:47:08.139Z",
+      "updatedAt": "2025-11-27T21:47:08.139Z"
+    },
+    {
+      "name": "promo_offer",
+      "category": "marketing",
+      "content": "Hi {{1}}, check out our latest discount!",
+      "variables": [
+        "var1"
+      ],
+      "id": "79f3cbd6-659e-4c2e-bba4-8c08e48fcbe0",
+      "status": "rejected",
+      "createdAt": "2025-11-27T21:47:08.140Z",
+      "updatedAt": "2025-11-27T21:47:08.141Z"
+    },
+    {
+      "name": "awards_marketing",
+      "category": "marketing",
+      "content": "Hi {{name}} 👋,\n\nThank you for showing your interest in the prestigious Top Life Changer Awards 🏆—a national platform dedicated to recognizing exceptional achievers 🌟, inspiring leaders 💼, and impactful changemakers 🌍 from across the nation.\n\nThis is an exclusive, premium paid event 💎, designed to highlight your achievements on a national stage 🎤.\n\nBenefits of Top Life Changers Awards:\n\n🌟 National Recognition\n\n🏅 Award Received by Celebrity\n\n💼 Brand Credibility\n\n📰 Media Exposure\n\n🤝 Networking Opportunities\n\n👀 Increased Visibility\n\n💡 Inspire Your Industry & Followers\n\n👥 Employee Motivation\n\n📈 Business Growth\n\n🏁 Competitive Advantage\n\n✅ Professional Validation\n\n📣 Marketing Leverage\n\n🌟 Enhanced Reputation\n\n🎟️ Exclusive Event Access\n\n⏱️ 2–3 Minute Interview\n\n🔮 Future Opportunities\n\n🌐 Brand / Influencer Website Creation\n\n📸 Photos with Celebrity and Industry Leaders\n\nIf you are really interested to be part of this premium event ✨, then please reply to us back 📩.",
+      "variables": [],
+      "id": "5ac356bc-5e3f-4f21-968d-edeaacaedf58",
+      "status": "approved",
+      "createdAt": "2025-11-27T21:47:08.143Z",
+      "updatedAt": "2025-11-27T21:47:08.144Z"
+    },
+    {
+      "name": "hello_world",
+      "category": "utility",
+      "content": "Welcome and congratulations!! This message demonstrates your ability to send a WhatsApp message notification from the Cloud API, hosted by Meta. Thank you for taking the time to test with us.",
+      "variables": [],
+      "id": "c1953815-cbe4-42f3-8a05-77ecf81fb69f",
+      "status": "approved",
+      "createdAt": "2025-11-27T21:47:08.146Z",
+      "updatedAt": "2025-11-27T21:47:08.147Z"
+    }
+  ],
+  "automations": [
+    {
+      "id": "auto-1",
+      "name": "Welcome Reply",
+      "type": "welcome",
+      "trigger": "new_contact",
+      "message": "Welcome! Thanks for reaching out. An agent will be with you shortly.",
+      "isActive": true,
+      "createdAt": "2025-11-27T21:46:19.551Z",
+      "updatedAt": "2025-11-27T21:46:19.551Z"
+    },
+    {
+      "id": "auto-2",
+      "name": "Pricing Keyword",
+      "type": "keyword",
+      "trigger": "pricing",
+      "message": "Here are our pricing options:\n- Basic: $29/mo\n- Pro: $79/mo\n- Enterprise: Contact us",
+      "isActive": true,
+      "createdAt": "2025-11-27T21:46:19.551Z",
+      "updatedAt": "2025-11-27T21:46:19.551Z"
+    },
+    {
+      "id": "auto-3",
+      "name": "Follow-up Reminder",
+      "type": "follow_up",
+      "trigger": "no_reply",
+      "message": "Hi! Just checking in. Is there anything else you need help with?",
+      "delay": 24,
+      "delayUnit": "hours",
+      "isActive": true,
+      "createdAt": "2025-11-27T21:46:19.551Z",
+      "updatedAt": "2025-11-27T21:46:19.551Z"
+    }
+  ],
+  "teamMembers": [
+    {
+      "id": "team-1",
+      "userId": "user-1",
+      "name": "Admin User",
+      "email": "admin@example.com",
+      "role": "admin",
+      "permissions": [
+        "all"
+      ],
+      "isActive": true,
+      "createdAt": "2025-11-27T21:46:19.551Z"
+    }
+  ],
+  "whatsappSettings": null,
+  "billing": {
+    "id": "billing-1",
+    "credits": 1500,
+    "transactions": [
+      {
+        "id": "txn-1",
+        "type": "purchase",
+        "amount": 2000,
+        "description": "Credits purchased",
+        "createdAt": "2025-11-20T21:46:19.552Z"
+      },
+      {
+        "id": "txn-2",
+        "type": "usage",
+        "amount": -500,
+        "description": "Campaign: Black Friday Sale",
+        "createdAt": "2025-11-25T21:46:19.552Z"
+      }
+    ]
+  },
+  "chats": [
+    {
+      "id": "chat-contact-1",
+      "contactId": "contact-1",
+      "contact": {
+        "id": "contact-1",
+        "name": "John Smith",
+        "phone": "+1234567890",
+        "email": "john@email.com",
+        "tags": [
+          "Customer",
+          "VIP"
+        ],
+        "notes": "Regular customer",
+        "createdAt": "2025-11-27T21:46:19.551Z",
+        "updatedAt": "2025-11-27T21:46:19.551Z"
+      },
+      "lastMessage": "Order #12345",
+      "lastMessageTime": "2025-11-27T20:49:39.552Z",
+      "lastInboundMessageTime": "2025-11-27T20:49:39.552Z",
+      "unreadCount": 0,
+      "status": "open",
+      "notes": []
+    },
+    {
+      "id": "chat-contact-2",
+      "contactId": "contact-2",
+      "contact": {
+        "id": "contact-2",
+        "name": "Sarah Johnson",
+        "phone": "+1234567891",
+        "email": "sarah@email.com",
+        "tags": [
+          "Hot Lead"
+        ],
+        "notes": "Interested in premium plan",
+        "createdAt": "2025-11-27T21:46:19.551Z",
+        "updatedAt": "2025-11-27T21:46:19.551Z"
+      },
+      "lastMessage": "Great to hear! What would you like to know more about?",
+      "lastMessageTime": "2025-11-27T19:47:59.552Z",
+      "lastInboundMessageTime": "2025-11-27T19:46:19.552Z",
+      "unreadCount": 0,
+      "status": "open",
+      "notes": []
+    },
+    {
+      "id": "chat-contact-3",
+      "contactId": "contact-3",
+      "contact": {
+        "id": "contact-3",
+        "name": "Mike Wilson",
+        "phone": "+1234567892",
+        "email": "mike@email.com",
+        "tags": [
+          "Customer"
+        ],
+        "notes": "",
+        "createdAt": "2025-11-27T21:46:19.551Z",
+        "updatedAt": "2025-11-27T21:46:19.551Z"
+      },
+      "lastMessage": "Thanks for the quick delivery!",
+      "lastMessageTime": "2025-11-26T21:46:19.552Z",
+      "lastInboundMessageTime": "2025-11-26T21:46:19.552Z",
+      "unreadCount": 0,
+      "status": "open",
+      "notes": []
+    },
+    {
+      "id": "chat-contact-4",
+      "contactId": "contact-4",
+      "contact": {
+        "id": "contact-4",
+        "name": "Emily Brown",
+        "phone": "+1234567893",
+        "email": "emily@email.com",
+        "tags": [
+          "New Lead"
+        ],
+        "notes": "From Facebook campaign",
+        "createdAt": "2025-11-27T21:46:19.551Z",
+        "updatedAt": "2025-11-27T21:46:19.551Z"
+      },
+      "lastMessage": "Hi, can you tell me more about your services?",
+      "lastMessageTime": "2025-11-27T21:16:19.552Z",
+      "lastInboundMessageTime": "2025-11-27T21:16:19.552Z",
+      "unreadCount": 1,
+      "status": "open",
+      "notes": []
+    },
+    {
+      "id": "chat-contact-5",
+      "contactId": "contact-5",
+      "contact": {
+        "id": "contact-5",
+        "name": "David Lee",
+        "phone": "+1234567894",
+        "email": "david@email.com",
+        "tags": [
+          "Customer",
+          "Enterprise"
+        ],
+        "notes": "Enterprise client",
+        "createdAt": "2025-11-27T21:46:19.551Z",
+        "updatedAt": "2025-11-27T21:46:19.551Z"
+      },
+      "unreadCount": 0,
+      "status": "open",
+      "notes": []
+    }
+  ]
+}
