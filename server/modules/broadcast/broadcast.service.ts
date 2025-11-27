@@ -160,10 +160,29 @@ export function deleteScheduledMessage(id: string): boolean {
   return true;
 }
 
-export async function sendTemplateMessage(phone: string, templateName: string): Promise<SendMessageResult> {
+export async function sendTemplateMessage(phone: string, templateName: string, contactName?: string): Promise<SendMessageResult> {
+  // Build components with named parameters if the template has variables
+  const components: templateService.TemplateComponent[] = [];
+  
+  // If template has named parameters like {{name}}, include them
+  // Use parameter_name for named variables in Meta templates
+  if (templateName.includes('awards') || templateName.includes('marketing')) {
+    components.push({
+      type: 'body',
+      parameters: [
+        {
+          type: 'text',
+          text: contactName || 'Valued Customer',
+          parameter_name: 'name',  // Named parameter for {{name}} variable
+        }
+      ]
+    });
+  }
+  
   const result = await templateService.sendTemplateMessage(formatPhoneNumber(phone), {
     name: templateName,
-    languageCode: 'en_US',
+    languageCode: 'en',  // Use 'en' as base language for awards templates
+    components: components.length > 0 ? components : undefined,
   });
   return result;
 }
@@ -273,7 +292,7 @@ export async function sendBroadcast(
 
     switch (messageType) {
       case 'template':
-        result = await sendTemplateMessage(contact.phone, options.templateName || 'hello_world');
+        result = await sendTemplateMessage(contact.phone, options.templateName || 'hello_world', contact.name);
         break;
       case 'custom':
         result = await sendCustomMessage(contact.phone, options.customMessage || '');
@@ -320,7 +339,7 @@ export async function sendSingleMessage(
 ): Promise<SendMessageResult> {
   switch (messageType) {
     case 'template':
-      return await sendTemplateMessage(phone, options.templateName || 'hello_world');
+      return await sendTemplateMessage(phone, options.templateName || 'hello_world', name);
     case 'custom':
       return await sendCustomMessage(phone, options.customMessage || '');
     case 'ai_agent':

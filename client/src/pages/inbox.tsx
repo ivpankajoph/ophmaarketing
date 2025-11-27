@@ -54,6 +54,7 @@ export default function Inbox() {
       if (!res.ok) throw new Error("Failed to fetch chats");
       return res.json();
     },
+    refetchInterval: 3000, // Auto-refresh every 3 seconds
   });
 
   const selectedChat = chats.find(c => c.id === selectedChatId);
@@ -68,6 +69,7 @@ export default function Inbox() {
       return res.json();
     },
     enabled: !!selectedContactId,
+    refetchInterval: 2000, // Auto-refresh messages every 2 seconds
   });
 
   const sendMessageMutation = useMutation({

@@ -110,6 +110,7 @@ export default function WindowInbox() {
           : undefined
       }));
     },
+    refetchInterval: 3000, // Auto-refresh every 3 seconds
   });
 
   const { data: templates = [] } = useQuery<Template[]>({
@@ -142,6 +143,7 @@ export default function WindowInbox() {
       return res.json();
     },
     enabled: !!selectedContactId,
+    refetchInterval: 2000, // Auto-refresh messages every 2 seconds
   });
 
   const sendMessageMutation = useMutation({

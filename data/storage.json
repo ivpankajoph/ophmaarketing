@@ -379,6 +379,96 @@
       "status": "sent",
       "id": "f2287c16-7661-4bd8-8043-cbdc31ffff28",
       "timestamp": "2025-11-27T22:59:32.452Z"
+    },
+    {
+      "contactId": "8a9e2cfc-5b0b-4473-a1e1-ed26edeaa049",
+      "content": "Cvc",
+      "type": "text",
+      "direction": "inbound",
+      "status": "sent",
+      "id": "e9a43938-8e9d-48ba-baf9-5cd5d57434dc",
+      "timestamp": "2025-11-27T22:59:55.527Z"
+    },
+    {
+      "contactId": "8a9e2cfc-5b0b-4473-a1e1-ed26edeaa049",
+      "content": "It seems like you're referring to \"CVC,\" which can stand for a few different things depending on the context. Here are a few possibilities:\n\n1. **Card Verification Code (CVC)**: This is a security feature for credit or debit card transactions, providing a layer of security against fraud. It's typically a three or four-digit number on the back of the card.\n\n2. **CVC Capital Partners**: A private equity and investment advisory firm known for its large-scale investments and global presence.\n\n3. **CVC Words**: In education, particularly in teaching reading, \"CVC\" refers to consonant-vowel-consonant words, like \"cat\" or \"dog,\" which are basic building blocks for teaching phonics.\n\n4. **Central Venous Catheter (CVC)**: In medicine, this is a tube placed into a large vein, typically in the neck, chest, or groin, to administer medication or fluids, obtain blood tests, and directly obtain cardiovascular measurements.\n\nIf you provide more context, I can give a more specific explanation!",
+      "type": "text",
+      "direction": "outbound",
+      "status": "sent",
+      "id": "daacf9a3-e5a9-4838-a26f-fc4b329d67ac",
+      "timestamp": "2025-11-27T22:59:59.000Z"
+    },
+    {
+      "contactId": "8a9e2cfc-5b0b-4473-a1e1-ed26edeaa049",
+      "content": "Hh",
+      "type": "text",
+      "direction": "inbound",
+      "status": "sent",
+      "id": "69b07536-850d-491f-8d61-dfe2a75fd379",
+      "timestamp": "2025-11-27T23:00:04.933Z"
+    },
+    {
+      "contactId": "8a9e2cfc-5b0b-4473-a1e1-ed26edeaa049",
+      "content": "It looks like you entered \"Hh.\" Could you provide a bit more context or detail? \"Hh\" could refer to a variety of things depending on where it's being used:\n\n1. **Genetics**: In genetics, \"Hh\" might refer to the shorthand for a genotype, where \"H\" represents a dominant allele and \"h\" represents a recessive allele.\n\n2. **Texting/Online Slang**: In casual texting or online communication, \"hh\" could be used as an abbreviation for something informal or even as a typo.\n\n3. **Music**: \"Hh\" could be short for \"hi-hat,\" a component of a drum set.\n\n4. **General Initials**: It could be someone's initials or stand for a phrase or title that starts with those letters.\n\nPlease let me know if you have a specific context in mind!",
+      "type": "text",
+      "direction": "outbound",
+      "status": "sent",
+      "id": "7fc96119-9d85-4c76-8498-d45ce6abf4ca",
+      "timestamp": "2025-11-27T23:00:10.777Z"
+    },
+    {
+      "contactId": "8a9e2cfc-5b0b-4473-a1e1-ed26edeaa049",
+      "content": "Ghh",
+      "type": "text",
+      "direction": "inbound",
+      "status": "sent",
+      "id": "9eae776f-3f5b-481f-8263-230b57e7f74a",
+      "timestamp": "2025-11-27T23:00:20.756Z"
+    },
+    {
+      "contactId": "8a9e2cfc-5b0b-4473-a1e1-ed26edeaa049",
+      "content": "The sequence \"Ghh\" doesn't have a widely recognized meaning on its own, but it could potentially stand for something specific depending on the context in which you encountered it. Here are a few possibilities:\n\n1. **Initials or Abbreviation**: It might be an abbreviation or initials for a person, organization, or concept.\n\n2. **Typo or Slang**: It could be a typo or part of informal internet slang that is specific to a certain group or community.\n\n3. **Code or Identifier**: It might be part of a code, product ID, or other identifier used in a specific context.\n\nIf you can provide more information or context about where you saw \"Ghh,\" I'd be happy to help figure out what it might mean!",
+      "type": "text",
+      "direction": "outbound",
+      "status": "sent",
+      "id": "ce12fac0-1863-45dc-8b16-98d35065ab4c",
+      "timestamp": "2025-11-27T23:00:24.321Z"
+    },
+    {
+      "contactId": "ebcdda60-5598-47b9-bc91-80c90c122996",
+      "content": "Yy",
+      "type": "text",
+      "direction": "inbound",
+      "status": "sent",
+      "id": "63db2a75-07c6-48a2-aa05-86153a082939",
+      "timestamp": "2025-11-27T23:00:31.584Z"
+    },
+    {
+      "contactId": "ebcdda60-5598-47b9-bc91-80c90c122996",
+      "content": "Hello! How can I assist you today?",
+      "type": "text",
+      "direction": "outbound",
+      "status": "sent",
+      "id": "2a89473b-849d-41df-836a-62c47e09685e",
+      "timestamp": "2025-11-27T23:00:32.985Z"
+    },
+    {
+      "contactId": "ebcdda60-5598-47b9-bc91-80c90c122996",
+      "content": "Yyr",
+      "type": "text",
+      "direction": "inbound",
+      "status": "sent",
+      "id": "25642966-3cca-452d-ab8b-cab11dd984ac",
+      "timestamp": "2025-11-27T23:00:57.326Z"
+    },
+    {
+      "contactId": "ebcdda60-5598-47b9-bc91-80c90c122996",
+      "content": "It seems like your message might be incomplete. Could you please provide more details or clarify your request? I'm here to help!",
+      "type": "text",
+      "direction": "outbound",
+      "status": "sent",
+      "id": "8d950dbb-78ad-45a1-ac74-8fb01c3ccd4e",
+      "timestamp": "2025-11-27T23:01:00.023Z"
     }
   ],
   "campaigns": [
@@ -702,11 +792,11 @@
         "createdAt": "2025-11-27T22:31:14.359Z",
         "updatedAt": "2025-11-27T22:31:14.359Z"
       },
-      "lastMessage": "It looks like there might have been a typing error in your message. If you have a question or need information on a specific topic, please let me know, and I'll be happy to help!",
-      "lastMessageTime": "2025-11-27T22:56:42.221Z",
-      "lastInboundMessageTime": "2025-11-27T22:56:39.836Z",
-      "lastInboundMessage": "Gkkgjgkh",
-      "unreadCount": 10,
+      "lastMessage": "The sequence \"Ghh\" doesn't have a widely recognized meaning on its own, but it could potentially stand for something specific depending on the context in which you encountered it. Here are a few possibilities:\n\n1. **Initials or Abbreviation**: It might be an abbreviation or initials for a person, organization, or concept.\n\n2. **Typo or Slang**: It could be a typo or part of informal internet slang that is specific to a certain group or community.\n\n3. **Code or Identifier**: It might be part of a code, product ID, or other identifier used in a specific context.\n\nIf you can provide more information or context about where you saw \"Ghh,\" I'd be happy to help figure out what it might mean!",
+      "lastMessageTime": "2025-11-27T23:00:24.321Z",
+      "lastInboundMessageTime": "2025-11-27T23:00:20.756Z",
+      "lastInboundMessage": "Ghh",
+      "unreadCount": 13,
       "status": "open",
       "notes": []
     },
@@ -725,11 +815,11 @@
         "createdAt": "2025-11-27T22:31:22.636Z",
         "updatedAt": "2025-11-27T22:31:22.636Z"
       },
-      "lastMessage": "[Template: hello_world]",
-      "lastMessageTime": "2025-11-27T22:59:32.452Z",
-      "lastInboundMessageTime": "2025-11-27T22:59:03.027Z",
-      "lastInboundMessage": "Jj",
-      "unreadCount": 3,
+      "lastMessage": "It seems like your message might be incomplete. Could you please provide more details or clarify your request? I'm here to help!",
+      "lastMessageTime": "2025-11-27T23:01:00.023Z",
+      "lastInboundMessageTime": "2025-11-27T23:00:57.326Z",
+      "lastInboundMessage": "Yyr",
+      "unreadCount": 5,
       "status": "open",
       "notes": []
     }

@@ -14,6 +14,7 @@ export interface TemplateComponent {
 export interface TemplateParameter {
   type: 'text' | 'currency' | 'date_time' | 'image' | 'video' | 'document';
   text?: string;
+  parameter_name?: string;  // For named parameters like {{name}}
   currency?: { fallback_value: string; code: string; amount_1000: number };
   date_time?: { fallback_value: string };
   image?: { link: string };
