@@ -24,56 +24,6 @@ import path from "path";
 const DATA_DIR = "./data";
 const DATA_FILE = path.join(DATA_DIR, "storage.json");
 
-interface FBForm {
-  id: string;
-  name: string;
-  status: string;
-  leadsCount: number;
-  fbCreatedTime?: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-interface FBLead {
-  id: string;
-  formId: string;
-  fieldData: Record<string, string>;
-  fbCreatedTime?: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-interface AIAgent {
-  id: string;
-  name: string;
-  model: string;
-  prompt: string;
-  isDefault: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
-
-interface AgentMapping {
-  id: string;
-  formId?: string;
-  senderId?: string;
-  agentId: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-interface WhatsAppMessage {
-  id: string;
-  senderId: string;
-  senderName?: string;
-  content: string;
-  type: string;
-  direction: 'inbound' | 'outbound';
-  timestamp: string;
-  agentId?: string;
-  raw?: any;
-}
-
 interface StorageData {
   users: User[];
   contacts: Contact[];
@@ -85,11 +35,6 @@ interface StorageData {
   whatsappSettings: WhatsappSettings | null;
   billing: Billing;
   chats: Chat[];
-  fbForms: FBForm[];
-  fbLeads: FBLead[];
-  aiAgents: AIAgent[];
-  agentMappings: AgentMapping[];
-  waMessages: WhatsAppMessage[];
 }
 
 function loadData(): StorageData {
@@ -175,13 +120,6 @@ function getDefaultData(): StorageData {
       ],
     },
     chats: [],
-    fbForms: [],
-    fbLeads: [],
-    aiAgents: [
-      { id: "agent-1", name: "Sales Assistant", model: "gpt-4.1", prompt: "You are a helpful sales assistant. Help customers with product questions and guide them toward making a purchase.", isDefault: true, createdAt: now, updatedAt: now },
-    ],
-    agentMappings: [],
-    waMessages: [],
   };
 }
 
@@ -225,27 +163,6 @@ export interface IStorage {
   getDashboardStats(): Promise<any>;
   getChats(): Promise<Chat[]>;
   getChat(id: string): Promise<Chat | undefined>;
-  getFBForms(): Promise<FBForm[]>;
-  getFBForm(id: string): Promise<FBForm | undefined>;
-  createFBForm(form: Omit<FBForm, 'createdAt' | 'updatedAt'> & { id?: string }): Promise<FBForm>;
-  updateFBForm(id: string, form: Partial<FBForm>): Promise<FBForm | undefined>;
-  deleteFBForm(id: string): Promise<boolean>;
-  getFBLeads(formId?: string): Promise<FBLead[]>;
-  getFBLead(id: string): Promise<FBLead | undefined>;
-  createFBLead(lead: Omit<FBLead, 'createdAt' | 'updatedAt'> & { id?: string }): Promise<FBLead>;
-  deleteFBLead(id: string): Promise<boolean>;
-  getAIAgents(): Promise<AIAgent[]>;
-  getAIAgent(id: string): Promise<AIAgent | undefined>;
-  createAIAgent(agent: Omit<AIAgent, 'id' | 'createdAt' | 'updatedAt'>): Promise<AIAgent>;
-  updateAIAgent(id: string, agent: Partial<AIAgent>): Promise<AIAgent | undefined>;
-  deleteAIAgent(id: string): Promise<boolean>;
-  getAgentMappings(): Promise<AgentMapping[]>;
-  getAgentMapping(id: string): Promise<AgentMapping | undefined>;
-  createAgentMapping(mapping: Omit<AgentMapping, 'id' | 'createdAt' | 'updatedAt'>): Promise<AgentMapping>;
-  deleteAgentMapping(id: string): Promise<boolean>;
-  getWAMessages(): Promise<WhatsAppMessage[]>;
-  createWAMessage(message: Omit<WhatsAppMessage, 'id'> & { id?: string }): Promise<WhatsAppMessage>;
-  getNewDashboardStats(): Promise<any>;
 }
 
 export class MemStorage implements IStorage {
@@ -631,205 +548,6 @@ export class MemStorage implements IStorage {
 
   async getChat(id: string): Promise<Chat | undefined> {
     return this.data.chats.find((c) => c.id === id);
-  }
-
-  async getFBForms(): Promise<FBForm[]> {
-    return this.data.fbForms || [];
-  }
-
-  async getFBForm(id: string): Promise<FBForm | undefined> {
-    return (this.data.fbForms || []).find((f) => f.id === id);
-  }
-
-  async createFBForm(form: Omit<FBForm, 'createdAt' | 'updatedAt'> & { id?: string }): Promise<FBForm> {
-    const now = new Date().toISOString();
-    const newForm: FBForm = {
-      ...form,
-      id: form.id || randomUUID(),
-      createdAt: now,
-      updatedAt: now,
-    };
-    if (!this.data.fbForms) this.data.fbForms = [];
-    this.data.fbForms.push(newForm);
-    this.save();
-    return newForm;
-  }
-
-  async updateFBForm(id: string, form: Partial<FBForm>): Promise<FBForm | undefined> {
-    if (!this.data.fbForms) this.data.fbForms = [];
-    const index = this.data.fbForms.findIndex((f) => f.id === id);
-    if (index === -1) return undefined;
-    this.data.fbForms[index] = {
-      ...this.data.fbForms[index],
-      ...form,
-      updatedAt: new Date().toISOString(),
-    };
-    this.save();
-    return this.data.fbForms[index];
-  }
-
-  async deleteFBForm(id: string): Promise<boolean> {
-    if (!this.data.fbForms) return false;
-    const index = this.data.fbForms.findIndex((f) => f.id === id);
-    if (index === -1) return false;
-    this.data.fbForms.splice(index, 1);
-    this.save();
-    return true;
-  }
-
-  async getFBLeads(formId?: string): Promise<FBLead[]> {
-    const leads = this.data.fbLeads || [];
-    if (formId) {
-      return leads.filter((l) => l.formId === formId);
-    }
-    return leads;
-  }
-
-  async getFBLead(id: string): Promise<FBLead | undefined> {
-    return (this.data.fbLeads || []).find((l) => l.id === id);
-  }
-
-  async createFBLead(lead: Omit<FBLead, 'createdAt' | 'updatedAt'> & { id?: string }): Promise<FBLead> {
-    const now = new Date().toISOString();
-    const newLead: FBLead = {
-      ...lead,
-      id: lead.id || randomUUID(),
-      createdAt: now,
-      updatedAt: now,
-    };
-    if (!this.data.fbLeads) this.data.fbLeads = [];
-    this.data.fbLeads.push(newLead);
-    this.save();
-    return newLead;
-  }
-
-  async deleteFBLead(id: string): Promise<boolean> {
-    if (!this.data.fbLeads) return false;
-    const index = this.data.fbLeads.findIndex((l) => l.id === id);
-    if (index === -1) return false;
-    this.data.fbLeads.splice(index, 1);
-    this.save();
-    return true;
-  }
-
-  async getAIAgents(): Promise<AIAgent[]> {
-    return this.data.aiAgents || [];
-  }
-
-  async getAIAgent(id: string): Promise<AIAgent | undefined> {
-    return (this.data.aiAgents || []).find((a) => a.id === id);
-  }
-
-  async createAIAgent(agent: Omit<AIAgent, 'id' | 'createdAt' | 'updatedAt'>): Promise<AIAgent> {
-    const now = new Date().toISOString();
-    const newAgent: AIAgent = {
-      ...agent,
-      id: randomUUID(),
-      createdAt: now,
-      updatedAt: now,
-    };
-    if (!this.data.aiAgents) this.data.aiAgents = [];
-    if (agent.isDefault) {
-      this.data.aiAgents.forEach((a) => (a.isDefault = false));
-    }
-    this.data.aiAgents.push(newAgent);
-    this.save();
-    return newAgent;
-  }
-
-  async updateAIAgent(id: string, agent: Partial<AIAgent>): Promise<AIAgent | undefined> {
-    if (!this.data.aiAgents) this.data.aiAgents = [];
-    const index = this.data.aiAgents.findIndex((a) => a.id === id);
-    if (index === -1) return undefined;
-    if (agent.isDefault) {
-      this.data.aiAgents.forEach((a) => (a.isDefault = false));
-    }
-    this.data.aiAgents[index] = {
-      ...this.data.aiAgents[index],
-      ...agent,
-      updatedAt: new Date().toISOString(),
-    };
-    this.save();
-    return this.data.aiAgents[index];
-  }
-
-  async deleteAIAgent(id: string): Promise<boolean> {
-    if (!this.data.aiAgents) return false;
-    const index = this.data.aiAgents.findIndex((a) => a.id === id);
-    if (index === -1) return false;
-    this.data.aiAgents.splice(index, 1);
-    if (this.data.agentMappings) {
-      this.data.agentMappings = this.data.agentMappings.filter((m) => m.agentId !== id);
-    }
-    this.save();
-    return true;
-  }
-
-  async getAgentMappings(): Promise<AgentMapping[]> {
-    return this.data.agentMappings || [];
-  }
-
-  async getAgentMapping(id: string): Promise<AgentMapping | undefined> {
-    return (this.data.agentMappings || []).find((m) => m.id === id);
-  }
-
-  async createAgentMapping(mapping: Omit<AgentMapping, 'id' | 'createdAt' | 'updatedAt'>): Promise<AgentMapping> {
-    const now = new Date().toISOString();
-    const newMapping: AgentMapping = {
-      ...mapping,
-      id: randomUUID(),
-      createdAt: now,
-      updatedAt: now,
-    };
-    if (!this.data.agentMappings) this.data.agentMappings = [];
-    this.data.agentMappings.push(newMapping);
-    this.save();
-    return newMapping;
-  }
-
-  async deleteAgentMapping(id: string): Promise<boolean> {
-    if (!this.data.agentMappings) return false;
-    const index = this.data.agentMappings.findIndex((m) => m.id === id);
-    if (index === -1) return false;
-    this.data.agentMappings.splice(index, 1);
-    this.save();
-    return true;
-  }
-
-  async getWAMessages(): Promise<WhatsAppMessage[]> {
-    return this.data.waMessages || [];
-  }
-
-  async createWAMessage(message: Omit<WhatsAppMessage, 'id'> & { id?: string }): Promise<WhatsAppMessage> {
-    const newMessage: WhatsAppMessage = {
-      ...message,
-      id: message.id || randomUUID(),
-    };
-    if (!this.data.waMessages) this.data.waMessages = [];
-    this.data.waMessages.push(newMessage);
-    this.save();
-    return newMessage;
-  }
-
-  async getNewDashboardStats(): Promise<any> {
-    const forms = this.data.fbForms || [];
-    const leads = this.data.fbLeads || [];
-    const agents = this.data.aiAgents || [];
-    const waMessages = this.data.waMessages || [];
-
-    const inboundMessages = waMessages.filter((m) => m.direction === 'inbound');
-    const outboundMessages = waMessages.filter((m) => m.direction === 'outbound');
-
-    return {
-      totalForms: forms.length,
-      totalLeads: leads.length,
-      totalAgents: agents.length,
-      totalMessages: waMessages.length,
-      inboundMessages: inboundMessages.length,
-      outboundMessages: outboundMessages.length,
-      recentLeads: leads.slice(-5).reverse(),
-      recentMessages: waMessages.slice(-10).reverse(),
-    };
   }
 }
 

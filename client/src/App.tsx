@@ -19,6 +19,7 @@ import Billing from "@/pages/settings/Billing";
 
 import Templates from "@/pages/templates";
 
+// New Imports
 import Broadcast from "@/pages/campaigns/Broadcast";
 import SelectedContacts from "@/pages/campaigns/SelectedContacts";
 import Schedule from "@/pages/campaigns/Schedule";
@@ -47,27 +48,12 @@ import AgentPerformance from "@/pages/reports/AgentPerformance";
 import Spending from "@/pages/reports/Spending";
 import Credits from "@/pages/reports/Credits";
 
-import MainDashboard from "@/pages/main/MainDashboard";
-import LeadForms from "@/pages/fb/LeadForms";
-import Leads from "@/pages/fb/Leads";
-import Agents from "@/pages/agents/Agents";
-import MapAgent from "@/pages/agents/MapAgent";
-import WhatsAppInbox from "@/pages/whatsapp/WhatsAppInbox";
-
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={MainDashboard} />
-      <Route path="/old-dashboard" component={Dashboard} />
+      <Route path="/" component={Dashboard} />
       <Route path="/inbox" component={Inbox} />
       
-      {/* New Architecture Routes */}
-      <Route path="/fb/forms" component={LeadForms} />
-      <Route path="/fb/leads" component={Leads} />
-      <Route path="/agents" component={Agents} />
-      <Route path="/map-agent" component={MapAgent} />
-      <Route path="/whatsapp" component={WhatsAppInbox} />
-
       {/* Campaigns */}
       <Route path="/campaigns" component={Campaigns} />
       <Route path="/campaigns/broadcast" component={Broadcast} />
