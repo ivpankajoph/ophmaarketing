@@ -95,6 +95,9 @@ export async function handleWebhook(req: Request, res: Response) {
     conversationHistory[from].push({ role: 'assistant', content: aiResponse });
 
     await sendWhatsAppMessage(from, aiResponse);
+    
+    // Save the AI response to storage
+    await saveOutboundMessage(from, aiResponse);
 
     return res.sendStatus(200);
   } catch (error) {
@@ -152,6 +155,37 @@ async function saveInboundMessage(from: string, content: string, type: string) {
 
   } catch (error) {
     console.error('Error saving inbound message:', error);
+  }
+}
+
+async function saveOutboundMessage(to: string, content: string) {
+  try {
+    const normalizedPhone = to.replace(/\D/g, '');
+    
+    // Find contact
+    const contacts = await storage.getContacts();
+    const contact = contacts.find(c => {
+      const contactPhone = (c.phone || '').replace(/\D/g, '');
+      return contactPhone.includes(normalizedPhone) || normalizedPhone.includes(contactPhone);
+    });
+
+    if (!contact) {
+      console.log('Contact not found for outbound message:', to);
+      return;
+    }
+
+    // Save the outbound message
+    const message = await storage.createMessage({
+      contactId: contact.id,
+      content: content,
+      type: 'text' as const,
+      direction: 'outbound',
+      status: 'sent' as const,
+    });
+    console.log('Saved outbound AI message:', message.id);
+
+  } catch (error) {
+    console.error('Error saving outbound message:', error);
   }
 }
 

@@ -226,6 +226,51 @@
       "status": "sent",
       "id": "a62e0c75-3831-4e5c-a550-199dd6aa1714",
       "timestamp": "2025-11-27T22:51:47.850Z"
+    },
+    {
+      "contactId": "8a9e2cfc-5b0b-4473-a1e1-ed26edeaa049",
+      "content": "Mjkk",
+      "type": "text",
+      "direction": "inbound",
+      "status": "sent",
+      "id": "b44af020-a412-41cc-b5b3-d48c4e4b3ea4",
+      "timestamp": "2025-11-27T22:51:55.674Z"
+    },
+    {
+      "contactId": "8a9e2cfc-5b0b-4473-a1e1-ed26edeaa049",
+      "content": "Gh",
+      "type": "text",
+      "direction": "inbound",
+      "status": "sent",
+      "id": "5c4436d2-41ac-4f77-a307-d4ba900f7a5e",
+      "timestamp": "2025-11-27T22:52:02.864Z"
+    },
+    {
+      "contactId": "8a9e2cfc-5b0b-4473-a1e1-ed26edeaa049",
+      "content": "Yesterday",
+      "type": "text",
+      "direction": "inbound",
+      "status": "sent",
+      "id": "5f332a38-449e-4306-868f-5719ecb60317",
+      "timestamp": "2025-11-27T22:52:14.050Z"
+    },
+    {
+      "contactId": "8a9e2cfc-5b0b-4473-a1e1-ed26edeaa049",
+      "content": "Tell me more about the awards event",
+      "type": "text",
+      "direction": "inbound",
+      "status": "sent",
+      "id": "ca37be98-09d2-40d8-b56c-df4ded7c4ad8",
+      "timestamp": "2025-11-27T22:54:40.396Z"
+    },
+    {
+      "contactId": "8a9e2cfc-5b0b-4473-a1e1-ed26edeaa049",
+      "content": "Certainly! Awards events are formal ceremonies where individuals or organizations are recognized for their achievements and contributions in various fields. These events can range from large international ceremonies to smaller, more localized gatherings. Here are some key aspects of awards events:\n\n1. **Purpose**: The primary purpose of an awards event is to celebrate excellence and acknowledge outstanding achievements. They can cover various fields, such as the arts, sciences, sports, business, and humanitarian efforts.\n\n2. **Types of Awards**: Awards can be specific to industries (like the Oscars for film, Grammys for music, or Nobel Prizes for various fields of research and peace), or more general, recognizing contributions across multiple domains.\n\n3. **Nomination and Selection Process**: Typically, there is a nomination process where individuals or organizations are proposed for awards. A panel of judges or a voting body usually reviews these nominations and selects the winners based on predefined criteria.\n\n4. **Ceremony Format**: Awards ceremonies often feature speeches, performances, and presentations. They might include a dinner or gala, and recipients usually give acceptance speeches upon receiving their awards.\n\n5. **Broadcast and Media Coverage**: Many major awards events are broadcast on television or streamed online, attracting large audiences. They can also generate significant media coverage before and after the event.\n\n6. **Impact**: Winning an award can significantly impact the recipient’s career or organization, providing recognition and increased visibility. It can also inspire others and set industry standards.\n\n7. **Criticism and Controversy**: Awards events can sometimes face criticism regarding the selection process, perceived biases, or lack of diversity among nominees and winners.\n\nIf you have a specific awards event in mind or want to know about a particular aspect, feel free to ask!",
+      "type": "text",
+      "direction": "outbound",
+      "status": "sent",
+      "id": "94f46219-61d5-43d2-9c1d-002e90cfb10d",
+      "timestamp": "2025-11-27T22:54:50.211Z"
     }
   ],
   "campaigns": [
@@ -549,11 +594,11 @@
         "createdAt": "2025-11-27T22:31:14.359Z",
         "updatedAt": "2025-11-27T22:31:14.359Z"
       },
-      "lastMessage": "Rty",
-      "lastMessageTime": "2025-11-27T22:51:47.850Z",
-      "lastInboundMessageTime": "2025-11-27T22:51:47.851Z",
-      "lastInboundMessage": "Rty",
-      "unreadCount": 4,
+      "lastMessage": "Certainly! Awards events are formal ceremonies where individuals or organizations are recognized for their achievements and contributions in various fields. These events can range from large international ceremonies to smaller, more localized gatherings. Here are some key aspects of awards events:\n\n1. **Purpose**: The primary purpose of an awards event is to celebrate excellence and acknowledge outstanding achievements. They can cover various fields, such as the arts, sciences, sports, business, and humanitarian efforts.\n\n2. **Types of Awards**: Awards can be specific to industries (like the Oscars for film, Grammys for music, or Nobel Prizes for various fields of research and peace), or more general, recognizing contributions across multiple domains.\n\n3. **Nomination and Selection Process**: Typically, there is a nomination process where individuals or organizations are proposed for awards. A panel of judges or a voting body usually reviews these nominations and selects the winners based on predefined criteria.\n\n4. **Ceremony Format**: Awards ceremonies often feature speeches, performances, and presentations. They might include a dinner or gala, and recipients usually give acceptance speeches upon receiving their awards.\n\n5. **Broadcast and Media Coverage**: Many major awards events are broadcast on television or streamed online, attracting large audiences. They can also generate significant media coverage before and after the event.\n\n6. **Impact**: Winning an award can significantly impact the recipient’s career or organization, providing recognition and increased visibility. It can also inspire others and set industry standards.\n\n7. **Criticism and Controversy**: Awards events can sometimes face criticism regarding the selection process, perceived biases, or lack of diversity among nominees and winners.\n\nIf you have a specific awards event in mind or want to know about a particular aspect, feel free to ask!",
+      "lastMessageTime": "2025-11-27T22:54:50.211Z",
+      "lastInboundMessageTime": "2025-11-27T22:54:40.396Z",
+      "lastInboundMessage": "Tell me more about the awards event",
+      "unreadCount": 8,
       "status": "open",
       "notes": []
     },
