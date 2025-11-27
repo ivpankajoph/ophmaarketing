@@ -16,7 +16,8 @@ import {
   Bot,
   BarChart3,
   ChevronDown,
-  ChevronRight
+  ChevronRight,
+  Facebook
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -93,8 +94,18 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       label: "AI Agent",
       href: "/ai",
       subItems: [
+        { label: "All Agents", href: "/ai/agents" },
         { label: "New Agent", href: "/ai/new" },
-        { label: "Manage Agents", href: "/ai/manage" },
+        { label: "Agent Mapping", href: "/ai/map" },
+      ]
+    },
+    {
+      icon: Facebook,
+      label: "Facebook",
+      href: "/facebook",
+      subItems: [
+        { label: "Lead Forms", href: "/facebook/forms" },
+        { label: "Leads", href: "/facebook/leads" },
       ]
     },
     {

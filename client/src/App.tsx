@@ -40,6 +40,11 @@ import ManageTemplates from "@/pages/templates/ManageTemplates";
 
 import NewAgent from "@/pages/ai/NewAgent";
 import ManageAgents from "@/pages/ai/ManageAgents";
+import AgentsPage from "@/pages/ai/AgentsPage";
+import MapAgent from "@/pages/ai/MapAgent";
+
+import LeadForms from "@/pages/facebook/LeadForms";
+import Leads from "@/pages/facebook/Leads";
 
 import DeliveryReport from "@/pages/reports/DeliveryReport";
 import CampaignPerformance from "@/pages/reports/CampaignPerformance";
@@ -80,9 +85,15 @@ function Router() {
       <Route path="/templates/manage" component={ManageTemplates} />
 
       {/* AI */}
-      <Route path="/ai" component={ManageAgents} />
+      <Route path="/ai" component={AgentsPage} />
       <Route path="/ai/new" component={NewAgent} />
-      <Route path="/ai/manage" component={ManageAgents} />
+      <Route path="/ai/manage" component={AgentsPage} />
+      <Route path="/ai/agents" component={AgentsPage} />
+      <Route path="/ai/map" component={MapAgent} />
+
+      {/* Facebook */}
+      <Route path="/facebook/forms" component={LeadForms} />
+      <Route path="/facebook/leads" component={Leads} />
 
       {/* Reports */}
       <Route path="/reports" component={DeliveryReport} />
