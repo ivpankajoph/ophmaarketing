@@ -1,4 +1,5 @@
 import { readCollection, writeCollection, addItem, findById, findByField } from '../storage';
+import * as leadAutoReply from '../leadAutoReply/leadAutoReply.service';
 
 const FB_ACCESS_TOKEN = process.env.FB_ACCESS_TOKEN;
 const FB_PAGE_ID = process.env.FB_PAGE_ID;
@@ -145,6 +146,27 @@ export async function syncLeadsForForm(formId: string): Promise<Lead[]> {
 
     const allLeads = [...existingLeads, ...newLeads];
     writeCollection(LEADS_COLLECTION, allLeads);
+    
+    // Trigger auto-reply for new leads
+    for (const lead of newLeads) {
+      if (lead.phone) {
+        console.log(`[FB Service] Triggering auto-reply for new lead: ${lead.id}`);
+        const autoReplyLead: leadAutoReply.Lead = {
+          id: lead.id,
+          formId: lead.formId,
+          formName: lead.formName,
+          fullName: lead.name,
+          email: lead.email,
+          phoneNumber: lead.phone,
+          fieldData: lead.fieldData,
+          createdTime: lead.createdTime,
+        };
+        leadAutoReply.processNewLead(autoReplyLead).catch(err => {
+          console.error(`[FB Service] Auto-reply failed for lead ${lead.id}:`, err);
+        });
+      }
+    }
+    
     return newLeads;
   } catch (error) {
     console.error('Error syncing leads:', error);
