@@ -102,6 +102,9 @@ The application uses in-memory storage with JSON file storage for new features. 
 - `GET /api/map-agent/form/:formId` - Get mapping by form
 - `GET/POST /api/webhook/whatsapp` - WhatsApp webhook (verify & receive)
 - `POST /api/webhook/whatsapp/send` - Send WhatsApp message
+- `POST /api/leads/auto-reply/process-all` - Process all pending leads for auto-reply
+- `POST /api/leads/auto-reply/process` - Process a single lead for auto-reply
+- `POST /api/leads/auto-reply/send/:leadId` - Send manual reply to a lead
 
 ## Environment Variables
 Required secrets for full functionality:
@@ -116,12 +119,25 @@ Required secrets for full functionality:
 The application runs on port 5000 with `npm run dev`.
 
 ## Recent Changes
+- **Nov 27, 2025**: Added Lead Auto-Reply system - automatically sends WhatsApp messages to new leads using AI agents
+- **Nov 27, 2025**: Fixed NewAgent.tsx to connect with backend API for creating agents
 - **Nov 27, 2025**: Added AI Agent management with OpenAI integration
 - **Nov 27, 2025**: Added Facebook Lead Forms sync and lead management
 - **Nov 27, 2025**: Added Agent-Form mapping for automated responses
 - **Nov 27, 2025**: Added WhatsApp webhook for receiving and auto-replying to messages
 - **Nov 27, 2025**: New modular backend structure in server/modules/
 - **Nov 27, 2025**: JSON file storage for new features (data/ directory)
+
+## Auto-Reply System Flow
+1. Sync Facebook Lead Forms via the dashboard
+2. Create an AI Agent with custom instructions
+3. Create a mapping between a Lead Form and an AI Agent
+4. When leads are synced, the system automatically:
+   - Checks if the lead has a phone number
+   - Checks if an active agent mapping exists for the form
+   - Generates a personalized welcome message using the AI agent
+   - Sends the message via WhatsApp Business API
+   - Tracks which leads have received auto-replies
 
 ## Development Notes
 - Existing features use in-memory storage (data resets on server restart)
