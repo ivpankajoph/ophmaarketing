@@ -296,12 +296,20 @@ export async function registerRoutes(
   // Sync templates from Meta Business Suite
   app.post("/api/templates/sync-meta", async (req, res) => {
     try {
-      const wabaId = process.env.WABA_ID || "848441401690739";
-      const token = process.env.WHATSAPP_TOKEN;
+      // WABA_ID is the WhatsApp Business Account ID, not the Phone Number ID
+      const wabaId = process.env.WABA_ID;
+      // Use either WHATSAPP_TOKEN or FB_ACCESS_TOKEN
+      const token = process.env.WHATSAPP_TOKEN || process.env.FB_ACCESS_TOKEN;
       
       if (!token) {
-        return res.status(400).json({ message: "WhatsApp token not configured" });
+        return res.status(400).json({ message: "WhatsApp/Facebook access token not configured. Please add WHATSAPP_TOKEN or FB_ACCESS_TOKEN." });
       }
+
+      if (!wabaId) {
+        return res.status(400).json({ message: "WhatsApp Business Account ID (WABA_ID) not configured. Please add WABA_ID environment variable." });
+      }
+
+      console.log(`Fetching templates from WABA ID: ${wabaId}`);
 
       // Fetch templates from Meta Graph API
       const response = await fetch(
@@ -313,7 +321,8 @@ export async function registerRoutes(
         console.error("Meta API Error:", errorData);
         return res.status(response.status).json({ 
           message: "Failed to fetch templates from Meta",
-          error: errorData.error?.message || "Unknown error"
+          error: errorData.error?.message || "Unknown error",
+          hint: "Make sure WABA_ID is set to your WhatsApp Business Account ID (not Phone Number ID)"
         });
       }
 
@@ -383,11 +392,15 @@ export async function registerRoutes(
         return res.status(404).json({ message: "Template not found" });
       }
 
-      const wabaId = process.env.WABA_ID || "848441401690739";
-      const token = process.env.WHATSAPP_TOKEN;
+      const wabaId = process.env.WABA_ID;
+      const token = process.env.WHATSAPP_TOKEN || process.env.FB_ACCESS_TOKEN;
       
       if (!token) {
-        return res.status(400).json({ message: "WhatsApp token not configured" });
+        return res.status(400).json({ message: "WhatsApp/Facebook access token not configured" });
+      }
+
+      if (!wabaId) {
+        return res.status(400).json({ message: "WABA_ID not configured" });
       }
 
       // Prepare template for Meta submission

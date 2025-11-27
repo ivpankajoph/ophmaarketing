@@ -163,6 +163,7 @@ export interface IStorage {
   getDashboardStats(): Promise<any>;
   getChats(): Promise<Chat[]>;
   getChat(id: string): Promise<Chat | undefined>;
+  updateChatInboundTime(contactId: string): Promise<void>;
 }
 
 export class MemStorage implements IStorage {
@@ -551,6 +552,45 @@ export class MemStorage implements IStorage {
 
   async getChat(id: string): Promise<Chat | undefined> {
     return this.data.chats.find((c) => c.id === id);
+  }
+
+  async updateChatInboundTime(contactId: string): Promise<void> {
+    const now = new Date().toISOString();
+    const chatIndex = this.data.chats.findIndex(c => c.contactId === contactId);
+    
+    if (chatIndex >= 0) {
+      // Update existing chat
+      this.data.chats[chatIndex].lastInboundMessageTime = now;
+      
+      // Also update lastMessageTime if needed
+      const contactMessages = this.data.messages.filter(m => m.contactId === contactId);
+      const lastMessage = contactMessages[contactMessages.length - 1];
+      if (lastMessage) {
+        this.data.chats[chatIndex].lastMessage = lastMessage.content;
+        this.data.chats[chatIndex].lastMessageTime = lastMessage.timestamp;
+      }
+    } else {
+      // Create new chat for this contact
+      const contact = await this.getContact(contactId);
+      if (contact) {
+        const contactMessages = this.data.messages.filter(m => m.contactId === contactId);
+        const lastMessage = contactMessages[contactMessages.length - 1];
+        
+        this.data.chats.push({
+          id: `chat-${contactId}`,
+          contactId,
+          contact,
+          lastMessage: lastMessage?.content,
+          lastMessageTime: lastMessage?.timestamp,
+          lastInboundMessageTime: now,
+          unreadCount: 1,
+          status: 'open',
+          notes: [],
+        });
+      }
+    }
+    
+    this.save();
   }
 }
 

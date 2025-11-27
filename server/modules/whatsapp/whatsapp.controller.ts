@@ -3,6 +3,7 @@ import { getMappingByFormId } from '../mapping/mapping.service';
 import { getAgentById } from '../aiAgents/agent.service';
 import { generateAgentResponse } from '../openai/openai.service';
 import { getLeadById, getAllLeads } from '../facebook/fb.service';
+import { storage } from '../../storage';
 
 const WHATSAPP_TOKEN = process.env.WHATSAPP_TOKEN;
 const PHONE_NUMBER_ID = process.env.PHONE_NUMBER_ID;
@@ -54,6 +55,9 @@ export async function handleWebhook(req: Request, res: Response) {
     const messageType = message.type;
 
     console.log(`Received message from ${from}: ${messageText}`);
+
+    // Save inbound message to storage and update chat
+    await saveInboundMessage(from, messageText, messageType);
 
     if (messageType !== 'text' || !messageText) {
       return res.sendStatus(200);
@@ -107,6 +111,48 @@ function findLeadByPhone(phone: string) {
     const leadPhone = (lead.phone || '').replace(/\D/g, '');
     return leadPhone.includes(normalizedPhone) || normalizedPhone.includes(leadPhone);
   });
+}
+
+async function saveInboundMessage(from: string, content: string, type: string) {
+  try {
+    const normalizedPhone = from.replace(/\D/g, '');
+    
+    // Find or create contact
+    const contacts = await storage.getContacts();
+    let contact = contacts.find(c => {
+      const contactPhone = (c.phone || '').replace(/\D/g, '');
+      return contactPhone.includes(normalizedPhone) || normalizedPhone.includes(contactPhone);
+    });
+
+    if (!contact) {
+      // Create new contact
+      contact = await storage.createContact({
+        name: `WhatsApp ${from}`,
+        phone: from,
+        email: '',
+        tags: ['WhatsApp'],
+        notes: 'Auto-created from WhatsApp message',
+      });
+      console.log('Created new contact:', contact.id);
+    }
+
+    // Save the message
+    const message = await storage.createMessage({
+      contactId: contact.id,
+      content: content || `[${type} message]`,
+      type: 'text' as const,
+      direction: 'inbound',
+      status: 'sent' as const,
+    });
+    console.log('Saved inbound message:', message.id);
+
+    // Update or create chat with lastInboundMessageTime
+    await storage.updateChatInboundTime(contact.id);
+    console.log('Updated chat inbound time for contact:', contact.id);
+
+  } catch (error) {
+    console.error('Error saving inbound message:', error);
+  }
 }
 
 async function sendWhatsAppMessage(to: string, message: string) {
