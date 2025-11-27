@@ -9,5 +9,16 @@
     "isActive": true,
     "createdAt": "2025-11-27T19:25:59.077Z",
     "updatedAt": "2025-11-27T19:25:59.077Z"
+  },
+  {
+    "id": "agent-1764272124224-jijzuo5cw",
+    "name": "Hi Bot",
+    "description": "",
+    "systemPrompt": "you are helpful for education and general things and you are polite and professional",
+    "model": "gpt-4o",
+    "temperature": 0.7,
+    "isActive": true,
+    "createdAt": "2025-11-27T19:35:24.224Z",
+    "updatedAt": "2025-11-27T19:35:24.224Z"
   }
 ]
