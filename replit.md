@@ -29,7 +29,8 @@ The application uses in-memory storage with JSON file storage for new features. 
 │       │   ├── ai/                 # AI Agent pages
 │       │   │   ├── AgentsPage.tsx  # AI agent management
 │       │   │   ├── MapAgent.tsx    # Agent-form mapping
-│       │   │   └── NewAgent.tsx    # Create new agent
+│       │   │   ├── NewAgent.tsx    # Create new agent
+│       │   │   └── AgentReports.tsx # AI lead qualification reports
 │       │   ├── facebook/           # Facebook integration
 │       │   │   ├── LeadForms.tsx   # Lead form sync
 │       │   │   └── Leads.tsx       # Lead management
@@ -50,13 +51,15 @@ The application uses in-memory storage with JSON file storage for new features. 
 │   │   ├── mapping/         # Agent-Form mapping
 │   │   ├── whatsapp/        # WhatsApp webhook
 │   │   ├── openai/          # OpenAI integration
+│   │   ├── aiAnalytics/     # AI lead qualification tracking
 │   │   └── storage/         # JSON file adapter
 │   └── index.ts             # Server entry point
 ├── data/                     # JSON data storage
 │   ├── agents.json          # AI agents
 │   ├── forms.json           # Facebook lead forms
 │   ├── leads.json           # Lead data
-│   └── mapping.json         # Agent-form mappings
+│   ├── mapping.json         # Agent-form mappings
+│   └── ai_qualifications.json # AI lead qualifications
 └── shared/                   # Shared types and schemas
     └── schema.ts            # Database schema definitions
 ```
@@ -87,6 +90,7 @@ The application uses in-memory storage with JSON file storage for new features. 
 23. **Template Approval** - Submit templates to Meta for approval with guidelines
 24. **Campaign Reports** - Section-wise messages, replies, costs, template performance
 25. **User Engagement Report** - Top users by engagement % (maximum to minimum)
+26. **AI Agent Reports** - Track lead qualification (Interested/Not Interested/Pending) from AI conversations
 
 ## API Endpoints
 
@@ -132,6 +136,14 @@ The application uses in-memory storage with JSON file storage for new features. 
 - `POST /api/templates/sync-meta` - Sync templates from Meta Business Suite
 - `POST /api/templates/:id/submit-approval` - Submit template to Meta for approval
 
+### AI Analytics APIs
+- `GET /api/ai-analytics/qualifications` - List all lead qualifications
+- `GET /api/ai-analytics/qualifications/:id` - Get specific qualification
+- `PUT /api/ai-analytics/qualifications/:id` - Update qualification (category/notes)
+- `DELETE /api/ai-analytics/qualifications/:id` - Delete qualification
+- `GET /api/ai-analytics/qualifications/stats` - Get summary statistics
+- `GET /api/ai-analytics/qualifications/report` - Get detailed report by source/campaign/agent
+
 ## Environment Variables
 Required secrets for full functionality:
 - `FB_ACCESS_TOKEN` - Facebook Graph API access token
@@ -145,6 +157,9 @@ Required secrets for full functionality:
 The application runs on port 5000 with `npm run dev`.
 
 ## Recent Changes
+- **Nov 27, 2025**: Added AI Agent Reports page for tracking lead qualification (Interested/Not Interested/Pending) from AI conversations
+- **Nov 27, 2025**: Added AI Analytics backend module with automatic keyword-based lead classification
+- **Nov 27, 2025**: Integrated AI qualification tracking with WhatsApp webhook for automatic lead scoring
 - **Nov 27, 2025**: Added 24-Hour Window Inbox page for customers within messaging window with Select All, Download, and bulk messaging options
 - **Nov 27, 2025**: Updated navigation sidebar with 24-Hour Window option before Inbox
 - **Nov 27, 2025**: Enhanced regular Inbox with Export List feature for leads outside 24-hour window
