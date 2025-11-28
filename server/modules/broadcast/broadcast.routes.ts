@@ -6,18 +6,18 @@ import * as broadcastService from './broadcast.service';
 const router = Router();
 const upload = multer({ storage: multer.memoryStorage() });
 
-router.get('/lists', (req: Request, res: Response) => {
+router.get('/lists', async (req: Request, res: Response) => {
   try {
-    const lists = broadcastService.getBroadcastLists();
+    const lists = await broadcastService.getBroadcastLists();
     res.json(lists);
   } catch (error) {
     res.status(500).json({ error: 'Failed to get broadcast lists' });
   }
 });
 
-router.get('/lists/:id', (req: Request, res: Response) => {
+router.get('/lists/:id', async (req: Request, res: Response) => {
   try {
-    const list = broadcastService.getBroadcastListById(req.params.id);
+    const list = await broadcastService.getBroadcastListById(req.params.id);
     if (!list) {
       return res.status(404).json({ error: 'List not found' });
     }
@@ -27,23 +27,23 @@ router.get('/lists/:id', (req: Request, res: Response) => {
   }
 });
 
-router.post('/lists', (req: Request, res: Response) => {
+router.post('/lists', async (req: Request, res: Response) => {
   try {
     const { name, contacts } = req.body;
     if (!name) {
       return res.status(400).json({ error: 'List name is required' });
     }
-    const list = broadcastService.createBroadcastList(name, contacts || []);
+    const list = await broadcastService.createBroadcastList(name, contacts || []);
     res.status(201).json(list);
   } catch (error) {
     res.status(500).json({ error: 'Failed to create broadcast list' });
   }
 });
 
-router.put('/lists/:id', (req: Request, res: Response) => {
+router.put('/lists/:id', async (req: Request, res: Response) => {
   try {
     const { name, contacts } = req.body;
-    const list = broadcastService.updateBroadcastList(req.params.id, name, contacts);
+    const list = await broadcastService.updateBroadcastList(req.params.id, name, contacts);
     if (!list) {
       return res.status(404).json({ error: 'List not found' });
     }
@@ -53,9 +53,9 @@ router.put('/lists/:id', (req: Request, res: Response) => {
   }
 });
 
-router.delete('/lists/:id', (req: Request, res: Response) => {
+router.delete('/lists/:id', async (req: Request, res: Response) => {
   try {
-    const success = broadcastService.deleteBroadcastList(req.params.id);
+    const success = await broadcastService.deleteBroadcastList(req.params.id);
     if (!success) {
       return res.status(404).json({ error: 'List not found' });
     }
@@ -115,18 +115,18 @@ router.post('/import-csv', upload.single('file'), (req: Request, res: Response) 
   }
 });
 
-router.get('/export-contacts', (req: Request, res: Response) => {
+router.get('/export-contacts', async (req: Request, res: Response) => {
   try {
     const { listId } = req.query;
     let contacts: broadcastService.BroadcastContact[] = [];
 
     if (listId && typeof listId === 'string') {
-      const list = broadcastService.getBroadcastListById(listId);
+      const list = await broadcastService.getBroadcastListById(listId);
       if (list) {
         contacts = list.contacts;
       }
     } else {
-      const lists = broadcastService.getBroadcastLists();
+      const lists = await broadcastService.getBroadcastLists();
       contacts = lists.flatMap(l => l.contacts);
     }
 
@@ -145,16 +145,16 @@ router.get('/export-contacts', (req: Request, res: Response) => {
   }
 });
 
-router.get('/schedules', (req: Request, res: Response) => {
+router.get('/schedules', async (req: Request, res: Response) => {
   try {
-    const schedules = broadcastService.getScheduledMessages();
+    const schedules = await broadcastService.getScheduledMessages();
     res.json(schedules);
   } catch (error) {
     res.status(500).json({ error: 'Failed to get scheduled messages' });
   }
 });
 
-router.post('/schedules', (req: Request, res: Response) => {
+router.post('/schedules', async (req: Request, res: Response) => {
   try {
     const { name, messageType, templateName, customMessage, agentId, contactIds, listId, scheduledAt, recipientCount } = req.body;
     
@@ -162,7 +162,7 @@ router.post('/schedules', (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Name, message type, and scheduled time are required' });
     }
 
-    const schedule = broadcastService.createScheduledMessage({
+    const schedule = await broadcastService.createScheduledMessage({
       name,
       messageType,
       templateName,
@@ -181,9 +181,9 @@ router.post('/schedules', (req: Request, res: Response) => {
   }
 });
 
-router.put('/schedules/:id', (req: Request, res: Response) => {
+router.put('/schedules/:id', async (req: Request, res: Response) => {
   try {
-    const schedule = broadcastService.updateScheduledMessage(req.params.id, req.body);
+    const schedule = await broadcastService.updateScheduledMessage(req.params.id, req.body);
     if (!schedule) {
       return res.status(404).json({ error: 'Schedule not found' });
     }
@@ -193,9 +193,9 @@ router.put('/schedules/:id', (req: Request, res: Response) => {
   }
 });
 
-router.delete('/schedules/:id', (req: Request, res: Response) => {
+router.delete('/schedules/:id', async (req: Request, res: Response) => {
   try {
-    const success = broadcastService.deleteScheduledMessage(req.params.id);
+    const success = await broadcastService.deleteScheduledMessage(req.params.id);
     if (!success) {
       return res.status(404).json({ error: 'Schedule not found' });
     }
@@ -258,7 +258,7 @@ router.post('/send-single', async (req: Request, res: Response) => {
 router.post('/send-to-list/:listId', async (req: Request, res: Response) => {
   try {
     const { messageType, templateName, customMessage, agentId } = req.body;
-    const list = broadcastService.getBroadcastListById(req.params.listId);
+    const list = await broadcastService.getBroadcastListById(req.params.listId);
     
     if (!list) {
       return res.status(404).json({ error: 'List not found' });

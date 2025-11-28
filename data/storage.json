@@ -108,6 +108,18 @@
       "id": "4d460e87-b06f-4c96-ab75-3a484e9a18ad",
       "createdAt": "2025-11-28T06:04:55.063Z",
       "updatedAt": "2025-11-28T06:04:55.063Z"
+    },
+    {
+      "name": "WhatsApp 919971294604",
+      "phone": "919971294604",
+      "email": "",
+      "tags": [
+        "WhatsApp"
+      ],
+      "notes": "Auto-created from WhatsApp message",
+      "id": "75310144-93aa-41ca-891b-65fecd512f42",
+      "createdAt": "2025-11-28T06:18:07.657Z",
+      "updatedAt": "2025-11-28T06:18:07.657Z"
     }
   ],
   "messages": [
@@ -544,6 +556,42 @@
       "status": "sent",
       "id": "29e25268-c73b-483c-8e06-2fdc8c98135c",
       "timestamp": "2025-11-28T06:04:55.066Z"
+    },
+    {
+      "contactId": "4d460e87-b06f-4c96-ab75-3a484e9a18ad",
+      "content": "Cool",
+      "type": "text",
+      "direction": "inbound",
+      "status": "sent",
+      "id": "e1c0bcc6-37dd-4754-8bba-66fe93fb1e07",
+      "timestamp": "2025-11-28T06:12:23.121Z"
+    },
+    {
+      "contactId": "4d460e87-b06f-4c96-ab75-3a484e9a18ad",
+      "content": "hii thanks for message",
+      "type": "text",
+      "direction": "outbound",
+      "status": "sent",
+      "id": "d82d9e22-a706-4fdb-87ee-cbb4ef0d76bb",
+      "timestamp": "2025-11-28T06:12:50.288Z"
+    },
+    {
+      "contactId": "75310144-93aa-41ca-891b-65fecd512f42",
+      "content": "hello",
+      "type": "text",
+      "direction": "inbound",
+      "status": "sent",
+      "id": "410e7301-ee0f-4e7f-a06b-fb5a74ac4068",
+      "timestamp": "2025-11-28T06:18:07.658Z"
+    },
+    {
+      "contactId": "75310144-93aa-41ca-891b-65fecd512f42",
+      "content": "Hello! How can I assist you today?",
+      "type": "text",
+      "direction": "outbound",
+      "status": "sent",
+      "id": "e8f8e077-c6c1-4036-8a05-2fa1cbe40307",
+      "timestamp": "2025-11-28T06:18:11.185Z"
     }
   ],
   "campaigns": [
@@ -913,10 +961,33 @@
         "createdAt": "2025-11-28T06:04:55.063Z",
         "updatedAt": "2025-11-28T06:04:55.063Z"
       },
-      "lastMessage": "Hey",
-      "lastMessageTime": "2025-11-28T06:04:55.066Z",
-      "lastInboundMessageTime": "2025-11-28T06:04:55.070Z",
-      "lastInboundMessage": "Hey",
+      "lastMessage": "hii thanks for message",
+      "lastMessageTime": "2025-11-28T06:12:50.288Z",
+      "lastInboundMessageTime": "2025-11-28T06:12:23.121Z",
+      "lastInboundMessage": "Cool",
+      "unreadCount": 2,
+      "status": "open",
+      "notes": []
+    },
+    {
+      "id": "chat-75310144-93aa-41ca-891b-65fecd512f42",
+      "contactId": "75310144-93aa-41ca-891b-65fecd512f42",
+      "contact": {
+        "name": "WhatsApp 919971294604",
+        "phone": "919971294604",
+        "email": "",
+        "tags": [
+          "WhatsApp"
+        ],
+        "notes": "Auto-created from WhatsApp message",
+        "id": "75310144-93aa-41ca-891b-65fecd512f42",
+        "createdAt": "2025-11-28T06:18:07.657Z",
+        "updatedAt": "2025-11-28T06:18:07.657Z"
+      },
+      "lastMessage": "Hello! How can I assist you today?",
+      "lastMessageTime": "2025-11-28T06:18:11.185Z",
+      "lastInboundMessageTime": "2025-11-28T06:18:07.658Z",
+      "lastInboundMessage": "hello",
       "unreadCount": 1,
       "status": "open",
       "notes": []
