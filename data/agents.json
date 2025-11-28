@@ -6,9 +6,9 @@
     "systemPrompt": "You are a helpful assistant",
     "model": "gpt-4o",
     "temperature": 0.7,
-    "isActive": true,
+    "isActive": false,
     "createdAt": "2025-11-27T19:25:59.077Z",
-    "updatedAt": "2025-11-27T19:25:59.077Z"
+    "updatedAt": "2025-11-28T05:29:26.891Z"
   },
   {
     "id": "agent-1764272124224-jijzuo5cw",
@@ -17,9 +17,9 @@
     "systemPrompt": "you are helpful for education and general things and you are polite and professional",
     "model": "gpt-4o",
     "temperature": 0.7,
-    "isActive": true,
+    "isActive": false,
     "createdAt": "2025-11-27T19:35:24.224Z",
-    "updatedAt": "2025-11-27T19:35:24.224Z"
+    "updatedAt": "2025-11-28T05:29:28.370Z"
   },
   {
     "id": "agent-1764272274099-5187b24wo",
@@ -28,9 +28,9 @@
     "systemPrompt": "This is polite and general bot who can answer for all quesries, speakes in manner, and give energetic chats with emojis\n",
     "model": "gpt-4o",
     "temperature": 0.7,
-    "isActive": true,
+    "isActive": false,
     "createdAt": "2025-11-27T19:37:54.099Z",
-    "updatedAt": "2025-11-27T19:37:54.099Z"
+    "updatedAt": "2025-11-28T05:29:29.362Z"
   },
   {
     "id": "agent-1764307285203-evgwt1pg2",
@@ -39,8 +39,8 @@
     "systemPrompt": "nothing",
     "model": "gpt-4o",
     "temperature": 0.7,
-    "isActive": true,
+    "isActive": false,
     "createdAt": "2025-11-28T05:21:25.203Z",
-    "updatedAt": "2025-11-28T05:21:25.203Z"
+    "updatedAt": "2025-11-28T05:29:30.225Z"
   }
 ]
