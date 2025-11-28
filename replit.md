@@ -152,6 +152,11 @@ Required secrets for full functionality:
 The application runs on port 5000 with `npm run dev`.
 
 ## Recent Changes
+- **Nov 28, 2025**: Fixed Campaign/Broadcast page - button click now working, contact selection fixed, template selection fixed
+- **Nov 28, 2025**: Added comprehensive message logging to MongoDB for all broadcast messages
+- **Nov 28, 2025**: Created Broadcast Reports page with filters, search, export CSV, and pagination
+- **Nov 28, 2025**: Fixed checkbox handling to properly handle "indeterminate" state
+- **Nov 28, 2025**: Added pagination to /api/broadcast/logs endpoint for performance
 - **Nov 28, 2025**: Migrated storage layer from JSON files to MongoDB Atlas for better scalability and data persistence
 - **Nov 28, 2025**: Updated all modular services (aiAgents, facebook, mapping, broadcast, aiAnalytics, leadAutoReply) to async/await for MongoDB
 - **Nov 28, 2025**: Added mongodb.adapter.ts with mongoose connection and collection management
