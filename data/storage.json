@@ -552,6 +552,18 @@
       "id": "98ee4ee3-4379-4f2d-8b8e-253099fdf20b",
       "createdAt": "2025-11-29T08:56:24.629Z",
       "updatedAt": "2025-11-29T08:56:24.629Z"
+    },
+    {
+      "name": "WhatsApp 919906015880",
+      "phone": "919906015880",
+      "email": "",
+      "tags": [
+        "WhatsApp"
+      ],
+      "notes": "Auto-created from WhatsApp message",
+      "id": "432ee252-f771-4f7e-9459-c642c7921577",
+      "createdAt": "2025-11-29T09:11:45.263Z",
+      "updatedAt": "2025-11-29T09:11:45.263Z"
     }
   ],
   "messages": [
@@ -1444,7 +1456,7 @@
       "content": "Thank you for contacting Ayush Wellness SHOPPEE! Deal With Wellness products with AYUSH PREMIUM Cerificates, Personal care, Body care, Home Care Contact/ Whatsup:9074962325",
       "type": "text",
       "direction": "inbound",
-      "status": "sent",
+      "status": "read",
       "id": "d036ceaf-c0e2-43fc-9a3d-0896597d0111",
       "timestamp": "2025-11-29T07:48:56.808Z"
     },
@@ -2020,7 +2032,7 @@
       "content": "Pricing?",
       "type": "text",
       "direction": "inbound",
-      "status": "sent",
+      "status": "read",
       "id": "1cc805b8-5ccd-40f7-ab74-9026dfa63982",
       "timestamp": "2025-11-29T08:11:32.465Z"
     },
@@ -2038,7 +2050,7 @@
       "content": "Are there any amount that we need to pay?",
       "type": "text",
       "direction": "inbound",
-      "status": "sent",
+      "status": "read",
       "id": "6d26ad9d-021e-4de9-859c-3b26292990e1",
       "timestamp": "2025-11-29T08:12:22.030Z"
     },
@@ -2074,7 +2086,7 @@
       "content": "Yes, I am Interested",
       "type": "text",
       "direction": "inbound",
-      "status": "sent",
+      "status": "read",
       "id": "7337e524-ab53-40ea-9908-a408ca43d68f",
       "timestamp": "2025-11-29T08:13:52.246Z"
     },
@@ -2146,7 +2158,7 @@
       "content": "Yes, I am Interested",
       "type": "text",
       "direction": "inbound",
-      "status": "sent",
+      "status": "read",
       "id": "af88c6a8-9708-4ca1-95fb-b25301c54f3b",
       "timestamp": "2025-11-29T08:27:09.145Z"
     },
@@ -2164,7 +2176,7 @@
       "content": "Yes, I am Interested",
       "type": "text",
       "direction": "inbound",
-      "status": "sent",
+      "status": "read",
       "id": "fa4f6578-31a1-4ece-9112-9e458bf717f9",
       "timestamp": "2025-11-29T08:39:58.624Z"
     },
@@ -2182,7 +2194,7 @@
       "content": "Yes, I am Interested",
       "type": "text",
       "direction": "inbound",
-      "status": "sent",
+      "status": "read",
       "id": "bd3b5565-25b2-44b1-a415-e4479e366cf3",
       "timestamp": "2025-11-29T08:41:44.826Z"
     },
@@ -2209,7 +2221,7 @@
       "content": "Any fee",
       "type": "text",
       "direction": "inbound",
-      "status": "sent",
+      "status": "read",
       "id": "d0515130-67c0-40bc-a0f6-3cc111919bae",
       "timestamp": "2025-11-29T08:56:24.631Z"
     },
@@ -2227,7 +2239,7 @@
       "content": "Plz send me fee details",
       "type": "text",
       "direction": "inbound",
-      "status": "sent",
+      "status": "read",
       "id": "4a370aeb-bcdd-424b-9340-31a147c454d0",
       "timestamp": "2025-11-29T08:56:57.646Z"
     },
@@ -2245,7 +2257,7 @@
       "content": "Sure",
       "type": "text",
       "direction": "inbound",
-      "status": "sent",
+      "status": "read",
       "id": "f3ed0302-dbdd-47d1-a159-844734949a02",
       "timestamp": "2025-11-29T09:04:56.063Z"
     },
@@ -2263,7 +2275,7 @@
       "content": "Thanks",
       "type": "text",
       "direction": "inbound",
-      "status": "sent",
+      "status": "read",
       "id": "4959a412-c4e3-4770-9c84-4512289a4473",
       "timestamp": "2025-11-29T09:04:59.066Z"
     },
@@ -2275,6 +2287,51 @@
       "status": "sent",
       "id": "6d71b93b-a4ff-41f3-a2d3-cb761260beb3",
       "timestamp": "2025-11-29T09:05:01.825Z"
+    },
+    {
+      "contactId": "e3c080b8-171b-464c-bcb0-88189249e9ac",
+      "content": "Hi there! 😊 Just wanted to check in and see how you're doing. Hope your day is going well! Let me know if there's anything exciting happening. Take care! 🌟",
+      "type": "text",
+      "direction": "outbound",
+      "status": "sent",
+      "id": "f23e4dad-b642-4eef-b7e3-0fee1defeb73",
+      "timestamp": "2025-11-29T09:07:42.332Z"
+    },
+    {
+      "contactId": "4d460e87-b06f-4c96-ab75-3a484e9a18ad",
+      "content": "Hey there! 😊 Just wanted to drop a quick hello and see how you're doing. Hope everything's going great on your end. Let me know if you want to catch up sometime! 🌟",
+      "type": "text",
+      "direction": "outbound",
+      "status": "sent",
+      "id": "5db3081c-ac1c-4a3f-a870-b2ce4166a365",
+      "timestamp": "2025-11-29T09:08:14.418Z"
+    },
+    {
+      "contactId": "4d460e87-b06f-4c96-ab75-3a484e9a18ad",
+      "content": "cool",
+      "type": "text",
+      "direction": "outbound",
+      "status": "sent",
+      "id": "1cef35ef-aea3-4e99-ad2b-dca45bed954c",
+      "timestamp": "2025-11-29T09:11:05.241Z"
+    },
+    {
+      "contactId": "432ee252-f771-4f7e-9459-c642c7921577",
+      "content": "Yes, I am Interested",
+      "type": "text",
+      "direction": "inbound",
+      "status": "sent",
+      "id": "fc014275-79db-4be7-ae30-7b058bcde480",
+      "timestamp": "2025-11-29T09:11:45.267Z"
+    },
+    {
+      "contactId": "432ee252-f771-4f7e-9459-c642c7921577",
+      "content": "Thanks for your feedback, we will keep in touch with you soon.",
+      "type": "text",
+      "direction": "outbound",
+      "status": "sent",
+      "id": "bd9645bd-5565-4273-b536-cdaff9e5229c",
+      "timestamp": "2025-11-29T09:11:46.643Z"
     }
   ],
   "campaigns": [
@@ -2656,8 +2713,8 @@
         "createdAt": "2025-11-28T06:04:55.063Z",
         "updatedAt": "2025-11-28T06:04:55.063Z"
       },
-      "lastMessage": "hello",
-      "lastMessageTime": "2025-11-29T08:45:33.043Z",
+      "lastMessage": "cool",
+      "lastMessageTime": "2025-11-29T09:11:05.241Z",
       "lastInboundMessageTime": "2025-11-29T07:44:18.953Z",
       "lastInboundMessage": "Yes, I am Interested",
       "unreadCount": 0,
@@ -2771,11 +2828,11 @@
         "createdAt": "2025-11-29T07:48:56.807Z",
         "updatedAt": "2025-11-29T07:48:56.807Z"
       },
-      "lastMessage": "You're welcome! If you have any questions or need assistance with Ayush Wellness products, feel free to reach out through the contact information provided. Whether you're interested in personal care, body care, or home care products with AYUSH PREMIUM certificates, they should be able to help you.",
-      "lastMessageTime": "2025-11-29T07:48:59.988Z",
+      "lastMessage": "Hi there! 😊 Just wanted to check in and see how you're doing. Hope your day is going well! Let me know if there's anything exciting happening. Take care! 🌟",
+      "lastMessageTime": "2025-11-29T09:07:42.332Z",
       "lastInboundMessageTime": "2025-11-29T07:48:56.808Z",
       "lastInboundMessage": "Thank you for contacting Ayush Wellness SHOPPEE! Deal With Wellness products with AYUSH PREMIUM Cerificates, Personal care, Body care, Home Care Contact/ Whatsup:9074962325",
-      "unreadCount": 1,
+      "unreadCount": 0,
       "status": "open",
       "notes": []
     },
@@ -3304,7 +3361,7 @@
       "lastMessageTime": "2025-11-29T08:12:25.305Z",
       "lastInboundMessageTime": "2025-11-29T08:12:22.030Z",
       "lastInboundMessage": "Are there any amount that we need to pay?",
-      "unreadCount": 2,
+      "unreadCount": 0,
       "status": "open",
       "notes": []
     },
@@ -3350,7 +3407,7 @@
       "lastMessageTime": "2025-11-29T09:05:01.825Z",
       "lastInboundMessageTime": "2025-11-29T09:04:59.066Z",
       "lastInboundMessage": "Thanks",
-      "unreadCount": 3,
+      "unreadCount": 0,
       "status": "open",
       "notes": []
     },
@@ -3442,7 +3499,7 @@
       "lastMessageTime": "2025-11-29T08:27:10.490Z",
       "lastInboundMessageTime": "2025-11-29T08:27:09.145Z",
       "lastInboundMessage": "Yes, I am Interested",
-      "unreadCount": 1,
+      "unreadCount": 0,
       "status": "open",
       "notes": []
     },
@@ -3465,7 +3522,7 @@
       "lastMessageTime": "2025-11-29T08:40:00.235Z",
       "lastInboundMessageTime": "2025-11-29T08:39:58.624Z",
       "lastInboundMessage": "Yes, I am Interested",
-      "unreadCount": 1,
+      "unreadCount": 0,
       "status": "open",
       "notes": []
     },
@@ -3488,7 +3545,7 @@
       "lastMessageTime": "2025-11-29T08:41:46.003Z",
       "lastInboundMessageTime": "2025-11-29T08:41:44.826Z",
       "lastInboundMessage": "Yes, I am Interested",
-      "unreadCount": 1,
+      "unreadCount": 0,
       "status": "open",
       "notes": []
     },
@@ -3511,7 +3568,30 @@
       "lastMessageTime": "2025-11-29T08:57:01.057Z",
       "lastInboundMessageTime": "2025-11-29T08:56:57.646Z",
       "lastInboundMessage": "Plz send me fee details",
-      "unreadCount": 2,
+      "unreadCount": 0,
+      "status": "open",
+      "notes": []
+    },
+    {
+      "id": "chat-432ee252-f771-4f7e-9459-c642c7921577",
+      "contactId": "432ee252-f771-4f7e-9459-c642c7921577",
+      "contact": {
+        "name": "WhatsApp 919906015880",
+        "phone": "919906015880",
+        "email": "",
+        "tags": [
+          "WhatsApp"
+        ],
+        "notes": "Auto-created from WhatsApp message",
+        "id": "432ee252-f771-4f7e-9459-c642c7921577",
+        "createdAt": "2025-11-29T09:11:45.263Z",
+        "updatedAt": "2025-11-29T09:11:45.263Z"
+      },
+      "lastMessage": "Thanks for your feedback, we will keep in touch with you soon.",
+      "lastMessageTime": "2025-11-29T09:11:46.643Z",
+      "lastInboundMessageTime": "2025-11-29T09:11:45.267Z",
+      "lastInboundMessage": "Yes, I am Interested",
+      "unreadCount": 1,
       "status": "open",
       "notes": []
     }
