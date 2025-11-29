@@ -112,6 +112,15 @@ export async function handleWebhook(req: Request, res: Response) {
       return res.sendStatus(200);
     }
 
+    // FIRST: Check if auto-reply is disabled for this contact (e.g., after "Thanks" message)
+    // This check must happen BEFORE checking for assigned agents
+    const autoReplyDisabled = await contactAgentService.isAutoReplyDisabled(from);
+    
+    if (autoReplyDisabled) {
+      console.log(`[Webhook] Auto-reply disabled for ${from} - no automatic AI response until agent manually selected in inbox`);
+      return res.sendStatus(200);
+    }
+    
     // For regular text messages, check if this contact has a manually assigned agent
     const contactAgentAssignment = await contactAgentService.getAgentForContact(from);
     let agentToUse = null;
@@ -123,14 +132,6 @@ export async function handleWebhook(req: Request, res: Response) {
       agentToUse = await getAgentById(contactAgentAssignment.agentId);
       useStoredHistory = true;
     } else {
-      // Check if auto-reply is disabled for this contact (e.g., after "Thanks" message)
-      const autoReplyDisabled = await contactAgentService.isAutoReplyDisabled(from);
-      
-      if (autoReplyDisabled) {
-        console.log(`[Webhook] Auto-reply disabled for ${from} - waiting for manual agent selection`);
-        return res.sendStatus(200);
-      }
-      
       // Fall back to lead-form mapping only if auto-reply is not disabled
       const lead = await findLeadByPhone(from);
       if (lead) {

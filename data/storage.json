@@ -2863,7 +2863,7 @@
       "content": "What you do",
       "type": "text",
       "direction": "inbound",
-      "status": "sent",
+      "status": "read",
       "id": "a882c7f5-2a6e-4418-910f-3a67fe710d31",
       "timestamp": "2025-11-29T10:58:08.294Z"
     },
@@ -3514,6 +3514,51 @@
       "status": "sent",
       "id": "436049bc-6d65-45bb-9548-e41494ed537f",
       "timestamp": "2025-11-29T11:13:19.439Z"
+    },
+    {
+      "contactId": "4d460e87-b06f-4c96-ab75-3a484e9a18ad",
+      "content": "Yes, I am Interested",
+      "type": "text",
+      "direction": "inbound",
+      "status": "sent",
+      "id": "afe104f4-73e9-4158-b22d-22360c9b6bf2",
+      "timestamp": "2025-11-29T11:17:24.283Z"
+    },
+    {
+      "contactId": "4d460e87-b06f-4c96-ab75-3a484e9a18ad",
+      "content": "Thanks for your feedback, we will keep in touch with you soon.",
+      "type": "text",
+      "direction": "outbound",
+      "status": "sent",
+      "id": "155bec4c-3452-4a8a-95fe-70967630ee36",
+      "timestamp": "2025-11-29T11:17:25.827Z"
+    },
+    {
+      "contactId": "4d460e87-b06f-4c96-ab75-3a484e9a18ad",
+      "content": "Okay",
+      "type": "text",
+      "direction": "inbound",
+      "status": "sent",
+      "id": "74cf5713-e008-4a8b-964e-1203595cbb4a",
+      "timestamp": "2025-11-29T11:17:32.761Z"
+    },
+    {
+      "contactId": "4d460e87-b06f-4c96-ab75-3a484e9a18ad",
+      "content": "Great! If you have any questions about fish or fishing, just let me know! I'm ready to help.",
+      "type": "text",
+      "direction": "outbound",
+      "status": "sent",
+      "id": "5d03325d-4394-4dc4-95ab-4983b3483ec0",
+      "timestamp": "2025-11-29T11:17:36.751Z"
+    },
+    {
+      "contactId": "3b4e746a-c4f8-484b-818d-06ed849299c7",
+      "content": "[image message]",
+      "type": "text",
+      "direction": "inbound",
+      "status": "sent",
+      "id": "e4eb2227-9b8d-445d-8f63-8e3933848ee5",
+      "timestamp": "2025-11-29T11:19:27.453Z"
     }
   ],
   "campaigns": [
@@ -3895,11 +3940,11 @@
         "createdAt": "2025-11-28T06:04:55.063Z",
         "updatedAt": "2025-11-28T06:04:55.063Z"
       },
-      "lastMessage": "I'm here to provide information about fish and fishing! Whether you have questions about different fish species, fishing techniques, or the best gear to use, feel free to ask!",
-      "lastMessageTime": "2025-11-29T10:58:12.804Z",
-      "lastInboundMessageTime": "2025-11-29T10:58:08.294Z",
-      "lastInboundMessage": "What you do",
-      "unreadCount": 1,
+      "lastMessage": "Great! If you have any questions about fish or fishing, just let me know! I'm ready to help.",
+      "lastMessageTime": "2025-11-29T11:17:36.751Z",
+      "lastInboundMessageTime": "2025-11-29T11:17:32.761Z",
+      "lastInboundMessage": "Okay",
+      "unreadCount": 2,
       "status": "open",
       "notes": []
     },
@@ -4838,11 +4883,11 @@
         "createdAt": "2025-11-29T10:45:06.286Z",
         "updatedAt": "2025-11-29T10:45:06.286Z"
       },
-      "lastMessage": "[document message]",
-      "lastMessageTime": "2025-11-29T11:02:02.462Z",
-      "lastInboundMessageTime": "2025-11-29T11:02:02.462Z",
-      "lastInboundMessage": "[document message]",
-      "unreadCount": 0,
+      "lastMessage": "[image message]",
+      "lastMessageTime": "2025-11-29T11:19:27.453Z",
+      "lastInboundMessageTime": "2025-11-29T11:19:27.456Z",
+      "lastInboundMessage": "[image message]",
+      "unreadCount": 2,
       "status": "open",
       "notes": []
     },
