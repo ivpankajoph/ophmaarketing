@@ -21,6 +21,7 @@ import * as broadcastService from "./modules/broadcast/broadcast.service";
 import * as agentService from "./modules/aiAgents/agent.service";
 import * as openaiService from "./modules/openai/openai.service";
 import * as templateService from "./modules/leadAutoReply/templateMessages.service";
+import * as mongodb from "./modules/storage/mongodb.adapter";
 
 export async function registerRoutes(
   httpServer: Server,
@@ -38,9 +39,49 @@ export async function registerRoutes(
 
   app.get("/api/contacts", async (req, res) => {
     try {
-      const contacts = await storage.getContacts();
-      res.json(contacts);
+      // Get contacts from both in-memory storage and MongoDB imported_contacts
+      const memContacts = await storage.getContacts();
+      const importedContacts = await mongodb.readCollection<{
+        id: string;
+        name: string;
+        phone: string;
+        email?: string;
+        tags?: string[];
+      }>('imported_contacts');
+      
+      // Combine and deduplicate by phone number
+      const phoneSet = new Set<string>();
+      const allContacts: typeof memContacts = [];
+      
+      // Add imported contacts first (they have user-provided names)
+      for (const contact of importedContacts) {
+        const normalizedPhone = contact.phone.replace(/\D/g, '');
+        if (!phoneSet.has(normalizedPhone)) {
+          phoneSet.add(normalizedPhone);
+          allContacts.push({
+            id: contact.id,
+            name: contact.name,
+            phone: contact.phone,
+            email: contact.email || '',
+            tags: contact.tags || [],
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          });
+        }
+      }
+      
+      // Add memory contacts that don't overlap
+      for (const contact of memContacts) {
+        const normalizedPhone = contact.phone.replace(/\D/g, '');
+        if (!phoneSet.has(normalizedPhone)) {
+          phoneSet.add(normalizedPhone);
+          allContacts.push(contact);
+        }
+      }
+      
+      res.json(allContacts);
     } catch (error) {
+      console.error("Error fetching contacts:", error);
       res.status(500).json({ message: "Failed to get contacts" });
     }
   });

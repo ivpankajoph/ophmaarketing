@@ -26,3 +26,8 @@ The system incorporates a modular backend structure, allowing for independent de
 - **Facebook Graph API**: For syncing Facebook Lead Forms and managing leads.
 - **WhatsApp Business API**: For sending and receiving WhatsApp messages.
 - **Meta Business Suite**: For syncing and approving message templates.
+
+## Recent Changes (November 29, 2025)
+- **24-Hour Window Inbox Contact Names**: Fixed contact name enrichment to properly display imported contact names instead of auto-generated "WhatsApp XXX" names. The fix filters out auto-generated names when building the phone-to-name lookup maps, allowing real names from imported contacts to be displayed via last-10-digit phone matching.
+- **AI Agent Reports**: Fixed date formatting to safely handle invalid/undefined timestamps, preventing runtime errors.
+- **Facebook Lead Forms Sync**: Enhanced form lookup to search by both internal ID and Facebook Form ID, resolving "form not found" errors during lead synchronization.

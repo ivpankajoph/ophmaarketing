@@ -49,8 +49,16 @@ import {
   BarChart3,
   PieChart
 } from "lucide-react";
-import { format } from "date-fns";
+import { format, isValid } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
+
+// Safe date formatting helper
+const formatDate = (dateStr: string | undefined | null, formatStr: string): string => {
+  if (!dateStr) return "N/A";
+  const date = new Date(dateStr);
+  if (!isValid(date)) return "N/A";
+  return format(date, formatStr);
+};
 
 interface Qualification {
   id: string;
@@ -221,8 +229,8 @@ export default function AgentReports() {
       q.score.toString(),
       q.totalMessages.toString(),
       q.keywords.join("; "),
-      format(new Date(q.firstContactAt), "yyyy-MM-dd HH:mm"),
-      format(new Date(q.lastMessageAt), "yyyy-MM-dd HH:mm"),
+      formatDate(q.firstContactAt, "yyyy-MM-dd HH:mm"),
+      formatDate(q.lastMessageAt, "yyyy-MM-dd HH:mm"),
       q.notes || ""
     ]);
     
@@ -293,7 +301,7 @@ export default function AgentReports() {
                     </div>
                   </TableCell>
                   <TableCell className="text-sm text-muted-foreground">
-                    {format(new Date(qual.lastMessageAt), "MMM dd, HH:mm")}
+                    {formatDate(qual.lastMessageAt, "MMM dd, HH:mm")}
                   </TableCell>
                   <TableCell>
                     <div className="flex flex-wrap gap-1 max-w-[150px]">
@@ -634,11 +642,11 @@ export default function AgentReports() {
                 </div>
                 <div>
                   <label className="text-sm text-muted-foreground">First Contact</label>
-                  <p className="font-medium">{format(new Date(selectedQualification.firstContactAt), "MMM dd, yyyy HH:mm")}</p>
+                  <p className="font-medium">{formatDate(selectedQualification.firstContactAt, "MMM dd, yyyy HH:mm")}</p>
                 </div>
                 <div>
                   <label className="text-sm text-muted-foreground">Last Message</label>
-                  <p className="font-medium">{format(new Date(selectedQualification.lastMessageAt), "MMM dd, yyyy HH:mm")}</p>
+                  <p className="font-medium">{formatDate(selectedQualification.lastMessageAt, "MMM dd, yyyy HH:mm")}</p>
                 </div>
               </div>
               {selectedQualification.agentName && (

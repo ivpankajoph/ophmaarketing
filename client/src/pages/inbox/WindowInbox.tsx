@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { Input } from "@/components/ui/input";
@@ -76,6 +76,19 @@ interface Agent {
   isActive: boolean;
 }
 
+interface ImportedContact {
+  id: string;
+  name: string;
+  phone: string;
+  email?: string;
+  tags?: string[];
+}
+
+// Normalize phone number for comparison (strip all non-digits)
+function normalizePhone(phone: string): string {
+  return phone.replace(/\D/g, '');
+}
+
 export default function WindowInbox() {
   const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -130,6 +143,76 @@ export default function WindowInbox() {
       return res.json();
     },
   });
+
+  // Fetch contacts for name lookup
+  const { data: importedContacts = [] } = useQuery<ImportedContact[]>({
+    queryKey: ["/api/contacts"],
+    queryFn: async () => {
+      const res = await fetch("/api/contacts");
+      if (!res.ok) throw new Error("Failed to fetch contacts");
+      return res.json();
+    },
+  });
+
+  // Create phone-to-name lookup maps for flexible matching (memoized)
+  // Only include contacts with real names (not auto-generated "WhatsApp XXX" names)
+  const { phoneToNameMap, last10ToNameMap } = useMemo(() => {
+    const phoneMap = new Map<string, string>();
+    const last10Map = new Map<string, string>();
+    
+    // Helper to check if name is a real name (not auto-generated)
+    const isRealName = (name: string): boolean => {
+      if (!name || !name.trim()) return false;
+      if (name.startsWith('WhatsApp')) return false;
+      if (name.startsWith('+')) return false;
+      // Check if it's just digits (possibly with spaces)
+      if (/^\d[\d\s]*$/.test(name)) return false;
+      return true;
+    };
+    
+    importedContacts.forEach(contact => {
+      const normalizedPhone = normalizePhone(contact.phone);
+      if (isRealName(contact.name)) {
+        // Store with full number
+        phoneMap.set(normalizedPhone, contact.name);
+        // Store with last 10 digits for matching with/without country code
+        if (normalizedPhone.length >= 10) {
+          last10Map.set(normalizedPhone.slice(-10), contact.name);
+        }
+      }
+    });
+    
+    return { phoneToNameMap: phoneMap, last10ToNameMap: last10Map };
+  }, [importedContacts]);
+
+  // Function to get contact name from phone
+  const getContactName = useMemo(() => {
+    return (chatContact: Contact): string => {
+      const normalizedPhone = normalizePhone(chatContact.phone);
+      
+      // First check if the chat contact already has a real name (not phone-based)
+      if (chatContact.name && 
+          !chatContact.name.startsWith('WhatsApp') && 
+          !chatContact.name.startsWith('+') &&
+          !/^\d+$/.test(chatContact.name.replace(/\s/g, ''))) {
+        return chatContact.name;
+      }
+      
+      // Look up name from imported contacts - try exact match first
+      let name = phoneToNameMap.get(normalizedPhone);
+      if (name) return name;
+      
+      // Try matching with last 10 digits (handles country code differences)
+      if (normalizedPhone.length >= 10) {
+        const last10 = normalizedPhone.slice(-10);
+        name = last10ToNameMap.get(last10);
+        if (name) return name;
+      }
+      
+      // Fallback to formatted phone number
+      return chatContact.phone.startsWith('+') ? chatContact.phone : `+${chatContact.phone}`;
+    };
+  }, [phoneToNameMap, last10ToNameMap]);
 
   const selectedChat = chats.find(c => c.id === selectedChatId);
   const selectedContactId = selectedChat?.contactId;
@@ -405,16 +488,8 @@ export default function WindowInbox() {
     return `${hours} hr ${minutes} min left`;
   };
 
-  const formatContactName = (name: string, phone: string) => {
-    if (name.startsWith('WhatsApp ')) {
-      const phoneNumber = phone.startsWith('+') ? phone : `+${phone}`;
-      return phoneNumber;
-    }
-    return name;
-  };
-
-  const getInitials = (name: string, phone: string) => {
-    const displayName = formatContactName(name, phone);
+  const getInitials = (contact: Contact) => {
+    const displayName = getContactName(contact);
     if (displayName.startsWith('+')) {
       return displayName.slice(-2);
     }
@@ -515,14 +590,14 @@ export default function WindowInbox() {
                       >
                         <Avatar>
                           <AvatarFallback className="bg-primary/10 text-primary">
-                            {getInitials(chat.contact.name, chat.contact.phone)}
+                            {getInitials(chat.contact)}
                           </AvatarFallback>
                         </Avatar>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between mb-1">
                             <div className="flex items-center gap-2">
                               <span className={`font-medium truncate ${chat.unreadCount > 0 ? 'font-bold' : ''}`}>
-                                {formatContactName(chat.contact.name, chat.contact.phone)}
+                                {getContactName(chat.contact)}
                               </span>
                               {chat.unreadCount > 0 && (
                                 <span className="h-5 w-5 rounded-full bg-primary text-primary-foreground text-[10px] flex items-center justify-center font-medium">
@@ -560,11 +635,11 @@ export default function WindowInbox() {
                   <div className="flex items-center gap-3">
                     <Avatar>
                       <AvatarFallback className="bg-primary/10 text-primary">
-                        {getInitials(selectedChat.contact.name, selectedChat.contact.phone)}
+                        {getInitials(selectedChat.contact)}
                       </AvatarFallback>
                     </Avatar>
                     <div>
-                      <h3 className="font-medium">{formatContactName(selectedChat.contact.name, selectedChat.contact.phone)}</h3>
+                      <h3 className="font-medium">{getContactName(selectedChat.contact)}</h3>
                       <div className="flex items-center gap-2">
                         <span className="text-xs text-muted-foreground">{selectedChat.contact.phone}</span>
                         <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">

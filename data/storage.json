@@ -1636,7 +1636,7 @@
       "content": "Thank you for contacting shreeprabha Homeproduct  Healthy and testy traditional food manufacturer 🙏 How can I help you  ❤️",
       "type": "text",
       "direction": "inbound",
-      "status": "sent",
+      "status": "read",
       "id": "82f27cdc-584c-4541-b7db-173b35f9d894",
       "timestamp": "2025-11-29T07:52:43.294Z"
     },
@@ -2347,7 +2347,7 @@
       "content": "How is the price",
       "type": "text",
       "direction": "inbound",
-      "status": "sent",
+      "status": "read",
       "id": "43d9df8e-48f7-4838-8362-0c8e1a5a1dec",
       "timestamp": "2025-11-29T09:14:44.202Z"
     },
@@ -2413,6 +2413,42 @@
       "status": "sent",
       "id": "af4f7370-e28b-4f67-8208-05dec9064264",
       "timestamp": "2025-11-29T09:16:33.247Z"
+    },
+    {
+      "contactId": "4d460e87-b06f-4c96-ab75-3a484e9a18ad",
+      "content": "Nothing",
+      "type": "text",
+      "direction": "inbound",
+      "status": "read",
+      "id": "43344934-0ce2-4f2a-85e3-2bd88bc18429",
+      "timestamp": "2025-11-29T09:33:22.697Z"
+    },
+    {
+      "contactId": "4d460e87-b06f-4c96-ab75-3a484e9a18ad",
+      "content": "Alright! If you have any questions or need assistance, feel free to ask.",
+      "type": "text",
+      "direction": "outbound",
+      "status": "sent",
+      "id": "1a1f6212-a73e-46dc-8f0c-47b31b8c5a86",
+      "timestamp": "2025-11-29T09:33:26.168Z"
+    },
+    {
+      "contactId": "98ee4ee3-4379-4f2d-8b8e-253099fdf20b",
+      "content": "For a teacher",
+      "type": "text",
+      "direction": "inbound",
+      "status": "sent",
+      "id": "39fa02f6-216f-4300-a109-cd031e238d68",
+      "timestamp": "2025-11-29T09:36:40.295Z"
+    },
+    {
+      "contactId": "98ee4ee3-4379-4f2d-8b8e-253099fdf20b",
+      "content": "Certainly! Are you looking for information or resources related to teaching? Whether it's lesson planning, classroom management, educational strategies, or professional development, feel free to let me know how I can assist you.",
+      "type": "text",
+      "direction": "outbound",
+      "status": "sent",
+      "id": "9a230c53-7539-4db7-b61e-72c5ccc83002",
+      "timestamp": "2025-11-29T09:36:43.737Z"
     }
   ],
   "campaigns": [
@@ -2794,11 +2830,11 @@
         "createdAt": "2025-11-28T06:04:55.063Z",
         "updatedAt": "2025-11-28T06:04:55.063Z"
       },
-      "lastMessage": "Hi there! 😊 Just wanted to drop by and say hello. Hope you're having a fantastic day! If you need anything or just want to chat, I'm here. Take care! 🌟",
-      "lastMessageTime": "2025-11-29T09:15:46.651Z",
-      "lastInboundMessageTime": "2025-11-29T09:14:44.202Z",
-      "lastInboundMessage": "How is the price",
-      "unreadCount": 1,
+      "lastMessage": "Alright! If you have any questions or need assistance, feel free to ask.",
+      "lastMessageTime": "2025-11-29T09:33:26.168Z",
+      "lastInboundMessageTime": "2025-11-29T09:33:22.697Z",
+      "lastInboundMessage": "Nothing",
+      "unreadCount": 0,
       "status": "open",
       "notes": []
     },
@@ -3074,7 +3110,7 @@
       "lastMessageTime": "2025-11-29T07:52:47.168Z",
       "lastInboundMessageTime": "2025-11-29T07:52:43.294Z",
       "lastInboundMessage": "Thank you for contacting shreeprabha Homeproduct  Healthy and testy traditional food manufacturer 🙏 How can I help you  ❤️",
-      "unreadCount": 1,
+      "unreadCount": 0,
       "status": "open",
       "notes": []
     },
@@ -3645,11 +3681,11 @@
         "createdAt": "2025-11-29T08:56:24.629Z",
         "updatedAt": "2025-11-29T08:56:24.629Z"
       },
-      "lastMessage": "Could you provide more details about what you need the fee information for? Are you referring to a specific service, institution, or event? This will help me assist you better.",
-      "lastMessageTime": "2025-11-29T08:57:01.057Z",
-      "lastInboundMessageTime": "2025-11-29T08:56:57.646Z",
-      "lastInboundMessage": "Plz send me fee details",
-      "unreadCount": 0,
+      "lastMessage": "Certainly! Are you looking for information or resources related to teaching? Whether it's lesson planning, classroom management, educational strategies, or professional development, feel free to let me know how I can assist you.",
+      "lastMessageTime": "2025-11-29T09:36:43.737Z",
+      "lastInboundMessageTime": "2025-11-29T09:36:40.295Z",
+      "lastInboundMessage": "For a teacher",
+      "unreadCount": 1,
       "status": "open",
       "notes": []
     },
