@@ -21,6 +21,7 @@ interface Contact {
   phone: string;
   email?: string;
   tags: string[];
+  source?: string;
 }
 
 interface Template {
@@ -37,6 +38,15 @@ interface Agent {
   isActive: boolean;
 }
 
+interface SavedContact {
+  id: string;
+  name: string;
+  phone: string;
+  email?: string;
+  tags?: string[];
+  source?: string;
+}
+
 export default function SelectedContacts() {
   const [selectedContactIds, setSelectedContactIds] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -46,7 +56,7 @@ export default function SelectedContacts() {
   const [customMessage, setCustomMessage] = useState("");
   const [showSendDialog, setShowSendDialog] = useState(false);
 
-  const { data: contacts = [], isLoading: contactsLoading } = useQuery<Contact[]>({
+  const { data: regularContacts = [], isLoading: regularLoading } = useQuery<Contact[]>({
     queryKey: ["/api/contacts"],
     queryFn: async () => {
       const res = await fetch("/api/contacts");
@@ -54,6 +64,29 @@ export default function SelectedContacts() {
       return res.json();
     },
   });
+
+  const { data: importedContacts = [], isLoading: importedLoading } = useQuery<SavedContact[]>({
+    queryKey: ["/api/broadcast/imported-contacts"],
+    queryFn: async () => {
+      const res = await fetch("/api/broadcast/imported-contacts");
+      if (!res.ok) throw new Error("Failed to fetch imported contacts");
+      return res.json();
+    },
+  });
+
+  const contacts: Contact[] = [
+    ...regularContacts,
+    ...importedContacts.map(c => ({
+      id: c.id,
+      name: c.name,
+      phone: c.phone,
+      email: c.email,
+      tags: c.tags || [],
+      source: c.source || 'import',
+    })),
+  ];
+
+  const contactsLoading = regularLoading || importedLoading;
 
   const { data: templates = [] } = useQuery<Template[]>({
     queryKey: ["/api/templates"],

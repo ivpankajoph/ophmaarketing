@@ -48,6 +48,15 @@ interface ImportedContact {
   email?: string;
 }
 
+interface SavedContact {
+  id: string;
+  name: string;
+  phone: string;
+  email?: string;
+  tags?: string[];
+  source?: string;
+}
+
 export default function Broadcast() {
   const [, setLocation] = useLocation();
   const [selectedContactIds, setSelectedContactIds] = useState<string[]>([]);
@@ -67,7 +76,7 @@ export default function Broadcast() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const queryClient = useQueryClient();
 
-  const { data: contacts = [] } = useQuery<Contact[]>({
+  const { data: regularContacts = [] } = useQuery<Contact[]>({
     queryKey: ["/api/contacts"],
     queryFn: async () => {
       const res = await fetch("/api/contacts");
@@ -75,6 +84,25 @@ export default function Broadcast() {
       return res.json();
     },
   });
+
+  const { data: savedImportedContacts = [] } = useQuery<SavedContact[]>({
+    queryKey: ["/api/broadcast/imported-contacts"],
+    queryFn: async () => {
+      const res = await fetch("/api/broadcast/imported-contacts");
+      if (!res.ok) throw new Error("Failed to fetch imported contacts");
+      return res.json();
+    },
+  });
+
+  const contacts: Contact[] = [
+    ...regularContacts,
+    ...savedImportedContacts.map(c => ({
+      id: c.id,
+      name: c.name,
+      phone: c.phone,
+      tags: c.tags || [],
+    })),
+  ];
 
   const { data: templates = [] } = useQuery<Template[]>({
     queryKey: ["/api/templates"],

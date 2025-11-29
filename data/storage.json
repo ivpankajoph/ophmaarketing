@@ -814,6 +814,18 @@
       "status": "approved",
       "createdAt": "2025-11-27T21:47:08.146Z",
       "updatedAt": "2025-11-27T21:47:08.147Z"
+    },
+    {
+      "name": "category_temp",
+      "category": "marketing",
+      "content": "hello {{name}} , thanks for being with us , lets create something new",
+      "variables": [
+        "name"
+      ],
+      "id": "d1664359-faec-483c-92af-fdb65c23cbbe",
+      "status": "pending",
+      "createdAt": "2025-11-29T04:47:47.445Z",
+      "updatedAt": "2025-11-29T04:47:47.445Z"
     }
   ],
   "automations": [
