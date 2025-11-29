@@ -82,6 +82,7 @@ export default function WindowInbox() {
   const [messageInput, setMessageInput] = useState("");
   const [selectedContacts, setSelectedContacts] = useState<string[]>([]);
   const [isBulkSendOpen, setIsBulkSendOpen] = useState(false);
+  const [isSingleSendOpen, setIsSingleSendOpen] = useState(false);
   const [messageType, setMessageType] = useState<"template" | "custom" | "ai">("custom");
   const [selectedTemplate, setSelectedTemplate] = useState("");
   const [selectedAgent, setSelectedAgent] = useState("");
@@ -220,6 +221,77 @@ export default function WindowInbox() {
       toast.error("Failed to send bulk message");
     },
   });
+
+  const sendSingleMessageMutation = useMutation({
+    mutationFn: async (data: { 
+      contactId: string;
+      phone: string;
+      name: string;
+      messageType: string;
+      templateName?: string;
+      customMessage?: string;
+      agentId?: string;
+    }) => {
+      const res = await fetch("/api/inbox/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.error || "Failed to send message");
+      return { ...result, contactId: data.contactId };
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/messages", data.contactId] });
+      queryClient.invalidateQueries({ queryKey: ["/api/chats/window"] });
+      setIsSingleSendOpen(false);
+      setCustomMessage("");
+      setSelectedTemplate("");
+      setSelectedAgent("");
+      setMessageType("custom");
+      toast.success("Message sent successfully!");
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || "Failed to send message");
+    },
+  });
+
+  const handleSingleSend = () => {
+    if (!selectedChat || !selectedContactId) {
+      toast.error("Please select a contact first");
+      return;
+    }
+
+    const phone = selectedChat.contact.phone.replace(/\D/g, '');
+    const name = selectedChat.contact.name;
+
+    if (messageType === "template" && !selectedTemplate) {
+      toast.error("Please select a template");
+      return;
+    }
+
+    if (messageType === "custom" && !customMessage.trim()) {
+      toast.error("Please enter a message");
+      return;
+    }
+
+    if (messageType === "ai" && !selectedAgent) {
+      toast.error("Please select an AI agent");
+      return;
+    }
+
+    const templateObj = templates.find(t => t.id === selectedTemplate);
+
+    sendSingleMessageMutation.mutate({
+      contactId: selectedContactId,
+      phone,
+      name,
+      messageType,
+      templateName: templateObj?.name,
+      customMessage: messageType === "custom" ? customMessage : undefined,
+      agentId: messageType === "ai" ? selectedAgent : undefined,
+    });
+  };
 
   useEffect(() => {
     if (chats.length > 0 && !selectedChatId) {
@@ -529,6 +601,15 @@ export default function WindowInbox() {
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
+                    <Button 
+                      variant="default" 
+                      size="sm"
+                      onClick={() => setIsSingleSendOpen(true)}
+                      className="flex items-center gap-2"
+                    >
+                      <Send className="h-4 w-4" />
+                      Send Message
+                    </Button>
                     <Button variant="ghost" size="icon"><Phone className="h-5 w-5 text-muted-foreground" /></Button>
                     <Button variant="ghost" size="icon"><Video className="h-5 w-5 text-muted-foreground" /></Button>
                     <Button variant="ghost" size="icon"><MoreVertical className="h-5 w-5 text-muted-foreground" /></Button>
@@ -719,6 +800,120 @@ export default function WindowInbox() {
             <Button onClick={handleBulkSend} disabled={sendBulkMessageMutation.isPending}>
               {sendBulkMessageMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Send to {selectedContacts.length} Contacts
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isSingleSendOpen} onOpenChange={setIsSingleSendOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Send className="h-5 w-5" />
+              Send Message to {selectedChat?.contact.name || "Contact"}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="p-3 bg-green-50 dark:bg-green-950/30 rounded-lg text-sm text-green-700 dark:text-green-400">
+              <Clock className="h-4 w-4 inline mr-2" />
+              Within 24-hour window - You can send custom messages, templates, or AI agent responses.
+            </div>
+
+            <div className="p-3 bg-muted rounded-lg">
+              <p className="text-sm font-medium">Sending to:</p>
+              <p className="text-sm text-muted-foreground">{selectedChat?.contact.name} - {selectedChat?.contact.phone}</p>
+            </div>
+
+            <Tabs value={messageType} onValueChange={(v) => setMessageType(v as any)}>
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="template" className="flex items-center gap-2">
+                  <FileText className="h-4 w-4" />
+                  Template
+                </TabsTrigger>
+                <TabsTrigger value="custom" className="flex items-center gap-2">
+                  <MessageSquare className="h-4 w-4" />
+                  Custom
+                </TabsTrigger>
+                <TabsTrigger value="ai" className="flex items-center gap-2">
+                  <Bot className="h-4 w-4" />
+                  AI Agent
+                </TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="template" className="space-y-4 pt-4">
+                <div className="space-y-2">
+                  <Label>Select Template</Label>
+                  <Select value={selectedTemplate} onValueChange={setSelectedTemplate}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Choose a template" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {approvedTemplates.map(template => (
+                        <SelectItem key={template.id} value={template.id}>
+                          {template.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                {selectedTemplate && (
+                  <div className="p-3 bg-muted rounded-lg">
+                    <p className="text-sm">
+                      {templates.find(t => t.id === selectedTemplate)?.content}
+                    </p>
+                  </div>
+                )}
+              </TabsContent>
+
+              <TabsContent value="custom" className="space-y-4 pt-4">
+                <div className="space-y-2">
+                  <Label>Custom Message</Label>
+                  <Textarea 
+                    placeholder="Type your message here..."
+                    value={customMessage}
+                    onChange={(e) => setCustomMessage(e.target.value)}
+                    rows={5}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Your message will be sent directly via WhatsApp.
+                  </p>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="ai" className="space-y-4 pt-4">
+                <div className="space-y-2">
+                  <Label>Select AI Agent</Label>
+                  <Select value={selectedAgent} onValueChange={setSelectedAgent}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Choose an AI Agent" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {agents.filter(a => a.isActive).map(agent => (
+                        <SelectItem key={agent.id} value={agent.id}>
+                          {agent.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                {selectedAgent && (
+                  <div className="p-3 bg-muted rounded-lg">
+                    <p className="text-sm">
+                      {agents.find(a => a.id === selectedAgent)?.description || "AI Agent will generate a personalized response."}
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-2">
+                      The AI will generate a contextual message and send it via WhatsApp. The conversation will appear below.
+                    </p>
+                  </div>
+                )}
+              </TabsContent>
+            </Tabs>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsSingleSendOpen(false)}>Cancel</Button>
+            <Button onClick={handleSingleSend} disabled={sendSingleMessageMutation.isPending}>
+              {sendSingleMessageMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Send Message
             </Button>
           </DialogFooter>
         </DialogContent>

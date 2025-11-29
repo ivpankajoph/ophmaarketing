@@ -17,6 +17,10 @@ import whatsappRoutes from "./modules/whatsapp/whatsapp.routes";
 import leadAutoReplyRoutes from "./modules/leadAutoReply/leadAutoReply.routes";
 import broadcastRoutes from "./modules/broadcast/broadcast.routes";
 import aiAnalyticsRoutes from "./modules/aiAnalytics/aiAnalytics.routes";
+import * as broadcastService from "./modules/broadcast/broadcast.service";
+import * as agentService from "./modules/aiAgents/agent.service";
+import * as openaiService from "./modules/openai/openai.service";
+import * as templateService from "./modules/leadAutoReply/templateMessages.service";
 
 export async function registerRoutes(
   httpServer: Server,
@@ -160,6 +164,177 @@ export async function registerRoutes(
       res.json({ success: true });
     } catch (error) {
       res.status(500).json({ message: "Failed to mark messages as read" });
+    }
+  });
+
+  app.post("/api/inbox/send", async (req, res) => {
+    try {
+      const { contactId, phone, name, messageType, templateName, customMessage, agentId } = req.body;
+      
+      if (!phone) {
+        return res.status(400).json({ error: "Phone number is required" });
+      }
+      
+      if (!messageType) {
+        return res.status(400).json({ error: "Message type is required" });
+      }
+      
+      console.log(`[InboxSend] Sending ${messageType} message to ${phone}`);
+      
+      let result: { success: boolean; messageId?: string; error?: string; aiMessage?: string } = { success: false };
+      let messageContent = "";
+      
+      switch (messageType) {
+        case "template": {
+          if (!templateName) {
+            return res.status(400).json({ error: "Template name is required for template messages" });
+          }
+          result = await broadcastService.sendTemplateMessage(phone, templateName, name);
+          messageContent = `[Template: ${templateName}]`;
+          break;
+        }
+        
+        case "custom": {
+          if (!customMessage) {
+            return res.status(400).json({ error: "Message content is required for custom messages" });
+          }
+          result = await broadcastService.sendCustomMessage(phone, customMessage);
+          messageContent = customMessage;
+          break;
+        }
+        
+        case "ai": {
+          if (!agentId) {
+            return res.status(400).json({ error: "Agent ID is required for AI messages" });
+          }
+          
+          const agent = await agentService.getAgentById(agentId);
+          if (!agent) {
+            return res.status(404).json({ error: "AI Agent not found" });
+          }
+          
+          console.log(`[InboxSend] Generating AI response with agent: ${agent.name}`);
+          
+          let conversationContext = "";
+          if (contactId) {
+            try {
+              const recentMessages = await storage.getMessagesByContactId(contactId);
+              const lastMessages = recentMessages.slice(-5);
+              if (lastMessages.length > 0) {
+                conversationContext = "\n\nRecent conversation:\n" + 
+                  lastMessages.map(m => `${m.direction === 'inbound' ? 'Customer' : 'Business'}: ${m.content}`).join("\n");
+              }
+            } catch (e) {
+              console.log("[InboxSend] Could not fetch conversation context");
+            }
+          }
+          
+          const aiMessage = await openaiService.generateAgentResponse(
+            `Generate a friendly personalized message for ${name || 'this customer'}. Keep it conversational and under 200 characters.${conversationContext}`,
+            agent
+          );
+          
+          if (!aiMessage) {
+            return res.status(500).json({ error: "Failed to generate AI response. Check if OPENAI_API_KEY is configured." });
+          }
+          
+          console.log(`[InboxSend] AI generated: "${aiMessage.substring(0, 100)}..."`);
+          
+          result = await broadcastService.sendCustomMessage(phone, aiMessage);
+          result.aiMessage = aiMessage;
+          messageContent = aiMessage;
+          
+          if (!result.success && result.error?.includes("24")) {
+            console.log("[InboxSend] Outside 24-hour window, trying template fallback");
+            result = await templateService.sendHelloWorldTemplate(phone);
+            messageContent = "[Template: hello_world] (AI fallback)";
+          }
+          break;
+        }
+        
+        default:
+          return res.status(400).json({ error: "Invalid message type. Use: template, custom, or ai" });
+      }
+      
+      if (result.success && contactId) {
+        try {
+          await storage.createMessage({
+            contactId,
+            content: messageContent,
+            type: "text" as const,
+            direction: "outbound",
+            status: "sent" as const,
+          });
+          console.log(`[InboxSend] Saved message to conversation for contact ${contactId}`);
+        } catch (saveError) {
+          console.error("[InboxSend] Failed to save message to conversation:", saveError);
+        }
+      }
+      
+      if (result.success) {
+        res.json({ 
+          success: true, 
+          messageId: result.messageId,
+          message: messageContent,
+          sent: true 
+        });
+      } else {
+        res.status(400).json({ 
+          success: false, 
+          error: result.error || "Failed to send message" 
+        });
+      }
+    } catch (error: any) {
+      console.error("[InboxSend] Error:", error);
+      res.status(500).json({ error: error.message || "Failed to send message" });
+    }
+  });
+
+  app.post("/api/inbox/send-ai-response", async (req, res) => {
+    try {
+      const { contactId, phone, name, agentId, userMessage } = req.body;
+      
+      if (!phone || !agentId) {
+        return res.status(400).json({ error: "Phone and agentId are required" });
+      }
+      
+      const agent = await agentService.getAgentById(agentId);
+      if (!agent) {
+        return res.status(404).json({ error: "AI Agent not found" });
+      }
+      
+      console.log(`[InboxSendAI] Generating contextual AI response with agent: ${agent.name}`);
+      
+      const context = userMessage 
+        ? `Customer ${name || ''} said: "${userMessage}". Please respond appropriately.`
+        : `Generate a friendly greeting for ${name || 'this customer'}.`;
+      
+      const aiMessage = await openaiService.generateAgentResponse(context, agent);
+      
+      if (!aiMessage) {
+        return res.status(500).json({ error: "Failed to generate AI response" });
+      }
+      
+      const result = await broadcastService.sendCustomMessage(phone, aiMessage);
+      
+      if (result.success && contactId) {
+        await storage.createMessage({
+          contactId,
+          content: aiMessage,
+          type: "text" as const,
+          direction: "outbound",
+          status: "sent" as const,
+        });
+      }
+      
+      res.json({ 
+        success: result.success, 
+        message: aiMessage,
+        error: result.error 
+      });
+    } catch (error: any) {
+      console.error("[InboxSendAI] Error:", error);
+      res.status(500).json({ error: error.message || "Failed to send AI response" });
     }
   });
 
