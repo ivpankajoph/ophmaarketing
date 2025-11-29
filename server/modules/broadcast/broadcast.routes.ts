@@ -65,7 +65,7 @@ router.delete('/lists/:id', async (req: Request, res: Response) => {
   }
 });
 
-router.post('/import-excel', upload.single('file'), (req: Request, res: Response) => {
+router.post('/import-excel', upload.single('file'), async (req: Request, res: Response) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'No file uploaded' });
@@ -91,11 +91,15 @@ router.post('/import-excel', upload.single('file'), (req: Request, res: Response
       });
     }
     
+    const saveResult = await broadcastService.saveImportedContacts(result.contacts, 'excel');
+    
     res.json({
       success: true,
       contacts: result.contacts,
       totalRows: result.totalRows,
       validContacts: result.validContacts,
+      savedContacts: saveResult.saved,
+      duplicates: saveResult.duplicates,
       errors: result.errors,
     });
   } catch (error) {
@@ -104,7 +108,7 @@ router.post('/import-excel', upload.single('file'), (req: Request, res: Response
   }
 });
 
-router.post('/import-csv', upload.single('file'), (req: Request, res: Response) => {
+router.post('/import-csv', upload.single('file'), async (req: Request, res: Response) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'No file uploaded' });
@@ -130,11 +134,15 @@ router.post('/import-csv', upload.single('file'), (req: Request, res: Response) 
       });
     }
     
+    const saveResult = await broadcastService.saveImportedContacts(result.contacts, 'csv');
+    
     res.json({
       success: true,
       contacts: result.contacts,
       totalRows: result.totalRows,
       validContacts: result.validContacts,
+      savedContacts: saveResult.saved,
+      duplicates: saveResult.duplicates,
       errors: result.errors,
     });
   } catch (error) {
@@ -337,6 +345,29 @@ router.get('/logs', async (req: Request, res: Response) => {
   } catch (error) {
     console.error('Failed to get broadcast logs:', error);
     res.status(500).json({ error: 'Failed to get broadcast logs' });
+  }
+});
+
+router.get('/imported-contacts', async (req: Request, res: Response) => {
+  try {
+    const contacts = await broadcastService.getImportedContacts();
+    res.json(contacts);
+  } catch (error) {
+    console.error('Failed to get imported contacts:', error);
+    res.status(500).json({ error: 'Failed to get imported contacts' });
+  }
+});
+
+router.delete('/imported-contacts/:id', async (req: Request, res: Response) => {
+  try {
+    const success = await broadcastService.deleteImportedContact(req.params.id);
+    if (!success) {
+      return res.status(404).json({ error: 'Contact not found' });
+    }
+    res.status(204).send();
+  } catch (error) {
+    console.error('Failed to delete imported contact:', error);
+    res.status(500).json({ error: 'Failed to delete imported contact' });
   }
 });
 

@@ -152,6 +152,10 @@ Required secrets for full functionality:
 The application runs on port 5000 with `npm run dev`.
 
 ## Recent Changes
+- **Nov 29, 2025**: Fixed imported contacts not showing in contact list - contacts now saved to MongoDB
+- **Nov 29, 2025**: Added ImportedContact MongoDB schema with proper persistence
+- **Nov 29, 2025**: Updated Contacts page to show both regular and imported contacts
+- **Nov 29, 2025**: Added /api/broadcast/imported-contacts endpoint for fetching saved contacts
 - **Nov 29, 2025**: Fixed CSV import to accept Mobile/Name columns (case-insensitive header mapping)
 - **Nov 29, 2025**: Added scientific notation handling for phone numbers from Excel
 - **Nov 29, 2025**: Fixed time display in 24-Hour Window Inbox (now shows "X hr Y min ago" format)

@@ -556,3 +556,71 @@ export function exportContactsToJSON(contacts: BroadcastContact[]): object[] {
     tags: c.tags?.join(', ') || '',
   }));
 }
+
+export interface ImportedContact {
+  id: string;
+  name: string;
+  phone: string;
+  email?: string;
+  tags?: string[];
+  source: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export async function saveImportedContacts(contacts: BroadcastContact[], source: string = 'import'): Promise<{ saved: number; duplicates: number; errors: string[] }> {
+  const errors: string[] = [];
+  let saved = 0;
+  let duplicates = 0;
+  const now = new Date().toISOString();
+
+  for (const contact of contacts) {
+    try {
+      const existingContact = await mongodb.findOne<ImportedContact>('imported_contacts', { phone: contact.phone });
+      
+      if (existingContact) {
+        duplicates++;
+        continue;
+      }
+
+      const newContact: ImportedContact = {
+        id: `contact-${Date.now()}-${Math.random().toString(36).substring(7)}`,
+        name: contact.name,
+        phone: contact.phone,
+        email: contact.email || '',
+        tags: contact.tags || [],
+        source,
+        createdAt: now,
+        updatedAt: now,
+      };
+
+      await mongodb.insertOne('imported_contacts', newContact);
+      saved++;
+    } catch (error) {
+      errors.push(`Failed to save contact ${contact.phone}: ${error}`);
+    }
+  }
+
+  console.log(`[ImportContacts] Saved ${saved} new contacts, ${duplicates} duplicates skipped`);
+  return { saved, duplicates, errors };
+}
+
+export async function getImportedContacts(): Promise<ImportedContact[]> {
+  try {
+    const contacts = await mongodb.readCollection<ImportedContact>('imported_contacts');
+    return contacts.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  } catch (error) {
+    console.error('[ImportContacts] Failed to get contacts:', error);
+    return [];
+  }
+}
+
+export async function deleteImportedContact(id: string): Promise<boolean> {
+  try {
+    await mongodb.deleteOne('imported_contacts', { id });
+    return true;
+  } catch (error) {
+    console.error('[ImportContacts] Failed to delete contact:', error);
+    return false;
+  }
+}

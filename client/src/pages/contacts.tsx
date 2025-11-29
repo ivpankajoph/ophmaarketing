@@ -32,6 +32,7 @@ interface Contact {
   email?: string;
   tags: string[];
   notes?: string;
+  source?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -47,7 +48,7 @@ export default function Contacts() {
 
   const queryClient = useQueryClient();
 
-  const { data: contacts = [], isLoading } = useQuery<Contact[]>({
+  const { data: regularContacts = [], isLoading: isLoadingRegular } = useQuery<Contact[]>({
     queryKey: ["/api/contacts"],
     queryFn: async () => {
       const res = await fetch("/api/contacts");
@@ -55,6 +56,23 @@ export default function Contacts() {
       return res.json();
     },
   });
+
+  const { data: importedContacts = [], isLoading: isLoadingImported } = useQuery<Contact[]>({
+    queryKey: ["/api/broadcast/imported-contacts"],
+    queryFn: async () => {
+      const res = await fetch("/api/broadcast/imported-contacts");
+      if (!res.ok) throw new Error("Failed to fetch imported contacts");
+      return res.json();
+    },
+  });
+
+  const contacts = [...regularContacts, ...importedContacts.map(c => ({
+    ...c,
+    tags: c.tags || [],
+    source: c.source || 'import',
+  }))];
+  
+  const isLoading = isLoadingRegular || isLoadingImported;
 
   const createMutation = useMutation({
     mutationFn: async (data: any) => {
@@ -99,12 +117,21 @@ export default function Contacts() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const res = await fetch(`/api/contacts/${id}`, { method: "DELETE" });
+    mutationFn: async (contact: Contact) => {
+      const isImported = contact.source === 'import' || contact.source === 'excel' || contact.source === 'csv';
+      const url = isImported 
+        ? `/api/broadcast/imported-contacts/${contact.id}`
+        : `/api/contacts/${contact.id}`;
+      const res = await fetch(url, { method: "DELETE" });
       if (!res.ok) throw new Error("Failed to delete contact");
+      return isImported;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/contacts"] });
+    onSuccess: (isImported) => {
+      if (isImported) {
+        queryClient.invalidateQueries({ queryKey: ["/api/broadcast/imported-contacts"] });
+      } else {
+        queryClient.invalidateQueries({ queryKey: ["/api/contacts"] });
+      }
       toast.success("Contact deleted successfully");
     },
     onError: () => {
@@ -409,7 +436,7 @@ export default function Contacts() {
                             </DropdownMenuItem>
                             <DropdownMenuItem 
                               className="text-destructive"
-                              onClick={() => deleteMutation.mutate(contact.id)}
+                              onClick={() => deleteMutation.mutate(contact)}
                             >
                               <Trash2 className="mr-2 h-4 w-4" />
                               Delete

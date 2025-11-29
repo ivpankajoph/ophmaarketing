@@ -135,6 +135,17 @@ const BroadcastLogSchema = new Schema({
   timestamp: { type: String, required: true },
 }, { collection: 'broadcast_logs' });
 
+const ImportedContactSchema = new Schema({
+  id: { type: String, required: true, unique: true },
+  name: { type: String, required: true },
+  phone: { type: String, required: true },
+  email: { type: String, default: '' },
+  tags: { type: [String], default: [] },
+  source: { type: String, default: 'import' },
+  createdAt: { type: String, required: true },
+  updatedAt: { type: String, required: true },
+}, { collection: 'imported_contacts' });
+
 export const Agent = mongoose.models.Agent || mongoose.model('Agent', AgentSchema);
 export const Form = mongoose.models.Form || mongoose.model('Form', FormSchema);
 export const Lead = mongoose.models.Lead || mongoose.model('Lead', LeadSchema);
@@ -143,6 +154,7 @@ export const Qualification = mongoose.models.Qualification || mongoose.model('Qu
 export const BroadcastList = mongoose.models.BroadcastList || mongoose.model('BroadcastList', BroadcastListSchema);
 export const ScheduledMessage = mongoose.models.ScheduledMessage || mongoose.model('ScheduledMessage', ScheduledMessageSchema);
 export const BroadcastLog = mongoose.models.BroadcastLog || mongoose.model('BroadcastLog', BroadcastLogSchema);
+export const ImportedContact = mongoose.models.ImportedContact || mongoose.model('ImportedContact', ImportedContactSchema);
 
 const modelMap: Record<string, Model<any>> = {
   agents: Agent,
@@ -153,6 +165,7 @@ const modelMap: Record<string, Model<any>> = {
   broadcast_lists: BroadcastList,
   scheduled_messages: ScheduledMessage,
   broadcast_logs: BroadcastLog,
+  imported_contacts: ImportedContact,
 };
 
 export async function readCollection<T>(collectionName: string): Promise<T[]> {
