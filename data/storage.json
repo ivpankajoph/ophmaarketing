@@ -3496,6 +3496,24 @@
       "status": "sent",
       "id": "028f198c-9e69-40f1-8625-1140f56cfdbc",
       "timestamp": "2025-11-29T11:11:35.779Z"
+    },
+    {
+      "contactId": "8a9e2cfc-5b0b-4473-a1e1-ed26edeaa049",
+      "content": "sparsh, business coach, 15",
+      "type": "text",
+      "direction": "inbound",
+      "status": "sent",
+      "id": "d74b1b81-80f8-4ad1-ad36-f55f3f960b6d",
+      "timestamp": "2025-11-29T11:13:14.360Z"
+    },
+    {
+      "contactId": "8a9e2cfc-5b0b-4473-a1e1-ed26edeaa049",
+      "content": "Great, nice to meet you Sparsh! 🌟  \nBusiness Coach sounds like a fantastic field 🏆  \nWow, 15 years of experience! Impressive 🙌  \n\nBased on your extensive experience as a Business Coach, I would suggest our \"Leadership and Mentorship Excellence Award.\" This category is perfect for highlighting your contributions and achievements in coaching. The fee for this category, including all the exclusive benefits, starts at ₹49,999 + GST. 😊\n\nRemember, this includes national recognition, media coverage, networking opportunities, and much more. Let me know if you have any questions or need further details! 🌟",
+      "type": "text",
+      "direction": "outbound",
+      "status": "sent",
+      "id": "436049bc-6d65-45bb-9548-e41494ed537f",
+      "timestamp": "2025-11-29T11:13:19.439Z"
     }
   ],
   "campaigns": [
@@ -3831,11 +3849,11 @@
         "createdAt": "2025-11-27T22:31:14.359Z",
         "updatedAt": "2025-11-27T22:31:14.359Z"
       },
-      "lastMessage": "The charges for participating in the Top Life Changers Awards 2026 can vary based on the award category and the benefits package you choose. 😊\n\nTo give you the best suggestion and its fee, could you please share your details in this format?\n\nName:  \nAward Category / Interest:  \nIndustry / Field:  \nYears of Experience:  \nAny Previous Awards (mention award name or 'None'):\n\nThis will help me tailor the information specifically for you! 🌟🏆",
-      "lastMessageTime": "2025-11-29T11:11:35.779Z",
-      "lastInboundMessageTime": "2025-11-29T11:11:31.356Z",
-      "lastInboundMessage": "what is the charges ?",
-      "unreadCount": 2,
+      "lastMessage": "Great, nice to meet you Sparsh! 🌟  \nBusiness Coach sounds like a fantastic field 🏆  \nWow, 15 years of experience! Impressive 🙌  \n\nBased on your extensive experience as a Business Coach, I would suggest our \"Leadership and Mentorship Excellence Award.\" This category is perfect for highlighting your contributions and achievements in coaching. The fee for this category, including all the exclusive benefits, starts at ₹49,999 + GST. 😊\n\nRemember, this includes national recognition, media coverage, networking opportunities, and much more. Let me know if you have any questions or need further details! 🌟",
+      "lastMessageTime": "2025-11-29T11:13:19.439Z",
+      "lastInboundMessageTime": "2025-11-29T11:13:14.360Z",
+      "lastInboundMessage": "sparsh, business coach, 15",
+      "unreadCount": 3,
       "status": "open",
       "notes": []
     },
