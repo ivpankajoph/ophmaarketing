@@ -5,6 +5,7 @@ import { generateAgentResponse } from '../openai/openai.service';
 import { getAllLeads } from '../facebook/fb.service';
 import { storage } from '../../storage';
 import * as aiAnalytics from '../aiAnalytics/aiAnalytics.service';
+import * as broadcastService from '../broadcast/broadcast.service';
 
 const WHATSAPP_TOKEN = process.env.WHATSAPP_TOKEN_NEW || process.env.WHATSAPP_TOKEN;
 const PHONE_NUMBER_ID = process.env.PHONE_NUMBER_ID;
@@ -165,6 +166,16 @@ async function findLeadByPhone(phone: string) {
 async function saveInboundMessage(from: string, content: string, type: string, buttonPayload?: string) {
   try {
     const normalizedPhone = from.replace(/\D/g, '');
+    
+    // Mark broadcast logs as replied when we receive a message from this phone
+    try {
+      const repliedCount = await broadcastService.markBroadcastLogAsReplied(from);
+      if (repliedCount > 0) {
+        console.log(`[Webhook] Marked ${repliedCount} broadcast logs as replied for ${from}`);
+      }
+    } catch (err) {
+      console.error('[Webhook] Error marking broadcast as replied:', err);
+    }
     
     const contacts = await storage.getContacts();
     let contact = contacts.find(c => {

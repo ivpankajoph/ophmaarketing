@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Search, Download, Filter, RefreshCw, MessageSquare, CheckCircle, XCircle, Clock } from "lucide-react";
+import { Search, Download, Filter, RefreshCw, MessageSquare, CheckCircle, XCircle, Clock, Reply } from "lucide-react";
 import { format } from "date-fns";
 
 interface BroadcastLog {
@@ -21,6 +21,8 @@ interface BroadcastLog {
   messageId?: string;
   error?: string;
   timestamp: string;
+  replied?: boolean;
+  repliedAt?: string;
 }
 
 export default function BroadcastReports() {
@@ -59,6 +61,7 @@ export default function BroadcastReports() {
     delivered: logs.filter(l => l.status === 'delivered').length,
     failed: logs.filter(l => l.status === 'failed').length,
     pending: logs.filter(l => l.status === 'pending').length,
+    replied: logs.filter(l => l.replied).length,
   };
 
   const getStatusBadge = (status: string) => {
@@ -90,7 +93,7 @@ export default function BroadcastReports() {
   };
 
   const handleExportCSV = () => {
-    const headers = ['Timestamp', 'Campaign', 'Contact Name', 'Phone', 'Type', 'Template', 'Status', 'Message ID', 'Error'];
+    const headers = ['Timestamp', 'Campaign', 'Contact Name', 'Phone', 'Type', 'Template', 'Status', 'Replied', 'Replied At', 'Message ID', 'Error'];
     const csvContent = [
       headers.join(','),
       ...filteredLogs.map(log => [
@@ -101,6 +104,8 @@ export default function BroadcastReports() {
         log.messageType,
         log.templateName || '',
         log.status,
+        log.replied ? 'Yes' : 'No',
+        log.repliedAt ? format(new Date(log.repliedAt), 'yyyy-MM-dd HH:mm:ss') : '',
         log.messageId || '',
         `"${log.error || ''}"`,
       ].join(','))
@@ -135,7 +140,7 @@ export default function BroadcastReports() {
           </div>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-4">
+        <div className="grid gap-4 md:grid-cols-5">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Messages</CardTitle>
@@ -161,6 +166,15 @@ export default function BroadcastReports() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-green-600">{stats.delivered}</div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Replied</CardTitle>
+              <Reply className="h-4 w-4 text-purple-500" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-purple-600">{stats.replied}</div>
             </CardContent>
           </Card>
           <Card>
@@ -248,6 +262,7 @@ export default function BroadcastReports() {
                         <th className="px-4 py-3 text-left text-sm font-medium">Contact</th>
                         <th className="px-4 py-3 text-left text-sm font-medium">Type</th>
                         <th className="px-4 py-3 text-left text-sm font-medium">Status</th>
+                        <th className="px-4 py-3 text-left text-sm font-medium">Replied</th>
                         <th className="px-4 py-3 text-left text-sm font-medium">Details</th>
                       </tr>
                     </thead>
@@ -274,6 +289,21 @@ export default function BroadcastReports() {
                           </td>
                           <td className="px-4 py-3">
                             {getStatusBadge(log.status)}
+                          </td>
+                          <td className="px-4 py-3">
+                            {log.replied ? (
+                              <Badge variant="default" className="bg-purple-500">
+                                <Reply className="h-3 w-3 mr-1" />
+                                Yes
+                              </Badge>
+                            ) : (
+                              <Badge variant="outline" className="text-muted-foreground">No</Badge>
+                            )}
+                            {log.repliedAt && (
+                              <div className="text-xs text-muted-foreground mt-1">
+                                {format(new Date(log.repliedAt), 'MMM d, HH:mm')}
+                              </div>
+                            )}
                           </td>
                           <td className="px-4 py-3">
                             {log.messageId && (

@@ -266,6 +266,8 @@ export interface BroadcastLog {
   messageId?: string;
   error?: string;
   timestamp: string;
+  replied?: boolean;
+  repliedAt?: string;
 }
 
 export async function logBroadcastMessage(log: Omit<BroadcastLog, 'id'>): Promise<BroadcastLog> {
@@ -280,6 +282,34 @@ export async function logBroadcastMessage(log: Omit<BroadcastLog, 'id'>): Promis
   } catch (error) {
     console.error('[BroadcastLog] Failed to save log:', error);
     return newLog;
+  }
+}
+
+export async function markBroadcastLogAsReplied(phone: string): Promise<number> {
+  try {
+    const normalizedPhone = phone.replace(/\D/g, '');
+    const logs = await mongodb.readCollection<BroadcastLog>('broadcast_logs');
+    let updatedCount = 0;
+    const now = new Date().toISOString();
+    
+    for (const log of logs) {
+      const logPhone = log.contactPhone.replace(/\D/g, '');
+      // Match if phones are similar (contains each other or match at the end)
+      if ((logPhone.includes(normalizedPhone) || normalizedPhone.includes(logPhone) || 
+           logPhone.endsWith(normalizedPhone.slice(-10)) || normalizedPhone.endsWith(logPhone.slice(-10))) && 
+          !log.replied) {
+        log.replied = true;
+        log.repliedAt = now;
+        await mongodb.updateOne('broadcast_logs', { id: log.id }, log);
+        updatedCount++;
+        console.log(`[BroadcastLog] Marked as replied: ${log.id} for phone ${phone}`);
+      }
+    }
+    
+    return updatedCount;
+  } catch (error) {
+    console.error('[BroadcastLog] Error marking as replied:', error);
+    return 0;
   }
 }
 

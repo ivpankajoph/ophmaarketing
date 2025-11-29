@@ -1,7 +1,9 @@
 import { readCollection, writeCollection, findById, findByField } from '../storage';
 import * as leadAutoReply from '../leadAutoReply/leadAutoReply.service';
 
-const FB_ACCESS_TOKEN = process.env.FB_ACCESS_TOKEN;
+// Facebook Page Access Token - required for Lead Forms API
+// This must be a Page Access Token, not a User Access Token
+const FB_PAGE_ACCESS_TOKEN = process.env.FB_PAGE_ACCESS_TOKEN || process.env.FB_ACCESS_TOKEN;
 const FB_PAGE_ID = process.env.FB_PAGE_ID;
 
 export interface LeadForm {
@@ -38,12 +40,12 @@ function generateId(prefix: string): string {
 }
 
 export async function syncLeadForms(): Promise<LeadForm[]> {
-  if (!FB_ACCESS_TOKEN || !FB_PAGE_ID) {
-    throw new Error('Facebook credentials not configured');
+  if (!FB_PAGE_ACCESS_TOKEN || !FB_PAGE_ID) {
+    throw new Error('Facebook credentials not configured. Please set FB_PAGE_ACCESS_TOKEN (Page Access Token) and FB_PAGE_ID.');
   }
 
   try {
-    const url = `https://graph.facebook.com/v18.0/${FB_PAGE_ID}/leadgen_forms?access_token=${FB_ACCESS_TOKEN}`;
+    const url = `https://graph.facebook.com/v18.0/${FB_PAGE_ID}/leadgen_forms?access_token=${FB_PAGE_ACCESS_TOKEN}`;
     const response = await fetch(url);
     
     if (!response.ok) {
@@ -92,8 +94,8 @@ export async function getFormByFbId(fbFormId: string): Promise<LeadForm | null> 
 }
 
 export async function syncLeadsForForm(formId: string): Promise<Lead[]> {
-  if (!FB_ACCESS_TOKEN) {
-    throw new Error('Facebook credentials not configured');
+  if (!FB_PAGE_ACCESS_TOKEN) {
+    throw new Error('Facebook credentials not configured. Please set FB_PAGE_ACCESS_TOKEN (Page Access Token).');
   }
 
   const form = await findById<LeadForm>(FORMS_COLLECTION, formId);
@@ -102,7 +104,7 @@ export async function syncLeadsForForm(formId: string): Promise<Lead[]> {
   }
 
   try {
-    const url = `https://graph.facebook.com/v18.0/${form.fbFormId}/leads?access_token=${FB_ACCESS_TOKEN}`;
+    const url = `https://graph.facebook.com/v18.0/${form.fbFormId}/leads?access_token=${FB_PAGE_ACCESS_TOKEN}`;
     const response = await fetch(url);
     
     if (!response.ok) {

@@ -220,7 +220,7 @@
       "content": "This is a test reply",
       "type": "text",
       "direction": "inbound",
-      "status": "sent",
+      "status": "read",
       "id": "ba525f59-4761-4001-914c-dca79bb19eaa",
       "timestamp": "2025-11-27T22:50:39.574Z"
     },
@@ -229,7 +229,7 @@
       "content": "Hi, I am interested in the awards!",
       "type": "text",
       "direction": "inbound",
-      "status": "sent",
+      "status": "read",
       "id": "425e6b42-751b-498a-8241-a4a50ab3fee2",
       "timestamp": "2025-11-27T22:51:27.144Z"
     },
@@ -238,7 +238,7 @@
       "content": "Cvbbbb",
       "type": "text",
       "direction": "inbound",
-      "status": "sent",
+      "status": "read",
       "id": "8d272679-2ec9-4eec-8303-473b6e22c09a",
       "timestamp": "2025-11-27T22:51:36.607Z"
     },
@@ -247,7 +247,7 @@
       "content": "Rty",
       "type": "text",
       "direction": "inbound",
-      "status": "sent",
+      "status": "read",
       "id": "a62e0c75-3831-4e5c-a550-199dd6aa1714",
       "timestamp": "2025-11-27T22:51:47.850Z"
     },
@@ -256,7 +256,7 @@
       "content": "Mjkk",
       "type": "text",
       "direction": "inbound",
-      "status": "sent",
+      "status": "read",
       "id": "b44af020-a412-41cc-b5b3-d48c4e4b3ea4",
       "timestamp": "2025-11-27T22:51:55.674Z"
     },
@@ -265,7 +265,7 @@
       "content": "Gh",
       "type": "text",
       "direction": "inbound",
-      "status": "sent",
+      "status": "read",
       "id": "5c4436d2-41ac-4f77-a307-d4ba900f7a5e",
       "timestamp": "2025-11-27T22:52:02.864Z"
     },
@@ -274,7 +274,7 @@
       "content": "Yesterday",
       "type": "text",
       "direction": "inbound",
-      "status": "sent",
+      "status": "read",
       "id": "5f332a38-449e-4306-868f-5719ecb60317",
       "timestamp": "2025-11-27T22:52:14.050Z"
     },
@@ -283,7 +283,7 @@
       "content": "Tell me more about the awards event",
       "type": "text",
       "direction": "inbound",
-      "status": "sent",
+      "status": "read",
       "id": "ca37be98-09d2-40d8-b56c-df4ded7c4ad8",
       "timestamp": "2025-11-27T22:54:40.396Z"
     },
@@ -301,7 +301,7 @@
       "content": "How u send without templates message",
       "type": "text",
       "direction": "inbound",
-      "status": "sent",
+      "status": "read",
       "id": "f620590d-22a9-4d69-a0d6-22cb92ca70fb",
       "timestamp": "2025-11-27T22:55:14.090Z"
     },
@@ -319,7 +319,7 @@
       "content": "Gkkgjgkh",
       "type": "text",
       "direction": "inbound",
-      "status": "sent",
+      "status": "read",
       "id": "270c493c-a4f6-4423-b5f2-732a079628a9",
       "timestamp": "2025-11-27T22:56:39.836Z"
     },
@@ -409,7 +409,7 @@
       "content": "Cvc",
       "type": "text",
       "direction": "inbound",
-      "status": "sent",
+      "status": "read",
       "id": "e9a43938-8e9d-48ba-baf9-5cd5d57434dc",
       "timestamp": "2025-11-27T22:59:55.527Z"
     },
@@ -427,7 +427,7 @@
       "content": "Hh",
       "type": "text",
       "direction": "inbound",
-      "status": "sent",
+      "status": "read",
       "id": "69b07536-850d-491f-8d61-dfe2a75fd379",
       "timestamp": "2025-11-27T23:00:04.933Z"
     },
@@ -445,7 +445,7 @@
       "content": "Ghh",
       "type": "text",
       "direction": "inbound",
-      "status": "sent",
+      "status": "read",
       "id": "9eae776f-3f5b-481f-8263-230b57e7f74a",
       "timestamp": "2025-11-27T23:00:20.756Z"
     },
@@ -535,7 +535,7 @@
       "content": "Uue",
       "type": "text",
       "direction": "inbound",
-      "status": "sent",
+      "status": "read",
       "id": "8027ee20-8df0-48ff-a601-eb235eb375cc",
       "timestamp": "2025-11-27T23:10:17.766Z"
     },
@@ -553,7 +553,7 @@
       "content": "Hey",
       "type": "text",
       "direction": "inbound",
-      "status": "sent",
+      "status": "read",
       "id": "29e25268-c73b-483c-8e06-2fdc8c98135c",
       "timestamp": "2025-11-28T06:04:55.066Z"
     },
@@ -562,7 +562,7 @@
       "content": "Cool",
       "type": "text",
       "direction": "inbound",
-      "status": "sent",
+      "status": "read",
       "id": "e1c0bcc6-37dd-4754-8bba-66fe93fb1e07",
       "timestamp": "2025-11-28T06:12:23.121Z"
     },
@@ -598,7 +598,7 @@
       "content": "[button message]",
       "type": "text",
       "direction": "inbound",
-      "status": "sent",
+      "status": "read",
       "id": "6ef1c5a0-7020-4251-8809-db0600bd2ed5",
       "timestamp": "2025-11-28T06:51:35.439Z"
     },
@@ -607,7 +607,7 @@
       "content": "Hi",
       "type": "text",
       "direction": "inbound",
-      "status": "sent",
+      "status": "read",
       "id": "34e61539-45ea-4e61-bace-eb9c701c482b",
       "timestamp": "2025-11-28T06:52:22.758Z"
     },
@@ -625,7 +625,7 @@
       "content": "Hey",
       "type": "text",
       "direction": "inbound",
-      "status": "sent",
+      "status": "read",
       "id": "a3af45c7-dc0e-40fd-bc70-637c527038b8",
       "timestamp": "2025-11-28T07:50:50.028Z"
     },
@@ -643,7 +643,7 @@
       "content": "Nothing",
       "type": "text",
       "direction": "inbound",
-      "status": "sent",
+      "status": "read",
       "id": "cdb2bfb8-2d80-411e-8416-e2bc526f6cd3",
       "timestamp": "2025-11-28T07:51:11.643Z"
     },
@@ -661,7 +661,7 @@
       "content": "Okay",
       "type": "text",
       "direction": "inbound",
-      "status": "sent",
+      "status": "read",
       "id": "325c24ad-d67e-4aa4-a8cc-c75b52eb55d4",
       "timestamp": "2025-11-28T07:51:23.716Z"
     },
@@ -679,7 +679,7 @@
       "content": "Hey",
       "type": "text",
       "direction": "inbound",
-      "status": "sent",
+      "status": "read",
       "id": "5e08d890-da59-4472-a8c0-596e25dd57b3",
       "timestamp": "2025-11-28T09:08:15.006Z"
     },
@@ -697,7 +697,7 @@
       "content": "[button message]",
       "type": "text",
       "direction": "inbound",
-      "status": "sent",
+      "status": "read",
       "id": "8a60aa66-9325-4d26-83ca-87bde9a145f7",
       "timestamp": "2025-11-29T04:56:01.368Z"
     },
@@ -715,7 +715,7 @@
       "content": "Hey",
       "type": "text",
       "direction": "inbound",
-      "status": "sent",
+      "status": "read",
       "id": "88416264-4374-485b-b77c-83307c7fd2ba",
       "timestamp": "2025-11-29T05:35:39.651Z"
     },
@@ -733,7 +733,7 @@
       "content": "Yes, I am Interested",
       "type": "text",
       "direction": "inbound",
-      "status": "sent",
+      "status": "read",
       "id": "34b9dbd3-e68c-47df-9793-bf5be36f18d9",
       "timestamp": "2025-11-29T06:51:53.906Z"
     },
@@ -760,7 +760,7 @@
       "content": "How can I participate",
       "type": "text",
       "direction": "inbound",
-      "status": "sent",
+      "status": "read",
       "id": "e40e12ae-1043-4b23-9bd5-888feb14179c",
       "timestamp": "2025-11-29T06:52:27.281Z"
     },
@@ -778,7 +778,7 @@
       "content": "Yes, I am Interested",
       "type": "text",
       "direction": "inbound",
-      "status": "sent",
+      "status": "read",
       "id": "75325ca1-4b91-4ada-b494-70e82cd60d0e",
       "timestamp": "2025-11-29T06:53:57.616Z"
     },
@@ -796,7 +796,7 @@
       "content": "Hi pls give more info",
       "type": "text",
       "direction": "inbound",
-      "status": "sent",
+      "status": "read",
       "id": "d380a6c9-ba9d-4991-9daf-4c8a49958d08",
       "timestamp": "2025-11-29T06:58:59.309Z"
     },
@@ -814,7 +814,7 @@
       "content": "Yes, I am Interested",
       "type": "text",
       "direction": "inbound",
-      "status": "sent",
+      "status": "read",
       "id": "9be11cd2-871a-4886-b668-e3f706e5ebbd",
       "timestamp": "2025-11-29T07:03:18.989Z"
     },
@@ -826,6 +826,42 @@
       "status": "sent",
       "id": "fbb8b48b-85a4-4bd3-b672-02d827b371a1",
       "timestamp": "2025-11-29T07:03:20.241Z"
+    },
+    {
+      "contactId": "8a9e2cfc-5b0b-4473-a1e1-ed26edeaa049",
+      "content": "Yes, I am Interested",
+      "type": "text",
+      "direction": "inbound",
+      "status": "read",
+      "id": "4f02e1b6-1e01-4c6b-b463-f156e8ec72c8",
+      "timestamp": "2025-11-29T07:13:29.423Z"
+    },
+    {
+      "contactId": "8a9e2cfc-5b0b-4473-a1e1-ed26edeaa049",
+      "content": "Thanks for your feedback, we will keep in touch with you soon.",
+      "type": "text",
+      "direction": "outbound",
+      "status": "sent",
+      "id": "dda39067-b856-4031-a83a-b78f8b15fe53",
+      "timestamp": "2025-11-29T07:13:30.674Z"
+    },
+    {
+      "contactId": "4d460e87-b06f-4c96-ab75-3a484e9a18ad",
+      "content": "Yes, I am Interested",
+      "type": "text",
+      "direction": "inbound",
+      "status": "read",
+      "id": "04ef4e44-a2e6-4644-bd14-958307101629",
+      "timestamp": "2025-11-29T07:13:35.822Z"
+    },
+    {
+      "contactId": "4d460e87-b06f-4c96-ab75-3a484e9a18ad",
+      "content": "Thanks for your feedback, we will keep in touch with you soon.",
+      "type": "text",
+      "direction": "outbound",
+      "status": "sent",
+      "id": "e3d4a31c-c7cd-4106-bd9d-5ca8460d8b4c",
+      "timestamp": "2025-11-29T07:13:37.172Z"
     }
   ],
   "campaigns": [
@@ -1161,11 +1197,11 @@
         "createdAt": "2025-11-27T22:31:14.359Z",
         "updatedAt": "2025-11-27T22:31:14.359Z"
       },
-      "lastMessage": "Of course! I’d be happy to help, but I need a bit more context to provide the most relevant information. Could you specify what topic or subject you are interested in? Whether it’s technology, health, travel, or something else, let me know so I can assist you appropriately.",
-      "lastMessageTime": "2025-11-29T06:59:02.118Z",
-      "lastInboundMessageTime": "2025-11-29T06:58:59.309Z",
-      "lastInboundMessage": "Hi pls give more info",
-      "unreadCount": 17,
+      "lastMessage": "Thanks for your feedback, we will keep in touch with you soon.",
+      "lastMessageTime": "2025-11-29T07:13:30.674Z",
+      "lastInboundMessageTime": "2025-11-29T07:13:29.423Z",
+      "lastInboundMessage": "Yes, I am Interested",
+      "unreadCount": 0,
       "status": "open",
       "notes": []
     },
@@ -1208,10 +1244,10 @@
         "updatedAt": "2025-11-28T06:04:55.063Z"
       },
       "lastMessage": "Thanks for your feedback, we will keep in touch with you soon.",
-      "lastMessageTime": "2025-11-29T07:03:20.241Z",
-      "lastInboundMessageTime": "2025-11-29T07:03:18.989Z",
+      "lastMessageTime": "2025-11-29T07:13:37.172Z",
+      "lastInboundMessageTime": "2025-11-29T07:13:35.822Z",
       "lastInboundMessage": "Yes, I am Interested",
-      "unreadCount": 12,
+      "unreadCount": 0,
       "status": "open",
       "notes": []
     },
