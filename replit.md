@@ -152,6 +152,9 @@ Required secrets for full functionality:
 The application runs on port 5000 with `npm run dev`.
 
 ## Recent Changes
+- **Nov 29, 2025**: Optimized CSV import with bulk MongoDB operations (insertMany) for better performance
+- **Nov 29, 2025**: Added fully functional Add Template page with form validation, live preview, and API integration
+- **Nov 29, 2025**: Added unread message count badge to 24-Hour Window inbox in sidebar navigation
 - **Nov 29, 2025**: Fixed imported contacts not showing in contact list - contacts now saved to MongoDB
 - **Nov 29, 2025**: Added ImportedContact MongoDB schema with proper persistence
 - **Nov 29, 2025**: Updated Contacts page to show both regular and imported contacts

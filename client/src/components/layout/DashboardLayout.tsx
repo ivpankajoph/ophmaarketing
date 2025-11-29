@@ -47,21 +47,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const { data: windowUnreadCount = 0 } = useQuery<number>({
-    queryKey: ["/api/chats", "window-unread"],
+    queryKey: ["/api/chats", "window-unread-count"],
     queryFn: async () => {
-      const res = await fetch("/api/chats/window");
+      const res = await fetch("/api/chats");
       if (!res.ok) return 0;
-      const windowChats: Chat[] = await res.json();
+      const allChats: Chat[] = await res.json();
       const now = new Date();
       let totalUnread = 0;
-      for (const chat of windowChats) {
-        const windowExpiresAt = (chat as any).windowExpiresAt;
-        if (windowExpiresAt) {
-          const expires = new Date(windowExpiresAt);
-          if (expires.getTime() > now.getTime() && chat.unreadCount > 0) {
-            totalUnread += chat.unreadCount;
-          }
-        } else if (chat.lastInboundMessageTime && chat.unreadCount > 0) {
+      for (const chat of allChats) {
+        if (chat.unreadCount <= 0) continue;
+        if (chat.lastInboundMessageTime) {
           const lastInbound = new Date(chat.lastInboundMessageTime);
           const hoursDiff = (now.getTime() - lastInbound.getTime()) / (1000 * 60 * 60);
           if (hoursDiff <= 24) {
@@ -71,7 +66,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       }
       return totalUnread;
     },
-    refetchInterval: 5000,
+    refetchInterval: 10000,
   });
 
   const navStructure = [
