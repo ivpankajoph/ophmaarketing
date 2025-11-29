@@ -154,6 +154,22 @@ const ImportedContactSchema = new Schema({
   updatedAt: { type: String, required: true },
 }, { collection: 'imported_contacts' });
 
+const ContactAgentSchema = new Schema({
+  id: { type: String, required: true, unique: true },
+  contactId: { type: String, required: true },
+  phone: { type: String, required: true, index: true },
+  agentId: { type: String, required: true },
+  agentName: { type: String },
+  conversationHistory: [{
+    role: { type: String, enum: ['user', 'assistant'] },
+    content: { type: String },
+    timestamp: { type: String }
+  }],
+  isActive: { type: Boolean, default: true },
+  createdAt: { type: String, required: true },
+  updatedAt: { type: String, required: true },
+}, { collection: 'contact_agents' });
+
 export const Agent = mongoose.models.Agent || mongoose.model('Agent', AgentSchema);
 export const Form = mongoose.models.Form || mongoose.model('Form', FormSchema);
 export const Lead = mongoose.models.Lead || mongoose.model('Lead', LeadSchema);
@@ -163,6 +179,7 @@ export const BroadcastList = mongoose.models.BroadcastList || mongoose.model('Br
 export const ScheduledMessage = mongoose.models.ScheduledMessage || mongoose.model('ScheduledMessage', ScheduledMessageSchema);
 export const BroadcastLog = mongoose.models.BroadcastLog || mongoose.model('BroadcastLog', BroadcastLogSchema);
 export const ImportedContact = mongoose.models.ImportedContact || mongoose.model('ImportedContact', ImportedContactSchema);
+export const ContactAgent = mongoose.models.ContactAgent || mongoose.model('ContactAgent', ContactAgentSchema);
 
 const modelMap: Record<string, Model<any>> = {
   agents: Agent,
@@ -174,6 +191,7 @@ const modelMap: Record<string, Model<any>> = {
   scheduled_messages: ScheduledMessage,
   broadcast_logs: BroadcastLog,
   imported_contacts: ImportedContact,
+  contact_agents: ContactAgent,
 };
 
 export async function readCollection<T>(collectionName: string): Promise<T[]> {

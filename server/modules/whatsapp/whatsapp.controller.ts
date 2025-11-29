@@ -6,6 +6,7 @@ import { getAllLeads } from '../facebook/fb.service';
 import { storage } from '../../storage';
 import * as aiAnalytics from '../aiAnalytics/aiAnalytics.service';
 import * as broadcastService from '../broadcast/broadcast.service';
+import * as contactAgentService from '../contactAgent/contactAgent.service';
 
 const WHATSAPP_TOKEN = process.env.WHATSAPP_TOKEN_NEW || process.env.WHATSAPP_TOKEN;
 const PHONE_NUMBER_ID = process.env.PHONE_NUMBER_ID;
@@ -109,16 +110,29 @@ export async function handleWebhook(req: Request, res: Response) {
     }
 
     // For regular text messages, use AI agent
-    const lead = await findLeadByPhone(from);
+    // First check if there's an assigned agent for this contact (from 24-hour window inbox)
+    const contactAgentAssignment = await contactAgentService.getAgentForContact(from);
     let agentToUse = null;
-
-    if (lead) {
-      const mapping = await getMappingByFormId(lead.formId);
-      if (mapping && mapping.isActive) {
-        agentToUse = await getAgentById(mapping.agentId);
+    let useStoredHistory = false;
+    
+    if (contactAgentAssignment) {
+      console.log(`[Webhook] Found assigned agent for ${from}: ${contactAgentAssignment.agentName} (${contactAgentAssignment.agentId})`);
+      agentToUse = await getAgentById(contactAgentAssignment.agentId);
+      useStoredHistory = true;
+    }
+    
+    // Fall back to lead-form mapping if no assigned agent
+    if (!agentToUse) {
+      const lead = await findLeadByPhone(from);
+      if (lead) {
+        const mapping = await getMappingByFormId(lead.formId);
+        if (mapping && mapping.isActive) {
+          agentToUse = await getAgentById(mapping.agentId);
+        }
       }
     }
 
+    // Fall back to any active agent
     if (!agentToUse) {
       const agents = await getAllAgents();
       agentToUse = agents.find((a: any) => a.isActive);
@@ -128,17 +142,33 @@ export async function handleWebhook(req: Request, res: Response) {
       console.log('No active agent found');
       return res.sendStatus(200);
     }
-
-    if (!conversationHistory[from]) {
-      conversationHistory[from] = [];
-    }
-    conversationHistory[from].push({ role: 'user', content: contentForAI });
-
-    const recentHistory = conversationHistory[from].slice(-10);
-
-    const aiResponse = await generateAgentResponse(contentForAI, agentToUse, recentHistory.slice(0, -1));
     
-    conversationHistory[from].push({ role: 'assistant', content: aiResponse });
+    // Get conversation history - prioritize stored MongoDB history for assigned agents
+    let recentHistory: { role: 'user' | 'assistant'; content: string }[] = [];
+    
+    if (useStoredHistory) {
+      recentHistory = await contactAgentService.getConversationHistory(from);
+      console.log(`[Webhook] Using stored history with ${recentHistory.length} messages for agent: ${agentToUse.name}`);
+    } else {
+      if (!conversationHistory[from]) {
+        conversationHistory[from] = [];
+      }
+      recentHistory = conversationHistory[from].slice(-10);
+    }
+    
+    // Add current message to history
+    const historyForAI = [...recentHistory, { role: 'user' as const, content: contentForAI }];
+
+    const aiResponse = await generateAgentResponse(contentForAI, agentToUse, historyForAI.slice(0, -1));
+    
+    // Store in appropriate history
+    if (useStoredHistory) {
+      await contactAgentService.addMessageToHistory(from, 'user', contentForAI);
+      await contactAgentService.addMessageToHistory(from, 'assistant', aiResponse);
+    } else {
+      conversationHistory[from].push({ role: 'user', content: contentForAI });
+      conversationHistory[from].push({ role: 'assistant', content: aiResponse });
+    }
 
     await sendWhatsAppMessage(from, aiResponse);
     

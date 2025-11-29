@@ -22,6 +22,7 @@ import * as agentService from "./modules/aiAgents/agent.service";
 import * as openaiService from "./modules/openai/openai.service";
 import * as templateService from "./modules/leadAutoReply/templateMessages.service";
 import * as mongodb from "./modules/storage/mongodb.adapter";
+import * as contactAgentService from "./modules/contactAgent/contactAgent.service";
 
 export async function registerRoutes(
   httpServer: Server,
@@ -256,23 +257,33 @@ export async function registerRoutes(
           
           console.log(`[InboxSend] Generating AI response with agent: ${agent.name}`);
           
-          let conversationContext = "";
-          if (contactId) {
+          // Assign this agent to the contact for future messages
+          await contactAgentService.assignAgentToContact(contactId, phone, agentId, agent.name);
+          console.log(`[InboxSend] Assigned agent ${agent.name} to contact ${phone}`);
+          
+          // Get conversation history from MongoDB (stored per contact-agent assignment)
+          let conversationHistory = await contactAgentService.getConversationHistory(phone);
+          
+          // If no stored history, fetch from messages
+          if (conversationHistory.length === 0 && contactId) {
             try {
-              const recentMessages = await storage.getMessagesByContactId(contactId);
-              const lastMessages = recentMessages.slice(-5);
-              if (lastMessages.length > 0) {
-                conversationContext = "\n\nRecent conversation:\n" + 
-                  lastMessages.map(m => `${m.direction === 'inbound' ? 'Customer' : 'Business'}: ${m.content}`).join("\n");
-              }
+              const recentMessages = await storage.getMessages(contactId);
+              const lastMessages = recentMessages.slice(-10);
+              conversationHistory = lastMessages.map((m: any) => ({
+                role: m.direction === 'inbound' ? 'user' as const : 'assistant' as const,
+                content: m.content
+              }));
             } catch (e) {
               console.log("[InboxSend] Could not fetch conversation context");
             }
           }
           
+          console.log(`[InboxSend] Using ${conversationHistory.length} messages for context`);
+          
           const aiMessage = await openaiService.generateAgentResponse(
-            `Generate a friendly personalized message for ${name || 'this customer'}. Keep it conversational and under 200 characters.${conversationContext}`,
-            agent
+            `Generate a friendly personalized message for ${name || 'this customer'}. Keep it conversational and under 200 characters.`,
+            agent,
+            conversationHistory
           );
           
           if (!aiMessage) {
@@ -280,6 +291,9 @@ export async function registerRoutes(
           }
           
           console.log(`[InboxSend] AI generated: "${aiMessage.substring(0, 100)}..."`);
+          
+          // Store the AI response in conversation history
+          await contactAgentService.addMessageToHistory(phone, 'assistant', aiMessage);
           
           result = await broadcastService.sendCustomMessage(phone, aiMessage);
           result.aiMessage = aiMessage;

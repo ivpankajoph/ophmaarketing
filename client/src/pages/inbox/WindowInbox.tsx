@@ -114,23 +114,34 @@ export default function WindowInbox() {
     notificationAudioRef.current = new Audio(beepSound);
     notificationAudioRef.current.volume = 0.5;
     
-    // Unlock audio on first user interaction
+    // Unlock audio on user interaction - mark as unlocked immediately
     const unlockAudio = () => {
-      if (!audioUnlockedRef.current && notificationAudioRef.current) {
-        notificationAudioRef.current.play().then(() => {
-          notificationAudioRef.current?.pause();
-          notificationAudioRef.current!.currentTime = 0;
-          audioUnlockedRef.current = true;
-        }).catch(() => {});
+      // Mark as unlocked after first user interaction
+      audioUnlockedRef.current = true;
+      
+      if (notificationAudioRef.current) {
+        // Try to play silently to fully unlock autoplay restrictions
+        notificationAudioRef.current.play()
+          .then(() => {
+            notificationAudioRef.current?.pause();
+            notificationAudioRef.current!.currentTime = 0;
+          })
+          .catch(() => {
+            // Ignore errors - audio is still marked as unlocked
+          });
       }
     };
     
-    document.addEventListener('click', unlockAudio, { once: true });
-    document.addEventListener('keydown', unlockAudio, { once: true });
+    // Add listeners for common user interactions
+    const events = ['click', 'keydown', 'touchstart'];
+    events.forEach(event => {
+      document.addEventListener(event, unlockAudio, { once: true });
+    });
     
     return () => {
-      document.removeEventListener('click', unlockAudio);
-      document.removeEventListener('keydown', unlockAudio);
+      events.forEach(event => {
+        document.removeEventListener(event, unlockAudio);
+      });
     };
   }, []);
 

@@ -576,6 +576,30 @@
       "id": "9a5dbbd4-7a68-4f6b-b956-0f04620c6ed9",
       "createdAt": "2025-11-29T10:28:21.428Z",
       "updatedAt": "2025-11-29T10:28:21.428Z"
+    },
+    {
+      "name": "+919732389407",
+      "phone": "919732389407",
+      "email": "",
+      "tags": [
+        "WhatsApp"
+      ],
+      "notes": "Auto-created from WhatsApp message",
+      "id": "eda28e99-0dcc-456a-b540-32f86f7d8a51",
+      "createdAt": "2025-11-29T10:42:00.988Z",
+      "updatedAt": "2025-11-29T10:42:00.988Z"
+    },
+    {
+      "name": "+919434474732",
+      "phone": "919434474732",
+      "email": "",
+      "tags": [
+        "WhatsApp"
+      ],
+      "notes": "Auto-created from WhatsApp message",
+      "id": "3b4e746a-c4f8-484b-818d-06ed849299c7",
+      "createdAt": "2025-11-29T10:45:06.286Z",
+      "updatedAt": "2025-11-29T10:45:06.286Z"
     }
   ],
   "messages": [
@@ -2575,7 +2599,7 @@
       "content": "Are you a fish",
       "type": "text",
       "direction": "inbound",
-      "status": "sent",
+      "status": "read",
       "id": "d5d0537b-737b-4644-82f6-0623c0ba694b",
       "timestamp": "2025-11-29T10:24:18.202Z"
     },
@@ -2593,7 +2617,7 @@
       "content": "Ohh  you are a trained fish according to your costom training",
       "type": "text",
       "direction": "inbound",
-      "status": "sent",
+      "status": "read",
       "id": "eb40ae2a-f977-4873-9f05-d310fb964e6b",
       "timestamp": "2025-11-29T10:25:07.975Z"
     },
@@ -2620,7 +2644,7 @@
       "content": "How are you",
       "type": "text",
       "direction": "inbound",
-      "status": "sent",
+      "status": "read",
       "id": "da206184-af16-4ca9-b69e-463bb54c2a11",
       "timestamp": "2025-11-29T10:26:04.246Z"
     },
@@ -2638,7 +2662,7 @@
       "content": "Fees",
       "type": "text",
       "direction": "inbound",
-      "status": "sent",
+      "status": "read",
       "id": "dad2bf65-9e24-4a46-8db5-a66c2b12094e",
       "timestamp": "2025-11-29T10:28:21.431Z"
     },
@@ -2665,7 +2689,7 @@
       "content": "any fees",
       "type": "text",
       "direction": "inbound",
-      "status": "sent",
+      "status": "read",
       "id": "405487b4-9ffb-4c0e-a21a-b844046f5a44",
       "timestamp": "2025-11-29T10:30:18.017Z"
     },
@@ -2683,7 +2707,7 @@
       "content": "is this paid awards ?",
       "type": "text",
       "direction": "inbound",
-      "status": "sent",
+      "status": "read",
       "id": "425a6066-0337-43ff-bc1c-60e20e444659",
       "timestamp": "2025-11-29T10:30:51.401Z"
     },
@@ -2695,6 +2719,123 @@
       "status": "sent",
       "id": "0c41758d-e079-4f10-ba39-19af10ac9b82",
       "timestamp": "2025-11-29T10:30:54.427Z"
+    },
+    {
+      "contactId": "eda28e99-0dcc-456a-b540-32f86f7d8a51",
+      "content": "জয় হিন্দ!!\n   ন্যূনতম মাধ্যমিক পাস যোগ্যতায় ভারতীয় সেনাবাহিনী, পুলিশ সহ অন্যান্য সরকারি সশস্ত্র বাহিনীতে যোগদানের জন্য প্রশিক্ষণ  চলেছে। \n👉 যোগ্যতা: ন্যূনতম মাধ্যমিক পাস। 👉 বয়স: 17 থেকে 20 বছর। 👉 উচ্চতা: ন্যূনতম 5 ফুট 6 ইঞ্চি (পুরুষ) / 5 ফুট 2 ইঞ্চি (মহিলা)।\n 👉 এখন ভর্তি চলছে।\n ◼️◼️ যদি আপনি এই প্রশিক্ষণ ক্যাম্পে অংশ গ্রহণ করতে ইচ্ছুক থাকেন তাহলে অতি শীঘ্রই নিচের নম্বরে কল করুন । \n\n       *কম্বাইন্ড স্পোর্টস অ্যাকাডেমি*\n               ইলামবাজার , বীরভূম \n📞  9434449407 / 9732389407.",
+      "type": "text",
+      "direction": "inbound",
+      "status": "read",
+      "id": "720ac423-0435-45c0-ac0c-1dc2a0832999",
+      "timestamp": "2025-11-29T10:42:00.991Z"
+    },
+    {
+      "contactId": "eda28e99-0dcc-456a-b540-32f86f7d8a51",
+      "content": "নূন্যতম মাধ্যমিক পাশ যোগ্যতায় সেনাবাহিনী এবং পুলিশের জন্য প্রশিক্ষণ। \n*কম্বাইন্ড স্পোর্টস অ্যাকাডেমী*\nইলামবাজার, বীরভূম \nবিস্তারিত জানতে কল করুন -\nCall Us : 9434449407 / 9732389407",
+      "type": "text",
+      "direction": "inbound",
+      "status": "read",
+      "id": "523f5412-60aa-404b-9079-72d3f09b6979",
+      "timestamp": "2025-11-29T10:42:01.367Z"
+    },
+    {
+      "contactId": "eda28e99-0dcc-456a-b540-32f86f7d8a51",
+      "content": "জয় হিন্দ!\n\nআপনি যদি ভারতীয় সেনাবাহিনী, পুলিশ বা অন্যান্য সরকারি সশস্ত্র বাহিনীতে যোগদানের জন্য আগ্রহী হন এবং ন্যূনতম মাধ্যমিক পাস যোগ্যতা থাকে, তাহলে কম্বাইন্ড স্পোর্টস অ্যাকাডেমির প্রশিক্ষণ ক্যাম্পে অংশগ্রহণ করতে পারেন। এখানে বিস্তারিত তথ্য দেওয়া হল:\n\n👉 **যোগ্যতা:** ন্যূনতম মাধ্যমিক পাস  \n👉 **বয়স সীমা:** 17 থেকে 20 বছর  \n👉 **উচ্চতা:**  \n   - পুরুষ: ন্যূনতম 5 ফুট 6 ইঞ্চি  \n   - মহিলা: ন্যূনতম 5 ফুট 2 ইঞ্চি  \n\n**অবস্থান:** কম্বাইন্ড স্পোর্টস অ্যাকাডেমি, ইলামবাজার, বীরভূম\n\n**যোগাযোগের জন্য ফোন করুন:**  \n📞 9434449407 / 9732389407\n\nযদি আপনি এই প্রশিক্ষণ ক্যাম্পে অংশগ্রহণ করতে ইচ্ছুক হন, তাহলে অতি শীঘ্রই উল্লেখিত নম্বরে কল করুন।",
+      "type": "text",
+      "direction": "outbound",
+      "status": "sent",
+      "id": "85d243dc-174a-4460-8acb-65e04d0c1274",
+      "timestamp": "2025-11-29T10:42:05.570Z"
+    },
+    {
+      "contactId": "eda28e99-0dcc-456a-b540-32f86f7d8a51",
+      "content": "এই বিজ্ঞপ্তিটি কম্বাইন্ড স্পোর্টস অ্যাকাডেমির দ্বারা প্রদত্ত, যেখানে ন্যূনতম মাধ্যমিক পাস যোগ্যতায় সেনাবাহিনী ও পুলিশ বাহিনীতে যোগদানের জন্য প্রশিক্ষণ দেওয়া হচ্ছে। প্রশিক্ষণে অংশগ্রহণের জন্য যোগ্যতাসমূহের মধ্যে বয়স ১৭ থেকে ২০ বছর এবং উচ্চতা পুরুষের জন্য ন্যূনতম ৫ ফুট ৬ ইঞ্চি এবং মহিলার জন্য ন্যূনতম ৫ ফুট ২ ইঞ্চি হতে হবে।\n\nযদি আপনি এই প্রশিক্ষণ ক্যাম্পে অংশগ্রহণ করতে ইচ্ছুক হন, তাহলে বিস্তারিত জানার জন্য নিচের নম্বরগুলিতে কল করতে পারেন:\n\nকম্বাইন্ড স্পোর্টস অ্যাকাডেমী\nইলামবাজার, বীরভূম\n📞 9434449407 / 9732389407\n\nএই প্রশিক্ষণ ক্যাম্পে অংশগ্রহণের মাধ্যমে আপনি সেনাবাহিনী ও পুলিশ বাহিনীতে যোগদানের জন্য প্রয়োজনীয় দক্ষতা ও প্রস্তুতি অর্জন করতে পারবেন।",
+      "type": "text",
+      "direction": "outbound",
+      "status": "sent",
+      "id": "c949e1d9-10ae-4a8c-906c-4033addfb941",
+      "timestamp": "2025-11-29T10:42:05.956Z"
+    },
+    {
+      "contactId": "3b4e746a-c4f8-484b-818d-06ed849299c7",
+      "content": "Yes, I am Interested",
+      "type": "text",
+      "direction": "inbound",
+      "status": "read",
+      "id": "bb4b3c1e-71a4-4637-ba32-be95d4b2a368",
+      "timestamp": "2025-11-29T10:45:06.290Z"
+    },
+    {
+      "contactId": "3b4e746a-c4f8-484b-818d-06ed849299c7",
+      "content": "Thanks for your feedback, we will keep in touch with you soon.",
+      "type": "text",
+      "direction": "outbound",
+      "status": "sent",
+      "id": "7798a254-e7a2-432d-8722-e159db14939f",
+      "timestamp": "2025-11-29T10:45:07.574Z"
+    },
+    {
+      "contactId": "98ee4ee3-4379-4f2d-8b8e-253099fdf20b",
+      "content": "Yes Mam, This is paid awards ",
+      "type": "text",
+      "direction": "outbound",
+      "status": "sent",
+      "id": "24b70729-4c73-437c-9207-7bb974a4c801",
+      "timestamp": "2025-11-29T10:47:13.595Z"
+    },
+    {
+      "contactId": "98ee4ee3-4379-4f2d-8b8e-253099fdf20b",
+      "content": "Benefits of Top Life Changers Awards:  🌟 National Recognition  🏅 Award Received by Celebrity  💼 Brand Credibility  📰 Media Exposure  🤝 Networking Opportunities  👀 Increased Visibility  💡 Inspire Your Industry & Followers  👥 Employee Motivation  📈 Business Growth  🏁 Competitive Advantage  ✅ Professional Validation  📣 Marketing Leverage  🌟 Enhanced Reputation  🎟️ Exclusive Event Access  ⏱️ 2–3 Minute Interview  🔮 Future Opportunities  🌐 Brand / Influencer Website Creation  📸 Photos with Celebrity and Industry Leaders",
+      "type": "text",
+      "direction": "outbound",
+      "status": "sent",
+      "id": "0e9269a3-79de-480f-b5a6-1f2d1301f3fa",
+      "timestamp": "2025-11-29T10:48:05.792Z"
+    },
+    {
+      "contactId": "98ee4ee3-4379-4f2d-8b8e-253099fdf20b",
+      "content": "And we are providing 20% discount to women acheivers ",
+      "type": "text",
+      "direction": "outbound",
+      "status": "sent",
+      "id": "10780d9d-be83-4868-bce9-a6e5fd16d3a5",
+      "timestamp": "2025-11-29T10:48:46.971Z"
+    },
+    {
+      "contactId": "6b9210a9-cee0-47f5-9a60-7f7ab0bb6359",
+      "content": "Yes, the Top Life Changers Awards 2026 is a paid event 😊✨  Just like major Bollywood awards, our event also follows a paid format—because it’s designed to give you premium experiences, exclusive networking, and powerful branding opportunities. You get national recognition, celebrity presenters, press coverage, and an unforgettable red carpet moment! 🏆📸  The participation fee isn’t just for the award—it covers the entire world-class event, VIP lunch, celebrity photoshoots, interviews, and a lot of exciting experiences. 🚀  Would you like more details, or should I help you get started for nomination? If you’re interested, I’ll need a few details from you:  Name: Award Category / Interest: Industry / Field: Years of Experience: Any Previous Awards (mention award name or 'None'):  I’ll guide you all the way through! 😊",
+      "type": "text",
+      "direction": "outbound",
+      "status": "sent",
+      "id": "27e437cc-20c9-432c-9bb1-272b7723b636",
+      "timestamp": "2025-11-29T10:50:14.468Z"
+    },
+    {
+      "contactId": "3b4e746a-c4f8-484b-818d-06ed849299c7",
+      "content": "[unsupported message]",
+      "type": "text",
+      "direction": "inbound",
+      "status": "read",
+      "id": "cf5c0b1e-850e-4542-b99d-cacabd050ea4",
+      "timestamp": "2025-11-29T10:51:41.687Z"
+    },
+    {
+      "contactId": "466ddcaf-77e6-484d-866e-8cf67feeecb0",
+      "content": "Hi! I’m Aarohi from Top Life Changers Awards 2026 😊 Let’s get started so I can suggest the perfect award category for you 🏆✨  Please provide your details in the following format:  Name: Award Category / Interest : Industry / Field: Years of Experience:",
+      "type": "text",
+      "direction": "outbound",
+      "status": "sent",
+      "id": "0f773cb1-1def-4345-ba16-bda78338bc26",
+      "timestamp": "2025-11-29T10:51:54.697Z"
+    },
+    {
+      "contactId": "3b4e746a-c4f8-484b-818d-06ed849299c7",
+      "content": "Hi! I’m Aarohi from Top Life Changers Awards 2026 😊 Let’s get started so I can suggest the perfect award category for you 🏆✨  Please provide your details in the following format:  Name: Award Category / Interest : Industry / Field: Years of Experience:",
+      "type": "text",
+      "direction": "outbound",
+      "status": "sent",
+      "id": "cdaba0ed-ec86-4f86-9251-7d4517d308be",
+      "timestamp": "2025-11-29T10:53:10.141Z"
     }
   ],
   "campaigns": [
@@ -3034,7 +3175,7 @@
       "lastMessageTime": "2025-11-29T10:30:54.427Z",
       "lastInboundMessageTime": "2025-11-29T10:30:51.401Z",
       "lastInboundMessage": "is this paid awards ?",
-      "unreadCount": 2,
+      "unreadCount": 0,
       "status": "open",
       "notes": []
     },
@@ -3080,7 +3221,7 @@
       "lastMessageTime": "2025-11-29T10:26:07.269Z",
       "lastInboundMessageTime": "2025-11-29T10:26:04.246Z",
       "lastInboundMessage": "How are you",
-      "unreadCount": 3,
+      "unreadCount": 0,
       "status": "open",
       "notes": []
     },
@@ -3720,8 +3861,8 @@
         "createdAt": "2025-11-29T08:11:32.462Z",
         "updatedAt": "2025-11-29T08:11:32.462Z"
       },
-      "lastMessage": "Could you please provide more details or specify the context of your question? Are you asking about a specific product, service, or platform? This will help me give you a more accurate answer.",
-      "lastMessageTime": "2025-11-29T08:12:25.305Z",
+      "lastMessage": "Yes, the Top Life Changers Awards 2026 is a paid event 😊✨  Just like major Bollywood awards, our event also follows a paid format—because it’s designed to give you premium experiences, exclusive networking, and powerful branding opportunities. You get national recognition, celebrity presenters, press coverage, and an unforgettable red carpet moment! 🏆📸  The participation fee isn’t just for the award—it covers the entire world-class event, VIP lunch, celebrity photoshoots, interviews, and a lot of exciting experiences. 🚀  Would you like more details, or should I help you get started for nomination? If you’re interested, I’ll need a few details from you:  Name: Award Category / Interest: Industry / Field: Years of Experience: Any Previous Awards (mention award name or 'None'):  I’ll guide you all the way through! 😊",
+      "lastMessageTime": "2025-11-29T10:50:14.468Z",
       "lastInboundMessageTime": "2025-11-29T08:12:22.030Z",
       "lastInboundMessage": "Are there any amount that we need to pay?",
       "unreadCount": 0,
@@ -3766,8 +3907,8 @@
         "createdAt": "2025-11-29T08:13:52.241Z",
         "updatedAt": "2025-11-29T08:13:52.241Z"
       },
-      "lastMessage": "You're welcome! If you have any questions or need assistance, feel free to ask.",
-      "lastMessageTime": "2025-11-29T09:05:01.825Z",
+      "lastMessage": "Hi! I’m Aarohi from Top Life Changers Awards 2026 😊 Let’s get started so I can suggest the perfect award category for you 🏆✨  Please provide your details in the following format:  Name: Award Category / Interest : Industry / Field: Years of Experience:",
+      "lastMessageTime": "2025-11-29T10:51:54.697Z",
       "lastInboundMessageTime": "2025-11-29T09:04:59.066Z",
       "lastInboundMessage": "Thanks",
       "unreadCount": 0,
@@ -3927,8 +4068,8 @@
         "createdAt": "2025-11-29T08:56:24.629Z",
         "updatedAt": "2025-11-29T08:56:24.629Z"
       },
-      "lastMessage": "Certainly! Are you looking for information or resources related to teaching? Whether it's lesson planning, classroom management, educational strategies, or professional development, feel free to let me know how I can assist you.",
-      "lastMessageTime": "2025-11-29T09:36:43.737Z",
+      "lastMessage": "And we are providing 20% discount to women acheivers ",
+      "lastMessageTime": "2025-11-29T10:48:46.971Z",
       "lastInboundMessageTime": "2025-11-29T09:36:40.295Z",
       "lastInboundMessage": "For a teacher",
       "unreadCount": 0,
@@ -3977,7 +4118,53 @@
       "lastMessageTime": "2025-11-29T10:28:24.410Z",
       "lastInboundMessageTime": "2025-11-29T10:28:21.431Z",
       "lastInboundMessage": "Fees",
-      "unreadCount": 1,
+      "unreadCount": 0,
+      "status": "open",
+      "notes": []
+    },
+    {
+      "id": "chat-eda28e99-0dcc-456a-b540-32f86f7d8a51",
+      "contactId": "eda28e99-0dcc-456a-b540-32f86f7d8a51",
+      "contact": {
+        "name": "+919732389407",
+        "phone": "919732389407",
+        "email": "",
+        "tags": [
+          "WhatsApp"
+        ],
+        "notes": "Auto-created from WhatsApp message",
+        "id": "eda28e99-0dcc-456a-b540-32f86f7d8a51",
+        "createdAt": "2025-11-29T10:42:00.988Z",
+        "updatedAt": "2025-11-29T10:42:00.988Z"
+      },
+      "lastMessage": "এই বিজ্ঞপ্তিটি কম্বাইন্ড স্পোর্টস অ্যাকাডেমির দ্বারা প্রদত্ত, যেখানে ন্যূনতম মাধ্যমিক পাস যোগ্যতায় সেনাবাহিনী ও পুলিশ বাহিনীতে যোগদানের জন্য প্রশিক্ষণ দেওয়া হচ্ছে। প্রশিক্ষণে অংশগ্রহণের জন্য যোগ্যতাসমূহের মধ্যে বয়স ১৭ থেকে ২০ বছর এবং উচ্চতা পুরুষের জন্য ন্যূনতম ৫ ফুট ৬ ইঞ্চি এবং মহিলার জন্য ন্যূনতম ৫ ফুট ২ ইঞ্চি হতে হবে।\n\nযদি আপনি এই প্রশিক্ষণ ক্যাম্পে অংশগ্রহণ করতে ইচ্ছুক হন, তাহলে বিস্তারিত জানার জন্য নিচের নম্বরগুলিতে কল করতে পারেন:\n\nকম্বাইন্ড স্পোর্টস অ্যাকাডেমী\nইলামবাজার, বীরভূম\n📞 9434449407 / 9732389407\n\nএই প্রশিক্ষণ ক্যাম্পে অংশগ্রহণের মাধ্যমে আপনি সেনাবাহিনী ও পুলিশ বাহিনীতে যোগদানের জন্য প্রয়োজনীয় দক্ষতা ও প্রস্তুতি অর্জন করতে পারবেন।",
+      "lastMessageTime": "2025-11-29T10:42:05.956Z",
+      "lastInboundMessageTime": "2025-11-29T10:42:01.367Z",
+      "lastInboundMessage": "নূন্যতম মাধ্যমিক পাশ যোগ্যতায় সেনাবাহিনী এবং পুলিশের জন্য প্রশিক্ষণ। \n*কম্বাইন্ড স্পোর্টস অ্যাকাডেমী*\nইলামবাজার, বীরভূম \nবিস্তারিত জানতে কল করুন -\nCall Us : 9434449407 / 9732389407",
+      "unreadCount": 0,
+      "status": "open",
+      "notes": []
+    },
+    {
+      "id": "chat-3b4e746a-c4f8-484b-818d-06ed849299c7",
+      "contactId": "3b4e746a-c4f8-484b-818d-06ed849299c7",
+      "contact": {
+        "name": "+919434474732",
+        "phone": "919434474732",
+        "email": "",
+        "tags": [
+          "WhatsApp"
+        ],
+        "notes": "Auto-created from WhatsApp message",
+        "id": "3b4e746a-c4f8-484b-818d-06ed849299c7",
+        "createdAt": "2025-11-29T10:45:06.286Z",
+        "updatedAt": "2025-11-29T10:45:06.286Z"
+      },
+      "lastMessage": "Hi! I’m Aarohi from Top Life Changers Awards 2026 😊 Let’s get started so I can suggest the perfect award category for you 🏆✨  Please provide your details in the following format:  Name: Award Category / Interest : Industry / Field: Years of Experience:",
+      "lastMessageTime": "2025-11-29T10:53:10.141Z",
+      "lastInboundMessageTime": "2025-11-29T10:51:41.687Z",
+      "lastInboundMessage": "[unsupported message]",
+      "unreadCount": 0,
       "status": "open",
       "notes": []
     }
