@@ -93,6 +93,21 @@ export async function handleWebhook(req: Request, res: Response) {
     // Use messageText or buttonPayload for AI processing
     const contentForAI = messageText || buttonPayload;
 
+    // Check if this is a button response - send fixed thank you message
+    const isButtonResponse = messageType === 'button' || messageType === 'interactive';
+    
+    if (isButtonResponse) {
+      // Send fixed thank you message for button responses
+      const thankYouMessage = "Thanks for your feedback, we will keep in touch with you soon.";
+      
+      await sendWhatsAppMessage(from, thankYouMessage);
+      await saveOutboundMessage(from, thankYouMessage);
+      
+      console.log(`Button response auto-reply sent to ${from}: ${thankYouMessage}`);
+      return res.sendStatus(200);
+    }
+
+    // For regular text messages, use AI agent
     const lead = await findLeadByPhone(from);
     let agentToUse = null;
 

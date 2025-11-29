@@ -727,6 +727,87 @@
       "status": "sent",
       "id": "2817c11d-53e1-4df5-a6b9-bd38dcd0abff",
       "timestamp": "2025-11-29T05:35:42.798Z"
+    },
+    {
+      "contactId": "4d460e87-b06f-4c96-ab75-3a484e9a18ad",
+      "content": "Yes, I am Interested",
+      "type": "text",
+      "direction": "inbound",
+      "status": "sent",
+      "id": "34b9dbd3-e68c-47df-9793-bf5be36f18d9",
+      "timestamp": "2025-11-29T06:51:53.906Z"
+    },
+    {
+      "contactId": "4d460e87-b06f-4c96-ab75-3a484e9a18ad",
+      "content": "Great! Could you please provide more details about what you're interested in? This will help me assist you better.",
+      "type": "text",
+      "direction": "outbound",
+      "status": "sent",
+      "id": "33fdb75a-fbef-4ff4-9117-5a85bda42307",
+      "timestamp": "2025-11-29T06:51:57.066Z"
+    },
+    {
+      "contactId": "4d460e87-b06f-4c96-ab75-3a484e9a18ad",
+      "content": " how can i participate",
+      "type": "text",
+      "direction": "outbound",
+      "status": "sent",
+      "id": "a385a51e-301b-4af0-ab67-5fe27119ed24",
+      "timestamp": "2025-11-29T06:52:14.683Z"
+    },
+    {
+      "contactId": "4d460e87-b06f-4c96-ab75-3a484e9a18ad",
+      "content": "How can I participate",
+      "type": "text",
+      "direction": "inbound",
+      "status": "sent",
+      "id": "e40e12ae-1043-4b23-9bd5-888feb14179c",
+      "timestamp": "2025-11-29T06:52:27.281Z"
+    },
+    {
+      "contactId": "4d460e87-b06f-4c96-ab75-3a484e9a18ad",
+      "content": "To help you effectively, could you please specify what you want to participate in? Whether it's a particular event, program, group, or activity, providing more details will allow me to give you the best guidance.",
+      "type": "text",
+      "direction": "outbound",
+      "status": "sent",
+      "id": "4c56806b-8732-4b7c-b97d-ce8835bd7173",
+      "timestamp": "2025-11-29T06:52:31.416Z"
+    },
+    {
+      "contactId": "8a9e2cfc-5b0b-4473-a1e1-ed26edeaa049",
+      "content": "Yes, I am Interested",
+      "type": "text",
+      "direction": "inbound",
+      "status": "sent",
+      "id": "75325ca1-4b91-4ada-b494-70e82cd60d0e",
+      "timestamp": "2025-11-29T06:53:57.616Z"
+    },
+    {
+      "contactId": "8a9e2cfc-5b0b-4473-a1e1-ed26edeaa049",
+      "content": "Great! Could you please provide more details about what you are interested in? This way, I can assist you better.",
+      "type": "text",
+      "direction": "outbound",
+      "status": "sent",
+      "id": "01cd8083-3d67-419c-8fda-b2afb0753fa8",
+      "timestamp": "2025-11-29T06:54:01.250Z"
+    },
+    {
+      "contactId": "8a9e2cfc-5b0b-4473-a1e1-ed26edeaa049",
+      "content": "Hi pls give more info",
+      "type": "text",
+      "direction": "inbound",
+      "status": "sent",
+      "id": "d380a6c9-ba9d-4991-9daf-4c8a49958d08",
+      "timestamp": "2025-11-29T06:58:59.309Z"
+    },
+    {
+      "contactId": "8a9e2cfc-5b0b-4473-a1e1-ed26edeaa049",
+      "content": "Of course! I’d be happy to help, but I need a bit more context to provide the most relevant information. Could you specify what topic or subject you are interested in? Whether it’s technology, health, travel, or something else, let me know so I can assist you appropriately.",
+      "type": "text",
+      "direction": "outbound",
+      "status": "sent",
+      "id": "cbc76520-aed4-47ff-a582-2e749b8c9de1",
+      "timestamp": "2025-11-29T06:59:02.118Z"
     }
   ],
   "campaigns": [
@@ -1062,11 +1143,11 @@
         "createdAt": "2025-11-27T22:31:14.359Z",
         "updatedAt": "2025-11-27T22:31:14.359Z"
       },
-      "lastMessage": "[button message]",
-      "lastMessageTime": "2025-11-28T06:51:35.439Z",
-      "lastInboundMessageTime": "2025-11-28T06:51:35.439Z",
-      "lastInboundMessage": "[button message]",
-      "unreadCount": 15,
+      "lastMessage": "Of course! I’d be happy to help, but I need a bit more context to provide the most relevant information. Could you specify what topic or subject you are interested in? Whether it’s technology, health, travel, or something else, let me know so I can assist you appropriately.",
+      "lastMessageTime": "2025-11-29T06:59:02.118Z",
+      "lastInboundMessageTime": "2025-11-29T06:58:59.309Z",
+      "lastInboundMessage": "Hi pls give more info",
+      "unreadCount": 17,
       "status": "open",
       "notes": []
     },
@@ -1108,11 +1189,11 @@
         "createdAt": "2025-11-28T06:04:55.063Z",
         "updatedAt": "2025-11-28T06:04:55.063Z"
       },
-      "lastMessage": "Hello! How can I assist you today?",
-      "lastMessageTime": "2025-11-29T05:35:42.798Z",
-      "lastInboundMessageTime": "2025-11-29T05:35:39.651Z",
-      "lastInboundMessage": "Hey",
-      "unreadCount": 9,
+      "lastMessage": "To help you effectively, could you please specify what you want to participate in? Whether it's a particular event, program, group, or activity, providing more details will allow me to give you the best guidance.",
+      "lastMessageTime": "2025-11-29T06:52:31.416Z",
+      "lastInboundMessageTime": "2025-11-29T06:52:27.281Z",
+      "lastInboundMessage": "How can I participate",
+      "unreadCount": 11,
       "status": "open",
       "notes": []
     },
