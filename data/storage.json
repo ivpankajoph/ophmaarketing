@@ -2239,6 +2239,42 @@
       "status": "sent",
       "id": "5adc262a-de51-4aa5-9b83-11e1e31bb68b",
       "timestamp": "2025-11-29T08:57:01.057Z"
+    },
+    {
+      "contactId": "466ddcaf-77e6-484d-866e-8cf67feeecb0",
+      "content": "Sure",
+      "type": "text",
+      "direction": "inbound",
+      "status": "sent",
+      "id": "f3ed0302-dbdd-47d1-a159-844734949a02",
+      "timestamp": "2025-11-29T09:04:56.063Z"
+    },
+    {
+      "contactId": "466ddcaf-77e6-484d-866e-8cf67feeecb0",
+      "content": "How can I assist you today?",
+      "type": "text",
+      "direction": "outbound",
+      "status": "sent",
+      "id": "906569ca-b275-412f-a721-add225726e60",
+      "timestamp": "2025-11-29T09:04:58.458Z"
+    },
+    {
+      "contactId": "466ddcaf-77e6-484d-866e-8cf67feeecb0",
+      "content": "Thanks",
+      "type": "text",
+      "direction": "inbound",
+      "status": "sent",
+      "id": "4959a412-c4e3-4770-9c84-4512289a4473",
+      "timestamp": "2025-11-29T09:04:59.066Z"
+    },
+    {
+      "contactId": "466ddcaf-77e6-484d-866e-8cf67feeecb0",
+      "content": "You're welcome! If you have any questions or need assistance, feel free to ask.",
+      "type": "text",
+      "direction": "outbound",
+      "status": "sent",
+      "id": "6d71b93b-a4ff-41f3-a2d3-cb761260beb3",
+      "timestamp": "2025-11-29T09:05:01.825Z"
     }
   ],
   "campaigns": [
@@ -3310,11 +3346,11 @@
         "createdAt": "2025-11-29T08:13:52.241Z",
         "updatedAt": "2025-11-29T08:13:52.241Z"
       },
-      "lastMessage": "Thanks for your feedback, we will keep in touch with you soon.",
-      "lastMessageTime": "2025-11-29T08:13:53.742Z",
-      "lastInboundMessageTime": "2025-11-29T08:13:52.246Z",
-      "lastInboundMessage": "Yes, I am Interested",
-      "unreadCount": 1,
+      "lastMessage": "You're welcome! If you have any questions or need assistance, feel free to ask.",
+      "lastMessageTime": "2025-11-29T09:05:01.825Z",
+      "lastInboundMessageTime": "2025-11-29T09:04:59.066Z",
+      "lastInboundMessage": "Thanks",
+      "unreadCount": 3,
       "status": "open",
       "notes": []
     },
