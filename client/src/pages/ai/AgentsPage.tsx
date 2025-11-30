@@ -1,20 +1,7 @@
 import { useState, useEffect } from "react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
@@ -76,21 +63,11 @@ export default function AgentsPage() {
 
   const getModelDisplayName = (model: string): string => {
     const modelNames: { [key: string]: string } = {
-      "gpt-5.1": "Bot 5.1",
-      "gpt-5": "Bot 5",
-      "gpt-4.1": "Bot 4.1",
-      "gpt-4.1-mini": "Bot 4.1-mini",
-      "gpt-4.1-nano": "Bot 4.1-nano",
-      "gpt-4": "Bot 4",
-      "gpt-4-turbo": "Bot 4-turbo",
-      "gpt-4o": "Bot 4o",
-      "gpt-4o-mini": "Bot 4o-mini",
-      "gpt-3.5-turbo": "Bot 3.5-turbo",
-      // (optional older or specialized models, if you want)
-      "gpt-4o-audio": "Bot 4o-Audio",
-      "gpt-4o-realtime": "Bot 4o-Realtime",
+      "gpt-4o": "Bot 1",
+      "gpt-4o-mini": "Bot 2",
+      "gpt-4-turbo": "Bot 3",
+      "gpt-3.5-turbo": "Bot 4",
     };
-
     return modelNames[model] || model;
   };
 
@@ -149,9 +126,7 @@ export default function AgentsPage() {
     }
 
     try {
-      const url = editingAgent
-        ? `/api/agents/${editingAgent.id}`
-        : "/api/agents";
+      const url = editingAgent ? `/api/agents/${editingAgent.id}` : "/api/agents";
       const method = editingAgent ? "PUT" : "POST";
 
       const response = await fetch(url, {
@@ -164,33 +139,19 @@ export default function AgentsPage() {
         const agent = await response.json();
         if (editingAgent) {
           setAgents((prev) => prev.map((a) => (a.id === agent.id ? agent : a)));
-          toast({
-            title: "Agent Updated",
-            description: `${agent.name} has been updated.`,
-          });
+          toast({ title: "Agent Updated", description: `${agent.name} has been updated.` });
         } else {
           setAgents((prev) => [...prev, agent]);
-          toast({
-            title: "Agent Created",
-            description: `${agent.name} has been created.`,
-          });
+          toast({ title: "Agent Created", description: `${agent.name} has been created.` });
         }
         setDialogOpen(false);
         resetForm();
       } else {
         const error = await response.json();
-        toast({
-          title: "Error",
-          description: error.error,
-          variant: "destructive",
-        });
+        toast({ title: "Error", description: error.error, variant: "destructive" });
       }
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to save agent.",
-        variant: "destructive",
-      });
+      toast({ title: "Error", description: "Failed to save agent.", variant: "destructive" });
     }
   };
 
@@ -199,17 +160,10 @@ export default function AgentsPage() {
       const response = await fetch(`/api/agents/${id}`, { method: "DELETE" });
       if (response.ok) {
         setAgents((prev) => prev.filter((a) => a.id !== id));
-        toast({
-          title: "Agent Deleted",
-          description: "The agent has been removed.",
-        });
+        toast({ title: "Agent Deleted", description: "The agent has been removed." });
       }
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to delete agent.",
-        variant: "destructive",
-      });
+      toast({ title: "Error", description: "Failed to delete agent.", variant: "destructive" });
     }
   };
 
@@ -226,11 +180,7 @@ export default function AgentsPage() {
         setAgents((prev) => prev.map((a) => (a.id === agent.id ? updated : a)));
       }
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to update agent.",
-        variant: "destructive",
-      });
+      toast({ title: "Error", description: "Failed to update agent.", variant: "destructive" });
     }
   };
 
@@ -266,17 +216,9 @@ export default function AgentsPage() {
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-3xl font-bold tracking-tight">AI Agents</h2>
-            <p className="text-muted-foreground">
-              Create and manage AI agents for automated responses
-            </p>
+            <p className="text-muted-foreground">Create and manage AI agents for automated responses</p>
           </div>
-          <Dialog
-            open={dialogOpen}
-            onOpenChange={(open) => {
-              setDialogOpen(open);
-              if (!open) resetForm();
-            }}
-          >
+          <Dialog open={dialogOpen} onOpenChange={(open) => { setDialogOpen(open); if (!open) resetForm(); }}>
             <DialogTrigger asChild>
               <Button>
                 <Plus className="h-4 w-4 mr-2" />
@@ -285,9 +227,7 @@ export default function AgentsPage() {
             </DialogTrigger>
             <DialogContent className="max-w-2xl">
               <DialogHeader>
-                <DialogTitle>
-                  {editingAgent ? "Edit Agent" : "Create New Agent"}
-                </DialogTitle>
+                <DialogTitle>{editingAgent ? "Edit Agent" : "Create New Agent"}</DialogTitle>
                 <DialogDescription>
                   Configure your AI agent's behavior and personality.
                 </DialogDescription>
@@ -299,58 +239,23 @@ export default function AgentsPage() {
                     <Input
                       placeholder="e.g., Support Bot"
                       value={formData.name}
-                      onChange={(e) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          name: e.target.value,
-                        }))
-                      }
+                      onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
                     />
                   </div>
                   <div className="grid gap-2">
                     <Label>AI Model</Label>
                     <Select
                       value={formData.model}
-                      onValueChange={(value) =>
-                        setFormData((prev) => ({ ...prev, model: value }))
-                      }
+                      onValueChange={(value) => setFormData((prev) => ({ ...prev, model: value }))}
                     >
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        {/* Latest Models */}
-                        <SelectItem value="gpt-5.1">
-                          Bot 5.1 
-                        </SelectItem>
-                        <SelectItem value="gpt-5">Bot 5 </SelectItem>
-
-                        {/* 4.1 Family */}
-                        <SelectItem value="gpt-4.1">Bot 4.1</SelectItem>
-                        <SelectItem value="gpt-4.1-mini">
-                          Bot 4.1 Mini
-                        </SelectItem>
-                        <SelectItem value="gpt-4.1-nano">
-                          Bot 4.1 Nano
-                        </SelectItem>
-
-                        {/* 4o Family */}
-                        <SelectItem value="gpt-4o">Bot 4o</SelectItem>
-                        <SelectItem value="gpt-4o-mini">
-                          Bot 4o Mini
-                        </SelectItem>
-                        <SelectItem value="gpt-4o-realtime">
-                          Bot 4o Realtime 
-                        </SelectItem>
-                      
-
-                        {/* Other GPT Models */}
-                        <SelectItem value="gpt-4-turbo">
-                          Bot 4 Turbo 
-                        </SelectItem>
-                        <SelectItem value="gpt-3.5-turbo">
-                          Bot 3.5 Turbo
-                        </SelectItem>
+                        <SelectItem value="gpt-4o">Bot 1 (Most Intelligent)</SelectItem>
+                        <SelectItem value="gpt-4o-mini">Bot 2 (Smart & Fast)</SelectItem>
+                        <SelectItem value="gpt-4-turbo">Bot 3 (Premium)</SelectItem>
+                        <SelectItem value="gpt-3.5-turbo">Bot 4 (Economy)</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -360,12 +265,7 @@ export default function AgentsPage() {
                   <Input
                     placeholder="Brief description of this agent"
                     value={formData.description}
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        description: e.target.value,
-                      }))
-                    }
+                    onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
                   />
                 </div>
                 <div className="grid gap-2">
@@ -374,12 +274,7 @@ export default function AgentsPage() {
                     className="min-h-[150px] font-mono text-sm"
                     placeholder="You are a helpful assistant..."
                     value={formData.systemPrompt}
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        systemPrompt: e.target.value,
-                      }))
-                    }
+                    onChange={(e) => setFormData((prev) => ({ ...prev, systemPrompt: e.target.value }))}
                   />
                 </div>
                 <div className="grid gap-2">
@@ -389,24 +284,15 @@ export default function AgentsPage() {
                     min={0}
                     max={1}
                     step={0.1}
-                    onValueChange={([value]) =>
-                      setFormData((prev) => ({ ...prev, temperature: value }))
-                    }
+                    onValueChange={([value]) => setFormData((prev) => ({ ...prev, temperature: value }))}
                   />
                   <p className="text-xs text-muted-foreground">
-                    Lower values make responses more focused, higher values more
-                    creative.
+                    Lower values make responses more focused, higher values more creative.
                   </p>
                 </div>
               </div>
               <DialogFooter>
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setDialogOpen(false);
-                    resetForm();
-                  }}
-                >
+                <Button variant="outline" onClick={() => { setDialogOpen(false); resetForm(); }}>
                   Cancel
                 </Button>
                 <Button onClick={handleSubmit}>
@@ -467,9 +353,7 @@ export default function AgentsPage() {
                             checked={agent.isActive}
                             onCheckedChange={() => toggleAgent(agent)}
                           />
-                          <Badge
-                            variant={agent.isActive ? "default" : "secondary"}
-                          >
+                          <Badge variant={agent.isActive ? "default" : "secondary"}>
                             {agent.isActive ? "Active" : "Inactive"}
                           </Badge>
                         </div>
@@ -487,11 +371,7 @@ export default function AgentsPage() {
                         >
                           <Play className="h-4 w-4" />
                         </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => openEditDialog(agent)}
-                        >
+                        <Button variant="ghost" size="icon" onClick={() => openEditDialog(agent)}>
                           <Edit className="h-4 w-4" />
                         </Button>
                         <Button
@@ -544,11 +424,7 @@ export default function AgentsPage() {
                   onKeyDown={(e) => e.key === "Enter" && testAgent()}
                 />
                 <Button onClick={testAgent} disabled={testing || !testMessage}>
-                  {testing ? (
-                    <RefreshCw className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Play className="h-4 w-4" />
-                  )}
+                  {testing ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
                 </Button>
               </div>
             </div>
