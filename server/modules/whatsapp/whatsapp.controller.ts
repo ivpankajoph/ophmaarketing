@@ -59,6 +59,8 @@ export async function handleWebhook(req: Request, res: Response) {
     // Extract message content based on type
     let messageText = '';
     let buttonPayload = '';
+    let mediaUrl = '';
+    let isMediaMessage = false;
     
     if (messageType === 'text') {
       messageText = message.text?.body || '';
@@ -79,12 +81,74 @@ export async function handleWebhook(req: Request, res: Response) {
         buttonPayload = interactive.list_reply?.id || '';
         console.log(`Interactive list reply from ${from}: title="${messageText}", id="${buttonPayload}"`);
       }
+    } else if (messageType === 'image') {
+      // Image message
+      isMediaMessage = true;
+      mediaUrl = message.image?.id || '';
+      const caption = message.image?.caption || '';
+      messageText = caption ? `[Image] ${caption}` : '[Image message]';
+      console.log(`Image message from ${from}: id=${mediaUrl}, caption="${caption}"`);
+    } else if (messageType === 'video') {
+      // Video message
+      isMediaMessage = true;
+      mediaUrl = message.video?.id || '';
+      const caption = message.video?.caption || '';
+      messageText = caption ? `[Video] ${caption}` : '[Video message]';
+      console.log(`Video message from ${from}: id=${mediaUrl}, caption="${caption}"`);
+    } else if (messageType === 'audio') {
+      // Audio/voice message
+      isMediaMessage = true;
+      mediaUrl = message.audio?.id || '';
+      messageText = '[Audio message]';
+      console.log(`Audio message from ${from}: id=${mediaUrl}`);
+    } else if (messageType === 'document') {
+      // Document message
+      isMediaMessage = true;
+      mediaUrl = message.document?.id || '';
+      const filename = message.document?.filename || 'document';
+      const caption = message.document?.caption || '';
+      messageText = caption ? `[Document: ${filename}] ${caption}` : `[Document: ${filename}]`;
+      console.log(`Document message from ${from}: id=${mediaUrl}, filename="${filename}"`);
+    } else if (messageType === 'sticker') {
+      // Sticker message
+      isMediaMessage = true;
+      mediaUrl = message.sticker?.id || '';
+      messageText = '[Sticker message]';
+      console.log(`Sticker message from ${from}: id=${mediaUrl}`);
+    } else if (messageType === 'location') {
+      // Location message
+      const lat = message.location?.latitude || 0;
+      const lng = message.location?.longitude || 0;
+      const name = message.location?.name || '';
+      messageText = name ? `[Location: ${name}] (${lat}, ${lng})` : `[Location] (${lat}, ${lng})`;
+      console.log(`Location message from ${from}: ${lat}, ${lng}`);
+    } else if (messageType === 'contacts') {
+      // Contact card message
+      const contacts = message.contacts || [];
+      const contactNames = contacts.map((c: any) => c.name?.formatted_name || 'Unknown').join(', ');
+      messageText = `[Contact shared: ${contactNames}]`;
+      console.log(`Contacts message from ${from}: ${contactNames}`);
+    } else if (messageType === 'reaction') {
+      // Reaction message
+      const emoji = message.reaction?.emoji || '';
+      messageText = `[Reaction: ${emoji}]`;
+      console.log(`Reaction from ${from}: ${emoji}`);
+    } else {
+      // Unsupported message type
+      messageText = `[Unsupported message type: ${messageType}]`;
+      console.log(`Unsupported message type from ${from}: ${messageType}`);
     }
 
     console.log(`Received ${messageType} message from ${from}: ${messageText}`);
 
-    // Save the inbound message with actual button text
-    await saveInboundMessage(from, messageText || buttonPayload, messageType, buttonPayload);
+    // Save the inbound message with actual button text and media info
+    await saveInboundMessage(from, messageText || buttonPayload, messageType, buttonPayload, mediaUrl);
+
+    // For media messages, we still save them but don't process with AI
+    if (isMediaMessage) {
+      console.log(`Media message saved, skipping AI processing for type: ${messageType}`);
+      return res.sendStatus(200);
+    }
 
     // Process message if we have content (text, button, or interactive)
     if (!messageText && !buttonPayload) {
@@ -203,7 +267,7 @@ async function findLeadByPhone(phone: string) {
   });
 }
 
-async function saveInboundMessage(from: string, content: string, type: string, buttonPayload?: string) {
+async function saveInboundMessage(from: string, content: string, type: string, buttonPayload?: string, mediaUrl?: string) {
   try {
     const normalizedPhone = from.replace(/\D/g, '');
     

@@ -1,11 +1,36 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Search, Paperclip, Send, Smile, MoreVertical, Phone, Video, Loader2, Download, Clock } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { 
+  Search, 
+  Paperclip, 
+  Send, 
+  Smile, 
+  MoreVertical, 
+  Phone, 
+  Video, 
+  Loader2, 
+  Download, 
+  Clock,
+  Bot,
+  FileText,
+  MessageSquare,
+  Reply,
+  X,
+  MailOpen,
+  CheckSquare
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 
@@ -25,6 +50,8 @@ interface Message {
   direction: "inbound" | "outbound";
   status: string;
   timestamp: string;
+  replyToMessageId?: string;
+  replyToContent?: string;
 }
 
 interface Chat {
@@ -39,11 +66,45 @@ interface Chat {
   fromWindowInbox?: boolean;
 }
 
+interface Template {
+  id: string;
+  name: string;
+  content: string;
+  variables: string[];
+  status: string;
+}
+
+interface Agent {
+  id: string;
+  name: string;
+  description: string;
+  isActive: boolean;
+}
+
+interface ImportedContact {
+  id: string;
+  name: string;
+  phone: string;
+  email?: string;
+  tags?: string[];
+}
+
+function normalizePhone(phone: string): string {
+  return phone.replace(/\D/g, '');
+}
+
 export default function Inbox() {
   const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [messageInput, setMessageInput] = useState("");
   const [filter, setFilter] = useState<"all" | "unread">("all");
+  const [selectedContacts, setSelectedContacts] = useState<string[]>([]);
+  const [isBulkSendOpen, setIsBulkSendOpen] = useState(false);
+  const [messageType, setMessageType] = useState<"template" | "custom" | "ai">("template");
+  const [selectedTemplate, setSelectedTemplate] = useState("");
+  const [selectedAgent, setSelectedAgent] = useState("");
+  const [customMessage, setCustomMessage] = useState("");
+  const [replyingTo, setReplyingTo] = useState<Message | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const queryClient = useQueryClient();
 
@@ -54,8 +115,84 @@ export default function Inbox() {
       if (!res.ok) throw new Error("Failed to fetch chats");
       return res.json();
     },
-    refetchInterval: 3000, // Auto-refresh every 3 seconds
+    refetchInterval: 3000,
   });
+
+  const { data: templates = [] } = useQuery<Template[]>({
+    queryKey: ["/api/templates"],
+    queryFn: async () => {
+      const res = await fetch("/api/templates");
+      if (!res.ok) throw new Error("Failed to fetch templates");
+      return res.json();
+    },
+  });
+
+  const { data: agents = [] } = useQuery<Agent[]>({
+    queryKey: ["/api/agents"],
+    queryFn: async () => {
+      const res = await fetch("/api/agents");
+      if (!res.ok) throw new Error("Failed to fetch agents");
+      return res.json();
+    },
+  });
+
+  const { data: importedContacts = [] } = useQuery<ImportedContact[]>({
+    queryKey: ["/api/contacts"],
+    queryFn: async () => {
+      const res = await fetch("/api/contacts");
+      if (!res.ok) throw new Error("Failed to fetch contacts");
+      return res.json();
+    },
+  });
+
+  const { phoneToNameMap, last10ToNameMap } = useMemo(() => {
+    const phoneMap = new Map<string, string>();
+    const last10Map = new Map<string, string>();
+    
+    const isRealName = (name: string): boolean => {
+      if (!name || !name.trim()) return false;
+      if (name.startsWith('WhatsApp')) return false;
+      if (name.startsWith('+')) return false;
+      if (/^\d[\d\s]*$/.test(name)) return false;
+      return true;
+    };
+    
+    importedContacts.forEach(contact => {
+      const normalizedPhone = normalizePhone(contact.phone);
+      if (isRealName(contact.name)) {
+        phoneMap.set(normalizedPhone, contact.name);
+        if (normalizedPhone.length >= 10) {
+          last10Map.set(normalizedPhone.slice(-10), contact.name);
+        }
+      }
+    });
+    
+    return { phoneToNameMap: phoneMap, last10ToNameMap: last10Map };
+  }, [importedContacts]);
+
+  const getContactName = useMemo(() => {
+    return (chatContact: Contact): string => {
+      const normalizedPhone = normalizePhone(chatContact.phone);
+      
+      if (chatContact.name && 
+          !chatContact.name.startsWith('WhatsApp') && 
+          !chatContact.name.startsWith('+') &&
+          !/^\d+$/.test(chatContact.name.replace(/\s/g, ''))) {
+        return chatContact.name;
+      }
+      
+      let name = phoneToNameMap.get(normalizedPhone);
+      if (name) return name;
+      
+      if (normalizedPhone.length >= 10) {
+        const last10 = normalizedPhone.slice(-10);
+        name = last10ToNameMap.get(last10);
+        if (name) return name;
+      }
+      
+      return chatContact.phone.startsWith('+') ? chatContact.phone : `+${chatContact.phone}`;
+    };
+  }, [phoneToNameMap, last10ToNameMap]);
 
   const selectedChat = chats.find(c => c.id === selectedChatId);
   const selectedContactId = selectedChat?.contactId;
@@ -69,18 +206,23 @@ export default function Inbox() {
       return res.json();
     },
     enabled: !!selectedContactId,
-    refetchInterval: 2000, // Auto-refresh messages every 2 seconds
+    refetchInterval: 2000,
   });
 
   const sendMessageMutation = useMutation({
-    mutationFn: async ({ content, phone, contactId }: { content: string; phone: string; contactId: string }) => {
-      // Send via WhatsApp API
+    mutationFn: async ({ content, phone, contactId, replyToMessageId, replyToContent }: { 
+      content: string; 
+      phone: string; 
+      contactId: string;
+      replyToMessageId?: string;
+      replyToContent?: string;
+    }) => {
       const waRes = await fetch("/api/webhook/whatsapp/send", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           to: phone,
-          message: content,
+          message: replyToContent ? `> ${replyToContent.substring(0, 50)}${replyToContent.length > 50 ? '...' : ''}\n\n${content}` : content,
         }),
       });
       
@@ -89,7 +231,6 @@ export default function Inbox() {
         throw new Error(error.error || "Failed to send WhatsApp message");
       }
       
-      // Also save to local storage for inbox display
       const res = await fetch("/api/messages", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -99,6 +240,8 @@ export default function Inbox() {
           type: "text",
           direction: "outbound",
           status: "sent",
+          replyToMessageId,
+          replyToContent,
         }),
       });
       
@@ -112,10 +255,68 @@ export default function Inbox() {
       queryClient.invalidateQueries({ queryKey: ["/api/messages", data.contactId] });
       queryClient.invalidateQueries({ queryKey: ["/api/chats"] });
       setMessageInput("");
+      setReplyingTo(null);
       toast.success("Message sent via WhatsApp");
     },
     onError: (error: Error) => {
       toast.error(error.message || "Failed to send message");
+    },
+  });
+
+  const sendBulkMessageMutation = useMutation({
+    mutationFn: async (data: { contacts: string[], messageType: string, content: string }) => {
+      const results: { success: number; failed: number } = { success: 0, failed: 0 };
+      
+      for (const contactId of data.contacts) {
+        const chat = chats.find(c => c.contactId === contactId);
+        if (!chat) continue;
+        
+        const phone = chat.contact.phone.replace(/\D/g, '');
+        const name = getContactName(chat.contact);
+        const templateObj = templates.find(t => t.id === selectedTemplate);
+        
+        try {
+          const res = await fetch("/api/inbox/send", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              contactId,
+              phone,
+              name,
+              messageType: data.messageType,
+              templateName: templateObj?.name,
+              customMessage: data.messageType === "custom" ? data.content : undefined,
+              agentId: data.messageType === "ai" ? selectedAgent : undefined,
+            }),
+          });
+          
+          if (res.ok) {
+            results.success++;
+          } else {
+            results.failed++;
+          }
+        } catch {
+          results.failed++;
+        }
+      }
+      
+      return results;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/chats"] });
+      setSelectedContacts([]);
+      setIsBulkSendOpen(false);
+      setCustomMessage("");
+      setSelectedTemplate("");
+      setSelectedAgent("");
+      if (data.failed > 0) {
+        toast.success(`Sent to ${data.success} contacts, ${data.failed} failed`);
+      } else {
+        toast.success(`Message sent to ${data.success} contact${data.success > 1 ? 's' : ''}`);
+      }
+    },
+    onError: () => {
+      toast.error("Failed to send messages");
     },
   });
 
@@ -125,7 +326,6 @@ export default function Inbox() {
     }
   }, [chats, selectedChatId]);
 
-  // Mark messages as read when selecting a chat
   const markAsReadMutation = useMutation({
     mutationFn: async (contactId: string) => {
       const res = await fetch(`/api/chats/${contactId}/mark-read`, {
@@ -136,6 +336,20 @@ export default function Inbox() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/chats"] });
+    },
+  });
+
+  const markAsUnreadMutation = useMutation({
+    mutationFn: async (contactId: string) => {
+      const res = await fetch(`/api/chats/${contactId}/mark-unread`, {
+        method: "POST",
+      });
+      if (!res.ok) throw new Error("Failed to mark as unread");
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/chats"] });
+      toast.success("Marked as unread");
     },
   });
 
@@ -157,7 +371,9 @@ export default function Inbox() {
     sendMessageMutation.mutate({ 
       content: messageInput, 
       phone, 
-      contactId: selectedContactId 
+      contactId: selectedContactId,
+      replyToMessageId: replyingTo?.id,
+      replyToContent: replyingTo?.content,
     });
   };
 
@@ -166,6 +382,51 @@ export default function Inbox() {
       e.preventDefault();
       handleSendMessage();
     }
+  };
+
+  const handleSelectAll = () => {
+    if (selectedContacts.length === filteredChats.length) {
+      setSelectedContacts([]);
+    } else {
+      setSelectedContacts(filteredChats.map(c => c.contactId));
+    }
+  };
+
+  const handleSelectContact = (contactId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSelectedContacts(prev => 
+      prev.includes(contactId) 
+        ? prev.filter(id => id !== contactId) 
+        : [...prev, contactId]
+    );
+  };
+
+  const handleBulkSend = () => {
+    if (selectedContacts.length === 0) {
+      toast.error("Please select at least one contact");
+      return;
+    }
+
+    let content = "";
+    if (messageType === "template") {
+      const template = templates.find(t => t.id === selectedTemplate);
+      content = template?.content || "";
+    } else if (messageType === "custom") {
+      content = customMessage;
+    } else if (messageType === "ai") {
+      content = `[AI Agent: ${agents.find(a => a.id === selectedAgent)?.name || 'Unknown'}]`;
+    }
+
+    if (!content && messageType !== "ai") {
+      toast.error("Please enter a message or select a template");
+      return;
+    }
+
+    sendBulkMessageMutation.mutate({
+      contacts: selectedContacts,
+      messageType,
+      content,
+    });
   };
 
   const formatTime = (timestamp: string) => {
@@ -185,8 +446,16 @@ export default function Inbox() {
     }
   };
 
+  const isWithin24Hours = (chat: Chat) => {
+    if (!chat.lastInboundMessageTime) return false;
+    const lastInbound = new Date(chat.lastInboundMessageTime);
+    const now = new Date();
+    const hoursDiff = (now.getTime() - lastInbound.getTime()) / (1000 * 60 * 60);
+    return hoursDiff <= 24;
+  };
+
   const filteredChats = chats.filter(chat => {
-    const matchesSearch = chat.contact.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    const matchesSearch = getContactName(chat.contact).toLowerCase().includes(searchQuery.toLowerCase()) ||
       chat.contact.phone.includes(searchQuery);
     const matchesFilter = filter === "all" || (filter === "unread" && chat.unreadCount > 0);
     return matchesSearch && matchesFilter;
@@ -204,7 +473,7 @@ export default function Inbox() {
 
   const handleExportList = () => {
     const data = windowLeads.map(chat => ({
-      name: chat.contact.name,
+      name: getContactName(chat.contact),
       phone: chat.contact.phone,
       email: chat.contact.email || "",
       lastMessage: chat.lastMessage || "",
@@ -229,6 +498,42 @@ export default function Inbox() {
     toast.success("List exported successfully");
   };
 
+  const getInitials = (contact: Contact) => {
+    const displayName = getContactName(contact);
+    if (displayName.startsWith('+')) {
+      return displayName.slice(-2);
+    }
+    return displayName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
+  };
+
+  const approvedTemplates = templates.filter(t => t.status === "approved");
+
+  const renderMessageContent = (msg: Message) => {
+    const content = msg.content;
+    
+    if (content.startsWith('[Image')) {
+      return <span className="flex items-center gap-1 text-muted-foreground italic">📷 {content}</span>;
+    } else if (content.startsWith('[Video')) {
+      return <span className="flex items-center gap-1 text-muted-foreground italic">🎥 {content}</span>;
+    } else if (content.startsWith('[Audio')) {
+      return <span className="flex items-center gap-1 text-muted-foreground italic">🎵 {content}</span>;
+    } else if (content.startsWith('[Sticker')) {
+      return <span className="flex items-center gap-1 text-muted-foreground italic">🎨 {content}</span>;
+    } else if (content.startsWith('[Document')) {
+      return <span className="flex items-center gap-1 text-muted-foreground italic">📄 {content}</span>;
+    } else if (content.startsWith('[Location')) {
+      return <span className="flex items-center gap-1 text-muted-foreground italic">📍 {content}</span>;
+    } else if (content.startsWith('[Contact')) {
+      return <span className="flex items-center gap-1 text-muted-foreground italic">👤 {content}</span>;
+    } else if (content.startsWith('[Reaction')) {
+      return <span className="flex items-center gap-1">{content}</span>;
+    } else if (content.startsWith('[Unsupported')) {
+      return <span className="flex items-center gap-1 text-muted-foreground italic">⚠️ {content}</span>;
+    }
+    
+    return <span>{content}</span>;
+  };
+
   return (
     <DashboardLayout>
       <div className="space-y-4 animate-in fade-in duration-500">
@@ -239,13 +544,32 @@ export default function Inbox() {
               All conversations. Contacts outside 24-hour window require templates.
             </p>
           </div>
-          <Button variant="outline" onClick={handleExportList}>
-            <Download className="mr-2 h-4 w-4" />
-            Export List ({windowLeads.length})
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" onClick={handleExportList}>
+              <Download className="mr-2 h-4 w-4" />
+              Export List ({windowLeads.length})
+            </Button>
+            {selectedContacts.length > 0 && (
+              <Button onClick={() => setIsBulkSendOpen(true)}>
+                <Send className="mr-2 h-4 w-4" />
+                Send to {selectedContacts.length} Selected
+              </Button>
+            )}
+          </div>
         </div>
 
-      <div className="h-[calc(100vh-12rem)] flex bg-card border border-border rounded-lg overflow-hidden shadow-sm">
+        <div className="flex items-center gap-4 p-4 bg-muted/50 rounded-lg">
+          <Checkbox 
+            checked={selectedContacts.length === filteredChats.length && filteredChats.length > 0}
+            onCheckedChange={handleSelectAll}
+          />
+          <span className="text-sm font-medium">Select All ({filteredChats.length} chats)</span>
+          {selectedContacts.length > 0 && (
+            <Badge variant="secondary">{selectedContacts.length} selected</Badge>
+          )}
+        </div>
+
+      <div className="h-[calc(100vh-16rem)] flex bg-card border border-border rounded-lg overflow-hidden shadow-sm">
         <div className="w-80 border-r border-border flex flex-col bg-background">
           <div className="p-4 border-b border-border">
             <div className="relative">
@@ -292,14 +616,28 @@ export default function Inbox() {
                     className={`p-4 flex items-start gap-3 hover:bg-muted/50 cursor-pointer transition-colors ${chat.id === selectedChatId ? 'bg-muted/50' : ''}`}
                     onClick={() => handleSelectChat(chat.id)}
                   >
+                    <Checkbox 
+                      checked={selectedContacts.includes(chat.contactId)}
+                      onCheckedChange={() => {}}
+                      onClick={(e) => handleSelectContact(chat.contactId, e)}
+                    />
                     <Avatar>
                       <AvatarFallback className="bg-primary/10 text-primary">
-                        {chat.contact.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                        {getInitials(chat.contact)}
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between mb-1">
-                        <span className={`font-medium truncate ${chat.unreadCount > 0 ? 'font-bold' : ''}`}>{chat.contact.name}</span>
+                        <div className="flex items-center gap-2">
+                          <span className={`font-medium truncate ${chat.unreadCount > 0 ? 'font-bold' : ''}`}>
+                            {getContactName(chat.contact)}
+                          </span>
+                          {isWithin24Hours(chat) && (
+                            <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200 px-1">
+                              <Clock className="h-2.5 w-2.5" />
+                            </Badge>
+                          )}
+                        </div>
                         <span className="text-xs text-muted-foreground whitespace-nowrap">
                           {chat.lastMessageTime ? formatTime(chat.lastMessageTime) : ""}
                         </span>
@@ -327,18 +665,36 @@ export default function Inbox() {
                 <div className="flex items-center gap-3">
                   <Avatar>
                     <AvatarFallback className="bg-primary/10 text-primary">
-                      {selectedChat.contact.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                      {getInitials(selectedChat.contact)}
                     </AvatarFallback>
                   </Avatar>
                   <div>
-                    <h3 className="font-medium">{selectedChat.contact.name}</h3>
-                    <p className="text-xs text-muted-foreground">{selectedChat.contact.phone}</p>
+                    <h3 className="font-medium">{getContactName(selectedChat.contact)}</h3>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-muted-foreground">{selectedChat.contact.phone}</span>
+                      {isWithin24Hours(selectedChat) && (
+                        <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
+                          <Clock className="h-3 w-3 mr-1" />
+                          24hr Window
+                        </Badge>
+                      )}
+                    </div>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
                   <Button variant="ghost" size="icon"><Phone className="h-5 w-5 text-muted-foreground" /></Button>
                   <Button variant="ghost" size="icon"><Video className="h-5 w-5 text-muted-foreground" /></Button>
-                  <Button variant="ghost" size="icon"><MoreVertical className="h-5 w-5 text-muted-foreground" /></Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon"><MoreVertical className="h-5 w-5 text-muted-foreground" /></Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => markAsUnreadMutation.mutate(selectedChat.contactId)}>
+                        <MailOpen className="mr-2 h-4 w-4" />
+                        Mark as Unread
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               </div>
 
@@ -356,26 +712,55 @@ export default function Inbox() {
                     {messages.map((msg) => (
                       <div 
                         key={msg.id} 
-                        className={`flex ${msg.direction === 'outbound' ? 'justify-end' : 'justify-start'}`}
+                        className={`flex ${msg.direction === 'outbound' ? 'justify-end' : 'justify-start'} group`}
                       >
-                        <div 
-                          className={`
-                            max-w-[70%] rounded-lg px-4 py-2 shadow-sm relative
-                            ${msg.direction === 'outbound' 
-                              ? 'bg-[#d9fdd3] dark:bg-primary/20 text-foreground rounded-tr-none' 
-                              : 'bg-white dark:bg-card text-card-foreground rounded-tl-none'
-                            }
-                          `}
-                        >
-                          <p className="text-sm leading-relaxed">{msg.content}</p>
-                          <span className="text-[10px] text-muted-foreground/80 block text-right mt-1">
-                            {formatTime(msg.timestamp)}
-                            {msg.direction === 'outbound' && (
-                              <span className={`ml-1 ${msg.status === 'read' ? 'text-blue-500' : msg.status === 'failed' ? 'text-red-500' : ''}`}>
-                                {msg.status === 'read' ? '✓✓' : msg.status === 'delivered' ? '✓✓' : msg.status === 'failed' ? '✗' : '✓'}
-                              </span>
+                        <div className="flex items-start gap-1">
+                          {msg.direction === 'inbound' && (
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                              onClick={() => setReplyingTo(msg)}
+                            >
+                              <Reply className="h-3 w-3" />
+                            </Button>
+                          )}
+                          <div 
+                            className={`
+                              max-w-[70%] rounded-lg px-4 py-2 shadow-sm relative
+                              ${msg.direction === 'outbound' 
+                                ? 'bg-[#d9fdd3] dark:bg-primary/20 text-foreground rounded-tr-none' 
+                                : 'bg-white dark:bg-card text-card-foreground rounded-tl-none'
+                              }
+                            `}
+                          >
+                            {msg.replyToContent && (
+                              <div className="mb-2 p-2 bg-black/5 dark:bg-white/10 rounded border-l-2 border-primary/50 text-xs text-muted-foreground">
+                                <Reply className="h-3 w-3 inline mr-1" />
+                                {msg.replyToContent.substring(0, 60)}
+                                {msg.replyToContent.length > 60 && '...'}
+                              </div>
                             )}
-                          </span>
+                            <div className="text-sm leading-relaxed">{renderMessageContent(msg)}</div>
+                            <span className="text-[10px] text-muted-foreground/80 block text-right mt-1">
+                              {formatTime(msg.timestamp)}
+                              {msg.direction === 'outbound' && (
+                                <span className={`ml-1 ${msg.status === 'read' ? 'text-blue-500' : msg.status === 'failed' ? 'text-red-500' : ''}`}>
+                                  {msg.status === 'read' ? '✓✓' : msg.status === 'delivered' ? '✓✓' : msg.status === 'failed' ? '✗' : '✓'}
+                                </span>
+                              )}
+                            </span>
+                          </div>
+                          {msg.direction === 'outbound' && (
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                              onClick={() => setReplyingTo(msg)}
+                            >
+                              <Reply className="h-3 w-3" />
+                            </Button>
+                          )}
                         </div>
                       </div>
                     ))}
@@ -385,6 +770,18 @@ export default function Inbox() {
               </ScrollArea>
 
               <div className="p-4 bg-background border-t border-border">
+                {replyingTo && (
+                  <div className="mb-2 p-2 bg-muted rounded-lg flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-sm">
+                      <Reply className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-muted-foreground">Replying to:</span>
+                      <span className="truncate max-w-[300px]">{replyingTo.content}</span>
+                    </div>
+                    <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => setReplyingTo(null)}>
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                )}
                 <div className="flex items-center gap-2">
                   <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
                     <Smile className="h-6 w-6" />
@@ -393,7 +790,7 @@ export default function Inbox() {
                     <Paperclip className="h-6 w-6" />
                   </Button>
                   <Input 
-                    placeholder="Type a message" 
+                    placeholder={isWithin24Hours(selectedChat) ? "Type a message" : "Use templates for contacts outside 24hr window"} 
                     className="flex-1 bg-secondary/50 border-none focus-visible:ring-1"
                     value={messageInput}
                     onChange={(e) => setMessageInput(e.target.value)}
@@ -422,6 +819,112 @@ export default function Inbox() {
         </div>
       </div>
       </div>
+
+      <Dialog open={isBulkSendOpen} onOpenChange={setIsBulkSendOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Send className="h-5 w-5" />
+              Send Message to {selectedContacts.length} Contacts
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="p-3 bg-amber-50 dark:bg-amber-950/30 rounded-lg text-sm text-amber-700 dark:text-amber-400">
+              <Clock className="h-4 w-4 inline mr-2" />
+              Note: Contacts outside the 24-hour window will only receive template messages. Custom messages work only for those within the window.
+            </div>
+
+            <Tabs value={messageType} onValueChange={(v) => setMessageType(v as any)}>
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="template" className="flex items-center gap-2">
+                  <FileText className="h-4 w-4" />
+                  Template
+                </TabsTrigger>
+                <TabsTrigger value="custom" className="flex items-center gap-2">
+                  <MessageSquare className="h-4 w-4" />
+                  Custom
+                </TabsTrigger>
+                <TabsTrigger value="ai" className="flex items-center gap-2">
+                  <Bot className="h-4 w-4" />
+                  AI Agent
+                </TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="template" className="space-y-4 pt-4">
+                <div className="space-y-2">
+                  <Label>Select Template</Label>
+                  <Select value={selectedTemplate} onValueChange={setSelectedTemplate}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Choose a template" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {approvedTemplates.map(template => (
+                        <SelectItem key={template.id} value={template.id}>
+                          {template.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                {selectedTemplate && (
+                  <div className="p-3 bg-muted rounded-lg">
+                    <p className="text-sm">
+                      {templates.find(t => t.id === selectedTemplate)?.content}
+                    </p>
+                  </div>
+                )}
+              </TabsContent>
+
+              <TabsContent value="custom" className="space-y-4 pt-4">
+                <div className="space-y-2">
+                  <Label>Custom Message</Label>
+                  <Textarea 
+                    placeholder="Type your message here..."
+                    value={customMessage}
+                    onChange={(e) => setCustomMessage(e.target.value)}
+                    rows={5}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Custom messages work only within the 24-hour window after customer contact.
+                  </p>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="ai" className="space-y-4 pt-4">
+                <div className="space-y-2">
+                  <Label>Select AI Agent</Label>
+                  <Select value={selectedAgent} onValueChange={setSelectedAgent}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Choose an AI Agent" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {agents.filter(a => a.isActive).map(agent => (
+                        <SelectItem key={agent.id} value={agent.id}>
+                          {agent.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                {selectedAgent && (
+                  <div className="p-3 bg-muted rounded-lg">
+                    <p className="text-sm">
+                      {agents.find(a => a.id === selectedAgent)?.description || "AI Agent will generate personalized responses."}
+                    </p>
+                  </div>
+                )}
+              </TabsContent>
+            </Tabs>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsBulkSendOpen(false)}>Cancel</Button>
+            <Button onClick={handleBulkSend} disabled={sendBulkMessageMutation.isPending}>
+              {sendBulkMessageMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Send to {selectedContacts.length} Contact{selectedContacts.length > 1 ? 's' : ''}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </DashboardLayout>
   );
 }

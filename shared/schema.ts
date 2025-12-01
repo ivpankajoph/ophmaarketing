@@ -26,12 +26,14 @@ export const messageSchema = z.object({
   id: z.string(),
   contactId: z.string(),
   content: z.string(),
-  type: z.enum(["text", "image", "video", "document", "audio"]).default("text"),
+  type: z.enum(["text", "image", "video", "document", "audio", "sticker", "location", "contacts"]).default("text"),
   mediaUrl: z.string().optional(),
   direction: z.enum(["inbound", "outbound"]),
   status: z.enum(["sent", "delivered", "read", "failed"]).default("sent"),
   timestamp: z.string(),
   agentId: z.string().optional(),
+  replyToMessageId: z.string().optional(),
+  replyToContent: z.string().optional(),
 });
 
 export const campaignSchema = z.object({

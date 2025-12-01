@@ -615,6 +615,16 @@ export class MemStorage implements IStorage {
     this.save();
   }
 
+  async markMessagesAsUnread(contactId: string): Promise<void> {
+    // Set unread count to 1 to mark the chat as unread
+    const chatIndex = this.data.chats.findIndex(c => c.contactId === contactId);
+    if (chatIndex >= 0) {
+      this.data.chats[chatIndex].unreadCount = 1;
+    }
+    
+    this.save();
+  }
+
   async incrementUnreadCount(contactId: string): Promise<void> {
     const chatIndex = this.data.chats.findIndex(c => c.contactId === contactId);
     if (chatIndex >= 0) {

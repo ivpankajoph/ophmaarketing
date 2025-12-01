@@ -12,6 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { 
   Search, 
   Paperclip, 
@@ -26,7 +27,10 @@ import {
   CheckSquare,
   Bot,
   FileText,
-  MessageSquare
+  MessageSquare,
+  Reply,
+  X,
+  MailOpen
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -46,6 +50,8 @@ interface Message {
   direction: "inbound" | "outbound";
   status: string;
   timestamp: string;
+  replyToMessageId?: string;
+  replyToContent?: string;
 }
 
 interface Chat {
@@ -99,6 +105,7 @@ export default function WindowInbox() {
   const [selectedTemplate, setSelectedTemplate] = useState("");
   const [selectedAgent, setSelectedAgent] = useState("");
   const [customMessage, setCustomMessage] = useState("");
+  const [replyingTo, setReplyingTo] = useState<Message | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const queryClient = useQueryClient();
   
@@ -297,7 +304,13 @@ export default function WindowInbox() {
   });
 
   const sendMessageMutation = useMutation({
-    mutationFn: async ({ content, phone, contactId }: { content: string; phone: string; contactId: string }) => {
+    mutationFn: async ({ content, phone, contactId, replyToMessageId, replyToContent }: { 
+      content: string; 
+      phone: string; 
+      contactId: string;
+      replyToMessageId?: string;
+      replyToContent?: string;
+    }) => {
       // Send via WhatsApp API
       const waRes = await fetch("/api/webhook/whatsapp/send", {
         method: "POST",
@@ -323,6 +336,8 @@ export default function WindowInbox() {
           type: "text",
           direction: "outbound",
           status: "sent",
+          replyToMessageId,
+          replyToContent,
         }),
       });
       
@@ -336,6 +351,7 @@ export default function WindowInbox() {
       queryClient.invalidateQueries({ queryKey: ["/api/messages", data.contactId] });
       queryClient.invalidateQueries({ queryKey: ["/api/chats/window"] });
       setMessageInput("");
+      setReplyingTo(null);
       toast.success("Message sent via WhatsApp");
     },
     onError: (error: Error) => {
@@ -422,6 +438,21 @@ export default function WindowInbox() {
     },
   });
 
+  const markAsUnreadMutation = useMutation({
+    mutationFn: async (contactId: string) => {
+      const res = await fetch(`/api/chats/${contactId}/mark-unread`, {
+        method: "POST",
+      });
+      if (!res.ok) throw new Error("Failed to mark as unread");
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/chats/window"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/chats"] });
+      toast.success("Marked as unread");
+    },
+  });
+
   const handleSelectChat = (chatId: string) => {
     setSelectedChatId(chatId);
     const chat = chats.find(c => c.id === chatId);
@@ -437,10 +468,13 @@ export default function WindowInbox() {
   const handleSendMessage = () => {
     if (!messageInput.trim() || !selectedChat || !selectedContactId) return;
     const phone = selectedChat.contact.phone.replace(/\D/g, '');
+    
     sendMessageMutation.mutate({ 
       content: messageInput, 
       phone, 
-      contactId: selectedContactId 
+      contactId: selectedContactId,
+      replyToMessageId: replyingTo?.id,
+      replyToContent: replyingTo?.content,
     });
   };
 
@@ -719,7 +753,17 @@ export default function WindowInbox() {
                   <div className="flex items-center gap-2">
                     <Button variant="ghost" size="icon"><Phone className="h-5 w-5 text-muted-foreground" /></Button>
                     <Button variant="ghost" size="icon"><Video className="h-5 w-5 text-muted-foreground" /></Button>
-                    <Button variant="ghost" size="icon"><MoreVertical className="h-5 w-5 text-muted-foreground" /></Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon"><MoreVertical className="h-5 w-5 text-muted-foreground" /></Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => markAsUnreadMutation.mutate(selectedChat.contactId)}>
+                          <MailOpen className="mr-2 h-4 w-4" />
+                          Mark as Unread
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
                 </div>
 
@@ -737,26 +781,45 @@ export default function WindowInbox() {
                       {messages.map((msg) => (
                         <div 
                           key={msg.id} 
-                          className={`flex ${msg.direction === 'outbound' ? 'justify-end' : 'justify-start'}`}
+                          className={`flex ${msg.direction === 'outbound' ? 'justify-end' : 'justify-start'} group`}
                         >
-                          <div 
-                            className={`
-                              max-w-[70%] rounded-lg px-4 py-2 shadow-sm relative
-                              ${msg.direction === 'outbound' 
-                                ? 'bg-[#d9fdd3] dark:bg-primary/20 text-foreground rounded-tr-none' 
-                                : 'bg-white dark:bg-card text-card-foreground rounded-tl-none'
-                              }
-                            `}
-                          >
-                            <p className="text-sm leading-relaxed">{msg.content}</p>
-                            <span className="text-[10px] text-muted-foreground/80 block text-right mt-1">
-                              {formatTime(msg.timestamp)}
-                              {msg.direction === 'outbound' && (
-                                <span className={`ml-1 ${msg.status === 'read' ? 'text-blue-500' : msg.status === 'failed' ? 'text-red-500' : ''}`}>
-                                  {msg.status === 'read' ? '✓✓' : msg.status === 'delivered' ? '✓✓' : msg.status === 'failed' ? '✗' : '✓'}
-                                </span>
+                          <div className="flex items-start gap-1">
+                            {msg.direction === 'inbound' && (
+                              <Button 
+                                variant="ghost" 
+                                size="icon" 
+                                className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                                onClick={() => setReplyingTo(msg)}
+                              >
+                                <Reply className="h-3 w-3" />
+                              </Button>
+                            )}
+                            <div 
+                              className={`
+                                max-w-[70%] rounded-lg px-4 py-2 shadow-sm relative
+                                ${msg.direction === 'outbound' 
+                                  ? 'bg-[#d9fdd3] dark:bg-primary/20 text-foreground rounded-tr-none' 
+                                  : 'bg-white dark:bg-card text-card-foreground rounded-tl-none'
+                                }
+                              `}
+                            >
+                              {msg.replyToContent && (
+                                <div className="mb-2 p-2 bg-black/5 dark:bg-white/10 rounded border-l-2 border-primary/50 text-xs text-muted-foreground">
+                                  <Reply className="h-3 w-3 inline mr-1" />
+                                  {msg.replyToContent.substring(0, 60)}
+                                  {msg.replyToContent.length > 60 && '...'}
+                                </div>
                               )}
-                            </span>
+                              <p className="text-sm leading-relaxed">{msg.content}</p>
+                              <span className="text-[10px] text-muted-foreground/80 block text-right mt-1">
+                                {formatTime(msg.timestamp)}
+                                {msg.direction === 'outbound' && (
+                                  <span className={`ml-1 ${msg.status === 'read' ? 'text-blue-500' : msg.status === 'failed' ? 'text-red-500' : ''}`}>
+                                    {msg.status === 'read' ? '✓✓' : msg.status === 'delivered' ? '✓✓' : msg.status === 'failed' ? '✗' : '✓'}
+                                  </span>
+                                )}
+                              </span>
+                            </div>
                           </div>
                         </div>
                       ))}
@@ -766,6 +829,18 @@ export default function WindowInbox() {
                 </ScrollArea>
 
                 <div className="p-4 bg-background border-t border-border">
+                  {replyingTo && (
+                    <div className="mb-2 p-2 bg-muted rounded-lg flex items-center justify-between">
+                      <div className="flex items-center gap-2 text-sm">
+                        <Reply className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-muted-foreground">Replying to:</span>
+                        <span className="truncate max-w-[300px]">{replyingTo.content}</span>
+                      </div>
+                      <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => setReplyingTo(null)}>
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  )}
                   <div className="flex items-center gap-2">
                     <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
                       <Smile className="h-6 w-6" />

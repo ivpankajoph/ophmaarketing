@@ -209,6 +209,15 @@ export async function registerRoutes(
     }
   });
 
+  app.post("/api/chats/:contactId/mark-unread", async (req, res) => {
+    try {
+      await storage.markMessagesAsUnread(req.params.contactId);
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to mark messages as unread" });
+    }
+  });
+
   app.post("/api/inbox/send", async (req, res) => {
     try {
       const { contactId, phone, name, messageType, templateName, customMessage, agentId } = req.body;

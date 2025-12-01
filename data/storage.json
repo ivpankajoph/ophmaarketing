@@ -5254,7 +5254,7 @@
       "content": "Hi",
       "type": "text",
       "direction": "inbound",
-      "status": "sent",
+      "status": "read",
       "id": "530dfe21-29d9-433a-87a1-ba98fa69a5ad",
       "timestamp": "2025-12-01T08:44:46.321Z"
     },
@@ -6801,7 +6801,7 @@
       "lastMessageTime": "2025-12-01T08:44:49.988Z",
       "lastInboundMessageTime": "2025-12-01T08:44:46.321Z",
       "lastInboundMessage": "Hi",
-      "unreadCount": 1,
+      "unreadCount": 0,
       "status": "open",
       "notes": []
     }
