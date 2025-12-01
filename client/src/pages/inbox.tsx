@@ -712,9 +712,9 @@ export default function Inbox() {
                     {messages.map((msg) => (
                       <div 
                         key={msg.id} 
-                        className={`flex ${msg.direction === 'outbound' ? 'justify-end' : 'justify-start'} group`}
+                        className={`flex ${msg.direction === 'inbound' ? 'justify-start' : 'justify-end'} group`}
                       >
-                        <div className="flex items-start gap-1">
+                        <div className={`flex items-start gap-1 ${msg.direction === 'inbound' ? 'flex-row' : 'flex-row-reverse'}`}>
                           {msg.direction === 'inbound' && (
                             <Button 
                               variant="ghost" 
@@ -728,9 +728,9 @@ export default function Inbox() {
                           <div 
                             className={`
                               max-w-[70%] rounded-lg px-4 py-2 shadow-sm relative
-                              ${msg.direction === 'outbound' 
-                                ? 'bg-[#d9fdd3] dark:bg-primary/20 text-foreground rounded-tr-none' 
-                                : 'bg-white dark:bg-card text-card-foreground rounded-tl-none'
+                              ${msg.direction === 'inbound' 
+                                ? 'bg-white dark:bg-card text-card-foreground rounded-tl-none' 
+                                : 'bg-[#d9fdd3] dark:bg-primary/20 text-foreground rounded-tr-none'
                               }
                             `}
                           >
@@ -751,16 +751,6 @@ export default function Inbox() {
                               )}
                             </span>
                           </div>
-                          {msg.direction === 'outbound' && (
-                            <Button 
-                              variant="ghost" 
-                              size="icon" 
-                              className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
-                              onClick={() => setReplyingTo(msg)}
-                            >
-                              <Reply className="h-3 w-3" />
-                            </Button>
-                          )}
                         </div>
                       </div>
                     ))}
