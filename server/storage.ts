@@ -18,110 +18,7 @@ import {
   type InsertTeamMember,
 } from "@shared/schema";
 import { randomUUID } from "crypto";
-import fs from "fs";
-import path from "path";
-
-const DATA_DIR = "./data";
-const DATA_FILE = path.join(DATA_DIR, "storage.json");
-
-interface StorageData {
-  users: User[];
-  contacts: Contact[];
-  messages: Message[];
-  campaigns: Campaign[];
-  templates: Template[];
-  automations: Automation[];
-  teamMembers: TeamMember[];
-  whatsappSettings: WhatsappSettings | null;
-  billing: Billing;
-  chats: Chat[];
-}
-
-function loadData(): StorageData {
-  try {
-    if (!fs.existsSync(DATA_DIR)) {
-      fs.mkdirSync(DATA_DIR, { recursive: true });
-    }
-    if (fs.existsSync(DATA_FILE)) {
-      const data = fs.readFileSync(DATA_FILE, "utf-8");
-      return JSON.parse(data);
-    }
-  } catch (error) {
-    console.error("Error loading data:", error);
-  }
-  return getDefaultData();
-}
-
-function saveData(data: StorageData): void {
-  try {
-    if (!fs.existsSync(DATA_DIR)) {
-      fs.mkdirSync(DATA_DIR, { recursive: true });
-    }
-    fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
-  } catch (error) {
-    console.error("Error saving data:", error);
-  }
-}
-
-function getDefaultData(): StorageData {
-  const now = new Date().toISOString();
-  return {
-    users: [
-      {
-        id: "user-1",
-        username: "admin",
-        password: "admin123",
-        name: "Admin User",
-        email: "admin@example.com",
-        role: "admin",
-        createdAt: now,
-      },
-    ],
-    contacts: [
-      { id: "contact-1", name: "John Smith", phone: "+1234567890", email: "john@email.com", tags: ["Customer", "VIP"], notes: "Regular customer", createdAt: now, updatedAt: now },
-      { id: "contact-2", name: "Sarah Johnson", phone: "+1234567891", email: "sarah@email.com", tags: ["Hot Lead"], notes: "Interested in premium plan", createdAt: now, updatedAt: now },
-      { id: "contact-3", name: "Mike Wilson", phone: "+1234567892", email: "mike@email.com", tags: ["Customer"], notes: "", createdAt: now, updatedAt: now },
-      { id: "contact-4", name: "Emily Brown", phone: "+1234567893", email: "emily@email.com", tags: ["New Lead"], notes: "From Facebook campaign", createdAt: now, updatedAt: now },
-      { id: "contact-5", name: "David Lee", phone: "+1234567894", email: "david@email.com", tags: ["Customer", "Enterprise"], notes: "Enterprise client", createdAt: now, updatedAt: now },
-    ],
-    messages: [
-      { id: "msg-1", contactId: "contact-1", content: "Hi, I need help with my order", type: "text", direction: "inbound", status: "read", timestamp: new Date(Date.now() - 3600000).toISOString() },
-      { id: "msg-2", contactId: "contact-1", content: "Sure! Let me check that for you. Can you provide your order number?", type: "text", direction: "outbound", status: "delivered", timestamp: new Date(Date.now() - 3500000).toISOString(), agentId: "user-1" },
-      { id: "msg-3", contactId: "contact-1", content: "Order #12345", type: "text", direction: "inbound", status: "read", timestamp: new Date(Date.now() - 3400000).toISOString() },
-      { id: "msg-4", contactId: "contact-2", content: "Hello! I saw your ad and I'm interested", type: "text", direction: "inbound", status: "read", timestamp: new Date(Date.now() - 7200000).toISOString() },
-      { id: "msg-5", contactId: "contact-2", content: "Great to hear! What would you like to know more about?", type: "text", direction: "outbound", status: "delivered", timestamp: new Date(Date.now() - 7100000).toISOString(), agentId: "user-1" },
-      { id: "msg-6", contactId: "contact-3", content: "Thanks for the quick delivery!", type: "text", direction: "inbound", status: "read", timestamp: new Date(Date.now() - 86400000).toISOString() },
-      { id: "msg-7", contactId: "contact-4", content: "Hi, can you tell me more about your services?", type: "text", direction: "inbound", status: "sent", timestamp: new Date(Date.now() - 1800000).toISOString() },
-    ],
-    campaigns: [
-      { id: "camp-1", name: "Black Friday Sale", message: "Hi {{name}}! Exclusive 50% off for our loyal customers. Use code BLACKFRIDAY50", contactIds: ["contact-1", "contact-3", "contact-5"], status: "completed", sentCount: 3, deliveredCount: 3, readCount: 2, repliedCount: 1, createdAt: now, updatedAt: now },
-      { id: "camp-2", name: "New Product Launch", message: "Hi {{name}}! Introducing our new premium product line. Check it out!", contactIds: ["contact-1", "contact-2", "contact-3", "contact-4", "contact-5"], status: "scheduled", scheduledAt: new Date(Date.now() + 86400000).toISOString(), sentCount: 0, deliveredCount: 0, readCount: 0, repliedCount: 0, createdAt: now, updatedAt: now },
-    ],
-    templates: [
-      { id: "tmpl-1", name: "Welcome Message", category: "utility", content: "Hello {{name}}! Welcome to our service. How can we help you today?", variables: ["name"], status: "approved", createdAt: now, updatedAt: now },
-      { id: "tmpl-2", name: "Order Confirmation", category: "utility", content: "Hi {{name}}, your order #{{order_id}} has been confirmed. Expected delivery: {{delivery_date}}", variables: ["name", "order_id", "delivery_date"], status: "approved", createdAt: now, updatedAt: now },
-      { id: "tmpl-3", name: "Special Offer", category: "marketing", content: "Hi {{name}}! Get {{discount}}% off on your next purchase. Valid until {{expiry}}", variables: ["name", "discount", "expiry"], status: "pending", createdAt: now, updatedAt: now },
-    ],
-    automations: [
-      { id: "auto-1", name: "Welcome Reply", type: "welcome", trigger: "new_contact", message: "Welcome! Thanks for reaching out. An agent will be with you shortly.", isActive: true, createdAt: now, updatedAt: now },
-      { id: "auto-2", name: "Pricing Keyword", type: "keyword", trigger: "pricing", message: "Here are our pricing options:\n- Basic: $29/mo\n- Pro: $79/mo\n- Enterprise: Contact us", isActive: true, createdAt: now, updatedAt: now },
-      { id: "auto-3", name: "Follow-up Reminder", type: "follow_up", trigger: "no_reply", message: "Hi! Just checking in. Is there anything else you need help with?", delay: 24, delayUnit: "hours", isActive: true, createdAt: now, updatedAt: now },
-    ],
-    teamMembers: [
-      { id: "team-1", userId: "user-1", name: "Admin User", email: "admin@example.com", role: "admin", permissions: ["all"], isActive: true, createdAt: now },
-    ],
-    whatsappSettings: null,
-    billing: {
-      id: "billing-1",
-      credits: 1500,
-      transactions: [
-        { id: "txn-1", type: "purchase", amount: 2000, description: "Credits purchased", createdAt: new Date(Date.now() - 604800000).toISOString() },
-        { id: "txn-2", type: "usage", amount: -500, description: "Campaign: Black Friday Sale", createdAt: new Date(Date.now() - 172800000).toISOString() },
-      ],
-    },
-    chats: [],
-  };
-}
+import * as mongodb from "./modules/storage/mongodb.adapter";
 
 export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
@@ -129,12 +26,14 @@ export interface IStorage {
   createUser(user: InsertUser): Promise<User>;
   getContacts(): Promise<Contact[]>;
   getContact(id: string): Promise<Contact | undefined>;
+  getContactByPhone(phone: string): Promise<Contact | undefined>;
   createContact(contact: InsertContact): Promise<Contact>;
   updateContact(id: string, contact: Partial<InsertContact>): Promise<Contact | undefined>;
   deleteContact(id: string): Promise<boolean>;
   getMessages(contactId?: string): Promise<Message[]>;
   getMessage(id: string): Promise<Message | undefined>;
   createMessage(message: InsertMessage): Promise<Message>;
+  updateMessage(id: string, message: Partial<Message>): Promise<Message | undefined>;
   getCampaigns(): Promise<Campaign[]>;
   getCampaign(id: string): Promise<Campaign | undefined>;
   createCampaign(campaign: InsertCampaign): Promise<Campaign>;
@@ -163,50 +62,27 @@ export interface IStorage {
   getDashboardStats(): Promise<any>;
   getChats(): Promise<Chat[]>;
   getChat(id: string): Promise<Chat | undefined>;
+  getChatByContactId(contactId: string): Promise<Chat | undefined>;
+  updateChat(id: string, chat: Partial<Chat>): Promise<Chat | undefined>;
   updateChatInboundTime(contactId: string): Promise<void>;
   markMessagesAsRead(contactId: string): Promise<void>;
   incrementUnreadCount(contactId: string): Promise<void>;
 }
 
-export class MemStorage implements IStorage {
-  private data: StorageData;
+function normalizePhone(phone: string): string {
+  return phone.replace(/\D/g, '');
+}
 
-  constructor() {
-    this.data = loadData();
-    this.initializeChats();
-  }
-
-  private save(): void {
-    saveData(this.data);
-  }
-
-  private initializeChats(): void {
-    this.data.chats = this.data.contacts.map((contact) => {
-      const contactMessages = this.data.messages.filter((m) => m.contactId === contact.id);
-      const lastMessage = contactMessages[contactMessages.length - 1];
-      const inboundMessages = contactMessages.filter((m) => m.direction === "inbound");
-      const lastInboundMessage = inboundMessages[inboundMessages.length - 1];
-      return {
-        id: `chat-${contact.id}`,
-        contactId: contact.id,
-        contact,
-        lastMessage: lastMessage?.content,
-        lastMessageTime: lastMessage?.timestamp,
-        lastInboundMessageTime: lastInboundMessage?.timestamp,
-        lastInboundMessage: lastInboundMessage?.content,
-        unreadCount: contactMessages.filter((m) => m.direction === "inbound" && m.status !== "read").length,
-        status: "open" as const,
-        notes: [],
-      };
-    });
-  }
-
+export class MongoStorage implements IStorage {
+  
   async getUser(id: string): Promise<User | undefined> {
-    return this.data.users.find((u) => u.id === id);
+    const user = await mongodb.findOne<User>('users', { id });
+    return user || undefined;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    return this.data.users.find((u) => u.username === username);
+    const user = await mongodb.findOne<User>('users', { username });
+    return user || undefined;
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
@@ -215,17 +91,24 @@ export class MemStorage implements IStorage {
       id: randomUUID(),
       createdAt: new Date().toISOString(),
     };
-    this.data.users.push(user);
-    this.save();
+    await mongodb.insertOne('users', user);
     return user;
   }
 
   async getContacts(): Promise<Contact[]> {
-    return this.data.contacts;
+    return mongodb.findMany<Contact>('contacts', {});
   }
 
   async getContact(id: string): Promise<Contact | undefined> {
-    return this.data.contacts.find((c) => c.id === id);
+    const contact = await mongodb.findOne<Contact>('contacts', { id });
+    return contact || undefined;
+  }
+
+  async getContactByPhone(phone: string): Promise<Contact | undefined> {
+    const normalizedPhone = normalizePhone(phone);
+    const contacts = await mongodb.findMany<Contact>('contacts', {});
+    return contacts.find(c => normalizePhone(c.phone).endsWith(normalizedPhone.slice(-10)) || 
+                              normalizedPhone.endsWith(normalizePhone(c.phone).slice(-10)));
   }
 
   async createContact(contact: InsertContact): Promise<Contact> {
@@ -237,44 +120,45 @@ export class MemStorage implements IStorage {
       createdAt: now,
       updatedAt: now,
     };
-    this.data.contacts.push(newContact);
-    this.initializeChats();
-    this.save();
+    await mongodb.insertOne('contacts', newContact);
+    
+    const chat: Chat = {
+      id: `chat-${newContact.id}`,
+      contactId: newContact.id,
+      contact: newContact,
+      unreadCount: 0,
+      status: 'open',
+      notes: [],
+    };
+    await mongodb.insertOne('chats', chat);
+    
     return newContact;
   }
 
   async updateContact(id: string, contact: Partial<InsertContact>): Promise<Contact | undefined> {
-    const index = this.data.contacts.findIndex((c) => c.id === id);
-    if (index === -1) return undefined;
-    this.data.contacts[index] = {
-      ...this.data.contacts[index],
+    const updated = await mongodb.updateOne<Contact>('contacts', { id }, {
       ...contact,
       updatedAt: new Date().toISOString(),
-    };
-    this.initializeChats();
-    this.save();
-    return this.data.contacts[index];
+    });
+    return updated || undefined;
   }
 
   async deleteContact(id: string): Promise<boolean> {
-    const index = this.data.contacts.findIndex((c) => c.id === id);
-    if (index === -1) return false;
-    this.data.contacts.splice(index, 1);
-    this.data.messages = this.data.messages.filter((m) => m.contactId !== id);
-    this.initializeChats();
-    this.save();
-    return true;
+    await mongodb.deleteOne('messages', { contactId: id });
+    await mongodb.deleteOne('chats', { contactId: id });
+    return mongodb.deleteOne('contacts', { id });
   }
 
   async getMessages(contactId?: string): Promise<Message[]> {
     if (contactId) {
-      return this.data.messages.filter((m) => m.contactId === contactId);
+      return mongodb.findMany<Message>('messages', { contactId });
     }
-    return this.data.messages;
+    return mongodb.findMany<Message>('messages', {});
   }
 
   async getMessage(id: string): Promise<Message | undefined> {
-    return this.data.messages.find((m) => m.id === id);
+    const message = await mongodb.findOne<Message>('messages', { id });
+    return message || undefined;
   }
 
   async createMessage(message: InsertMessage): Promise<Message> {
@@ -283,18 +167,36 @@ export class MemStorage implements IStorage {
       id: randomUUID(),
       timestamp: new Date().toISOString(),
     };
-    this.data.messages.push(newMessage);
-    this.initializeChats();
-    this.save();
+    await mongodb.insertOne('messages', newMessage);
+    
+    const chat = await this.getChatByContactId(message.contactId);
+    if (chat) {
+      const updateData: Partial<Chat> = {
+        lastMessage: newMessage.content,
+        lastMessageTime: newMessage.timestamp,
+      };
+      if (message.direction === 'inbound') {
+        updateData.lastInboundMessageTime = newMessage.timestamp;
+        updateData.lastInboundMessage = newMessage.content;
+      }
+      await mongodb.updateOne('chats', { id: chat.id }, updateData);
+    }
+    
     return newMessage;
   }
 
+  async updateMessage(id: string, message: Partial<Message>): Promise<Message | undefined> {
+    const updated = await mongodb.updateOne<Message>('messages', { id }, message);
+    return updated || undefined;
+  }
+
   async getCampaigns(): Promise<Campaign[]> {
-    return this.data.campaigns;
+    return mongodb.findMany<Campaign>('campaigns', {});
   }
 
   async getCampaign(id: string): Promise<Campaign | undefined> {
-    return this.data.campaigns.find((c) => c.id === id);
+    const campaign = await mongodb.findOne<Campaign>('campaigns', { id });
+    return campaign || undefined;
   }
 
   async createCampaign(campaign: InsertCampaign): Promise<Campaign> {
@@ -309,37 +211,29 @@ export class MemStorage implements IStorage {
       createdAt: now,
       updatedAt: now,
     };
-    this.data.campaigns.push(newCampaign);
-    this.save();
+    await mongodb.insertOne('campaigns', newCampaign);
     return newCampaign;
   }
 
   async updateCampaign(id: string, campaign: Partial<Campaign>): Promise<Campaign | undefined> {
-    const index = this.data.campaigns.findIndex((c) => c.id === id);
-    if (index === -1) return undefined;
-    this.data.campaigns[index] = {
-      ...this.data.campaigns[index],
+    const updated = await mongodb.updateOne<Campaign>('campaigns', { id }, {
       ...campaign,
       updatedAt: new Date().toISOString(),
-    };
-    this.save();
-    return this.data.campaigns[index];
+    });
+    return updated || undefined;
   }
 
   async deleteCampaign(id: string): Promise<boolean> {
-    const index = this.data.campaigns.findIndex((c) => c.id === id);
-    if (index === -1) return false;
-    this.data.campaigns.splice(index, 1);
-    this.save();
-    return true;
+    return mongodb.deleteOne('campaigns', { id });
   }
 
   async getTemplates(): Promise<Template[]> {
-    return this.data.templates;
+    return mongodb.findMany<Template>('templates', {});
   }
 
   async getTemplate(id: string): Promise<Template | undefined> {
-    return this.data.templates.find((t) => t.id === id);
+    const template = await mongodb.findOne<Template>('templates', { id });
+    return template || undefined;
   }
 
   async createTemplate(template: InsertTemplate): Promise<Template> {
@@ -351,37 +245,29 @@ export class MemStorage implements IStorage {
       createdAt: now,
       updatedAt: now,
     };
-    this.data.templates.push(newTemplate);
-    this.save();
+    await mongodb.insertOne('templates', newTemplate);
     return newTemplate;
   }
 
   async updateTemplate(id: string, template: Partial<Template>): Promise<Template | undefined> {
-    const index = this.data.templates.findIndex((t) => t.id === id);
-    if (index === -1) return undefined;
-    this.data.templates[index] = {
-      ...this.data.templates[index],
+    const updated = await mongodb.updateOne<Template>('templates', { id }, {
       ...template,
       updatedAt: new Date().toISOString(),
-    };
-    this.save();
-    return this.data.templates[index];
+    });
+    return updated || undefined;
   }
 
   async deleteTemplate(id: string): Promise<boolean> {
-    const index = this.data.templates.findIndex((t) => t.id === id);
-    if (index === -1) return false;
-    this.data.templates.splice(index, 1);
-    this.save();
-    return true;
+    return mongodb.deleteOne('templates', { id });
   }
 
   async getAutomations(): Promise<Automation[]> {
-    return this.data.automations;
+    return mongodb.findMany<Automation>('automations', {});
   }
 
   async getAutomation(id: string): Promise<Automation | undefined> {
-    return this.data.automations.find((a) => a.id === id);
+    const automation = await mongodb.findOne<Automation>('automations', { id });
+    return automation || undefined;
   }
 
   async createAutomation(automation: InsertAutomation): Promise<Automation> {
@@ -392,37 +278,29 @@ export class MemStorage implements IStorage {
       createdAt: now,
       updatedAt: now,
     };
-    this.data.automations.push(newAutomation);
-    this.save();
+    await mongodb.insertOne('automations', newAutomation);
     return newAutomation;
   }
 
   async updateAutomation(id: string, automation: Partial<Automation>): Promise<Automation | undefined> {
-    const index = this.data.automations.findIndex((a) => a.id === id);
-    if (index === -1) return undefined;
-    this.data.automations[index] = {
-      ...this.data.automations[index],
+    const updated = await mongodb.updateOne<Automation>('automations', { id }, {
       ...automation,
       updatedAt: new Date().toISOString(),
-    };
-    this.save();
-    return this.data.automations[index];
+    });
+    return updated || undefined;
   }
 
   async deleteAutomation(id: string): Promise<boolean> {
-    const index = this.data.automations.findIndex((a) => a.id === id);
-    if (index === -1) return false;
-    this.data.automations.splice(index, 1);
-    this.save();
-    return true;
+    return mongodb.deleteOne('automations', { id });
   }
 
   async getTeamMembers(): Promise<TeamMember[]> {
-    return this.data.teamMembers;
+    return mongodb.findMany<TeamMember>('team_members', {});
   }
 
   async getTeamMember(id: string): Promise<TeamMember | undefined> {
-    return this.data.teamMembers.find((m) => m.id === id);
+    const member = await mongodb.findOne<TeamMember>('team_members', { id });
+    return member || undefined;
   }
 
   async createTeamMember(member: InsertTeamMember): Promise<TeamMember> {
@@ -431,73 +309,86 @@ export class MemStorage implements IStorage {
       id: randomUUID(),
       createdAt: new Date().toISOString(),
     };
-    this.data.teamMembers.push(newMember);
-    this.save();
+    await mongodb.insertOne('team_members', newMember);
     return newMember;
   }
 
   async updateTeamMember(id: string, member: Partial<TeamMember>): Promise<TeamMember | undefined> {
-    const index = this.data.teamMembers.findIndex((m) => m.id === id);
-    if (index === -1) return undefined;
-    this.data.teamMembers[index] = {
-      ...this.data.teamMembers[index],
-      ...member,
-    };
-    this.save();
-    return this.data.teamMembers[index];
+    const updated = await mongodb.updateOne<TeamMember>('team_members', { id }, member);
+    return updated || undefined;
   }
 
   async deleteTeamMember(id: string): Promise<boolean> {
-    const index = this.data.teamMembers.findIndex((m) => m.id === id);
-    if (index === -1) return false;
-    this.data.teamMembers.splice(index, 1);
-    this.save();
-    return true;
+    return mongodb.deleteOne('team_members', { id });
   }
 
   async getWhatsappSettings(): Promise<WhatsappSettings | null> {
-    return this.data.whatsappSettings;
+    const settings = await mongodb.findOne<WhatsappSettings>('whatsapp_settings', {});
+    return settings;
   }
 
   async saveWhatsappSettings(settings: Omit<WhatsappSettings, "id" | "createdAt" | "updatedAt">): Promise<WhatsappSettings> {
     const now = new Date().toISOString();
-    this.data.whatsappSettings = {
+    const existing = await this.getWhatsappSettings();
+    
+    if (existing) {
+      const updated = await mongodb.updateOne<WhatsappSettings>('whatsapp_settings', { id: existing.id }, {
+        ...settings,
+        updatedAt: now,
+      });
+      return updated!;
+    }
+    
+    const newSettings: WhatsappSettings = {
       ...settings,
-      id: this.data.whatsappSettings?.id || randomUUID(),
-      createdAt: this.data.whatsappSettings?.createdAt || now,
+      id: randomUUID(),
+      createdAt: now,
       updatedAt: now,
     };
-    this.save();
-    return this.data.whatsappSettings;
+    await mongodb.insertOne('whatsapp_settings', newSettings);
+    return newSettings;
   }
 
   async getBilling(): Promise<Billing> {
-    return this.data.billing;
+    const billing = await mongodb.findOne<Billing>('billing', {});
+    if (!billing) {
+      const defaultBilling: Billing = {
+        id: 'billing-1',
+        credits: 1500,
+        transactions: [],
+      };
+      await mongodb.insertOne('billing', defaultBilling);
+      return defaultBilling;
+    }
+    return billing;
   }
 
   async updateBilling(billing: Partial<Billing>): Promise<Billing> {
-    this.data.billing = {
-      ...this.data.billing,
-      ...billing,
-    };
-    this.save();
-    return this.data.billing;
+    const current = await this.getBilling();
+    const updated = await mongodb.updateOne<Billing>('billing', { id: current.id }, billing);
+    return updated || current;
   }
 
   async addTransaction(transaction: { type: "purchase" | "usage"; amount: number; description: string }): Promise<Billing> {
+    const billing = await this.getBilling();
     const newTransaction = {
       id: randomUUID(),
       ...transaction,
       createdAt: new Date().toISOString(),
     };
-    this.data.billing.transactions.push(newTransaction);
-    this.data.billing.credits += transaction.amount;
-    this.save();
-    return this.data.billing;
+    billing.transactions.push(newTransaction);
+    billing.credits += transaction.amount;
+    await mongodb.updateOne('billing', { id: billing.id }, {
+      credits: billing.credits,
+      transactions: billing.transactions,
+    });
+    return billing;
   }
 
   async getDashboardStats(): Promise<any> {
-    const messages = this.data.messages;
+    const messages = await this.getMessages();
+    const campaigns = await this.getCampaigns();
+    
     const outbound = messages.filter((m) => m.direction === "outbound");
     const delivered = outbound.filter((m) => m.status === "delivered" || m.status === "read");
     const read = outbound.filter((m) => m.status === "read");
@@ -529,7 +420,7 @@ export class MemStorage implements IStorage {
       });
     }
 
-    const campaignPerformance = this.data.campaigns.slice(0, 5).map((c) => ({
+    const campaignPerformance = campaigns.slice(0, 5).map((c) => ({
       name: c.name,
       delivered: c.deliveredCount,
       read: c.readCount,
@@ -550,88 +441,111 @@ export class MemStorage implements IStorage {
   }
 
   async getChats(): Promise<Chat[]> {
-    return this.data.chats;
+    const chats = await mongodb.findMany<Chat>('chats', {});
+    const contacts = await this.getContacts();
+    
+    return chats.map(chat => {
+      const contact = contacts.find(c => c.id === chat.contactId);
+      return {
+        ...chat,
+        contact: contact || {
+          id: chat.contactId,
+          name: 'Unknown',
+          phone: '',
+          tags: [],
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+      };
+    });
   }
 
   async getChat(id: string): Promise<Chat | undefined> {
-    return this.data.chats.find((c) => c.id === id);
+    const chat = await mongodb.findOne<Chat>('chats', { id });
+    if (!chat) return undefined;
+    
+    const contact = await this.getContact(chat.contactId);
+    return {
+      ...chat,
+      contact: contact || {
+        id: chat.contactId,
+        name: 'Unknown',
+        phone: '',
+        tags: [],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      },
+    };
+  }
+
+  async getChatByContactId(contactId: string): Promise<Chat | undefined> {
+    const chat = await mongodb.findOne<Chat>('chats', { contactId });
+    if (!chat) return undefined;
+    
+    const contact = await this.getContact(contactId);
+    return {
+      ...chat,
+      contact: contact || {
+        id: contactId,
+        name: 'Unknown',
+        phone: '',
+        tags: [],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      },
+    };
+  }
+
+  async updateChat(id: string, chat: Partial<Chat>): Promise<Chat | undefined> {
+    const updated = await mongodb.updateOne<Chat>('chats', { id }, chat);
+    return updated || undefined;
   }
 
   async updateChatInboundTime(contactId: string): Promise<void> {
     const now = new Date().toISOString();
-    const chatIndex = this.data.chats.findIndex(c => c.contactId === contactId);
+    const chat = await this.getChatByContactId(contactId);
     
-    if (chatIndex >= 0) {
-      // Update existing chat
-      this.data.chats[chatIndex].lastInboundMessageTime = now;
-      this.data.chats[chatIndex].unreadCount = (this.data.chats[chatIndex].unreadCount || 0) + 1;
-      
-      // Also update lastMessageTime if needed
-      const contactMessages = this.data.messages.filter(m => m.contactId === contactId);
-      const lastMessage = contactMessages[contactMessages.length - 1];
-      if (lastMessage) {
-        this.data.chats[chatIndex].lastMessage = lastMessage.content;
-        this.data.chats[chatIndex].lastMessageTime = lastMessage.timestamp;
-      }
+    if (chat) {
+      await mongodb.updateOne('chats', { contactId }, {
+        lastInboundMessageTime: now,
+        unreadCount: (chat.unreadCount || 0) + 1,
+      });
     } else {
-      // Create new chat for this contact
       const contact = await this.getContact(contactId);
       if (contact) {
-        const contactMessages = this.data.messages.filter(m => m.contactId === contactId);
-        const lastMessage = contactMessages[contactMessages.length - 1];
-        
-        this.data.chats.push({
+        const newChat: Chat = {
           id: `chat-${contactId}`,
           contactId,
           contact,
-          lastMessage: lastMessage?.content,
-          lastMessageTime: lastMessage?.timestamp,
           lastInboundMessageTime: now,
           unreadCount: 1,
           status: 'open',
           notes: [],
-        });
+        };
+        await mongodb.insertOne('chats', newChat);
       }
     }
-    
-    this.save();
   }
 
   async markMessagesAsRead(contactId: string): Promise<void> {
-    // Update all inbound messages for this contact to "read" status
-    this.data.messages = this.data.messages.map(m => {
-      if (m.contactId === contactId && m.direction === 'inbound' && m.status !== 'read') {
-        return { ...m, status: 'read' as const };
+    const messages = await mongodb.findMany<Message>('messages', { contactId, direction: 'inbound' });
+    for (const msg of messages) {
+      if (msg.status !== 'read') {
+        await mongodb.updateOne('messages', { id: msg.id }, { status: 'read' });
       }
-      return m;
-    });
-    
-    // Reset unread count for this chat
-    const chatIndex = this.data.chats.findIndex(c => c.contactId === contactId);
-    if (chatIndex >= 0) {
-      this.data.chats[chatIndex].unreadCount = 0;
     }
     
-    this.save();
-  }
-
-  async markMessagesAsUnread(contactId: string): Promise<void> {
-    // Set unread count to 1 to mark the chat as unread
-    const chatIndex = this.data.chats.findIndex(c => c.contactId === contactId);
-    if (chatIndex >= 0) {
-      this.data.chats[chatIndex].unreadCount = 1;
-    }
-    
-    this.save();
+    await mongodb.updateOne('chats', { contactId }, { unreadCount: 0 });
   }
 
   async incrementUnreadCount(contactId: string): Promise<void> {
-    const chatIndex = this.data.chats.findIndex(c => c.contactId === contactId);
-    if (chatIndex >= 0) {
-      this.data.chats[chatIndex].unreadCount = (this.data.chats[chatIndex].unreadCount || 0) + 1;
-      this.save();
+    const chat = await this.getChatByContactId(contactId);
+    if (chat) {
+      await mongodb.updateOne('chats', { contactId }, {
+        unreadCount: (chat.unreadCount || 0) + 1,
+      });
     }
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new MongoStorage();

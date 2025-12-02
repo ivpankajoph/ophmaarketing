@@ -132,6 +132,7 @@ export const chatSchema = z.object({
   lastMessage: z.string().optional(),
   lastMessageTime: z.string().optional(),
   lastInboundMessageTime: z.string().optional(),
+  lastInboundMessage: z.string().optional(),
   unreadCount: z.number().default(0),
   assignedAgentId: z.string().optional(),
   status: z.enum(["open", "pending", "resolved"]).default("open"),
