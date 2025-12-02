@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CheckCircle2, Eye, MessageSquare, AlertCircle, DollarSign, TrendingUp, Users, Star, Download, BarChart3, FileText } from "lucide-react";
+import { CheckCircle2, Eye, MessageSquare, AlertCircle, DollarSign, TrendingUp, Users, Star, Download, BarChart3, FileText, Loader2 } from "lucide-react";
 import { 
   BarChart, 
   Bar, 
@@ -25,61 +25,86 @@ import {
   Line
 } from "recharts";
 import { useLocation } from "wouter";
+import { format } from "date-fns";
 
-const deliveryData = [
-  { name: 'Delivered', value: 14980, color: '#22c55e' },
-  { name: 'Read', value: 9620, color: '#3b82f6' },
-  { name: 'Replied', value: 2890, color: '#8b5cf6' },
-  { name: 'Failed', value: 250, color: '#ef4444' },
-];
-
-const dailyStats = [
-  { name: 'Mon', sent: 4000, read: 2400, replied: 720 },
-  { name: 'Tue', sent: 3000, read: 1800, replied: 540 },
-  { name: 'Wed', sent: 5200, read: 3640, replied: 1092 },
-  { name: 'Thu', sent: 2780, read: 1946, replied: 584 },
-  { name: 'Fri', sent: 3890, read: 2723, replied: 817 },
-  { name: 'Sat', sent: 2390, read: 1673, replied: 502 },
-  { name: 'Sun', sent: 1490, read: 1043, replied: 313 },
-];
-
-const templatePerformance = [
-  { name: 'hello_world', sent: 5230, delivered: 5180, read: 3626, replied: 1088, cost: 52.30, readRate: 70, replyRate: 21 },
-  { name: 'welcome_message', sent: 3420, delivered: 3386, read: 2370, replied: 711, cost: 34.20, readRate: 70, replyRate: 21 },
-  { name: 'order_confirmation', sent: 2890, delivered: 2875, read: 2300, replied: 920, cost: 28.90, readRate: 80, replyRate: 32 },
-  { name: 'shipping_update', sent: 2150, delivered: 2129, read: 1489, replied: 297, cost: 21.50, readRate: 70, replyRate: 14 },
-  { name: 'special_offer', sent: 1540, delivered: 1509, read: 755, replied: 151, cost: 15.40, readRate: 50, replyRate: 10 },
-];
-
-const campaignStats = [
-  { name: 'Black Friday Sale', type: 'Marketing', sent: 5000, delivered: 4950, read: 3465, replied: 1039, cost: 50.00, date: '2025-11-25' },
-  { name: 'New Product Launch', type: 'Marketing', sent: 3500, delivered: 3465, read: 2426, replied: 485, cost: 35.00, date: '2025-11-20' },
-  { name: 'Order Updates', type: 'Utility', sent: 2890, delivered: 2875, read: 2300, replied: 920, cost: 14.45, date: '2025-11-24' },
-  { name: 'Welcome Series', type: 'Utility', sent: 2100, delivered: 2079, read: 1455, replied: 436, cost: 10.50, date: '2025-11-22' },
-  { name: 'Weekly Newsletter', type: 'Marketing', sent: 1740, delivered: 1705, read: 853, replied: 171, cost: 17.40, date: '2025-11-18' },
-];
-
-const costTrend = [
-  { date: 'Nov 18', cost: 17.40, messages: 1740 },
-  { date: 'Nov 20', cost: 35.00, messages: 3500 },
-  { date: 'Nov 22', cost: 10.50, messages: 2100 },
-  { date: 'Nov 24', cost: 14.45, messages: 2890 },
-  { date: 'Nov 25', cost: 50.00, messages: 5000 },
-  { date: 'Nov 27', cost: 22.30, messages: 2230 },
-];
+interface CampaignReportData {
+  totalSent: number;
+  totalDelivered: number;
+  totalRead: number;
+  totalReplied: number;
+  totalFailed: number;
+  totalCost: number;
+  deliveryRate: number;
+  readRate: number;
+  replyRate: number;
+  deliveryData: Array<{ name: string; value: number; color: string }>;
+  dailyStats: Array<{ name: string; date: string; sent: number; read: number; replied: number }>;
+  campaignStats: Array<{ name: string; type: string; sent: number; delivered: number; read: number; replied: number; cost: number; date: string }>;
+  templatePerformance: Array<{ name: string; sent: number; delivered: number; read: number; replied: number; readRate: number; replyRate: number; cost: number }>;
+  costTrend: Array<{ date: string; cost: number; messages: number }>;
+}
 
 export default function Report() {
   const [, setLocation] = useLocation();
-  const [dateRange, setDateRange] = useState("7days");
+  const [dateRange, setDateRange] = useState("7");
 
-  const totalSent = 15230;
-  const totalDelivered = 14980;
-  const totalRead = 9620;
-  const totalReplied = 2890;
-  const totalCost = 149.35;
-  const deliveryRate = ((totalDelivered / totalSent) * 100).toFixed(1);
-  const readRate = ((totalRead / totalDelivered) * 100).toFixed(1);
-  const replyRate = ((totalReplied / totalRead) * 100).toFixed(1);
+  const { data: reportData, isLoading } = useQuery<CampaignReportData>({
+    queryKey: ["/api/reports/campaign", dateRange],
+    queryFn: async () => {
+      const res = await fetch(`/api/reports/campaign?days=${dateRange}`);
+      if (!res.ok) throw new Error("Failed to fetch report");
+      return res.json();
+    },
+    refetchInterval: 30000,
+  });
+
+  if (isLoading) {
+    return (
+      <DashboardLayout>
+        <div className="flex items-center justify-center h-[calc(100vh-8rem)]">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  const totalSent = reportData?.totalSent || 0;
+  const totalDelivered = reportData?.totalDelivered || 0;
+  const totalRead = reportData?.totalRead || 0;
+  const totalReplied = reportData?.totalReplied || 0;
+  const totalCost = reportData?.totalCost || 0;
+  const deliveryRate = reportData?.deliveryRate || 0;
+  const readRate = reportData?.readRate || 0;
+  const replyRate = reportData?.replyRate || 0;
+
+  const deliveryData = reportData?.deliveryData || [];
+  const dailyStats = reportData?.dailyStats || [];
+  const campaignStats = reportData?.campaignStats || [];
+  const templatePerformance = reportData?.templatePerformance || [];
+  const costTrend = reportData?.costTrend || [];
+
+  const handleExportCSV = () => {
+    const headers = ['Metric', 'Value'];
+    const rows = [
+      ['Total Sent', totalSent.toString()],
+      ['Total Delivered', totalDelivered.toString()],
+      ['Total Read', totalRead.toString()],
+      ['Total Replied', totalReplied.toString()],
+      ['Delivery Rate', `${deliveryRate}%`],
+      ['Read Rate', `${readRate}%`],
+      ['Reply Rate', `${replyRate}%`],
+      ['Total Cost', `₹${totalCost.toFixed(2)}`],
+    ];
+    
+    const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `campaign-report-${format(new Date(), 'yyyyMMdd')}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   return (
     <DashboardLayout>
@@ -95,16 +120,16 @@ export default function Report() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="7days">Last 7 Days</SelectItem>
-                <SelectItem value="30days">Last 30 Days</SelectItem>
-                <SelectItem value="90days">Last 90 Days</SelectItem>
+                <SelectItem value="7">Last 7 Days</SelectItem>
+                <SelectItem value="30">Last 30 Days</SelectItem>
+                <SelectItem value="90">Last 90 Days</SelectItem>
               </SelectContent>
             </Select>
             <Button variant="outline" onClick={() => setLocation("/reports/user-engagement")}>
               <Star className="mr-2 h-4 w-4" />
               User Engagement Report
             </Button>
-            <Button variant="outline">
+            <Button variant="outline" onClick={handleExportCSV}>
               <Download className="mr-2 h-4 w-4" />
               Export
             </Button>
@@ -116,7 +141,6 @@ export default function Report() {
              title="Total Sent" 
              value={totalSent.toLocaleString()} 
              icon={CheckCircle2}
-             trend={{ value: 12, label: "vs last period" }}
           />
           <StatsCard 
              title="Delivered" 
@@ -140,7 +164,6 @@ export default function Report() {
              title="Total Cost" 
              value={`₹${totalCost.toFixed(2)}`} 
              icon={DollarSign}
-             trend={{ value: 8, label: "vs last period" }}
           />
         </div>
 
@@ -161,26 +184,33 @@ export default function Report() {
                 </CardHeader>
                 <CardContent>
                   <div className="h-[300px] flex items-center justify-center">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <PieChart>
-                        <Pie
-                          data={deliveryData}
-                          cx="50%"
-                          cy="50%"
-                          innerRadius={60}
-                          outerRadius={80}
-                          paddingAngle={5}
-                          dataKey="value"
-                          label={({ name, value }) => `${name}: ${value.toLocaleString()}`}
-                        >
-                          {deliveryData.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={entry.color} />
-                          ))}
-                        </Pie>
-                        <Tooltip formatter={(value: number) => value.toLocaleString()} />
-                        <Legend />
-                      </PieChart>
-                    </ResponsiveContainer>
+                    {deliveryData.length > 0 && deliveryData.some(d => d.value > 0) ? (
+                      <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                          <Pie
+                            data={deliveryData.filter(d => d.value > 0)}
+                            cx="50%"
+                            cy="50%"
+                            innerRadius={60}
+                            outerRadius={80}
+                            paddingAngle={5}
+                            dataKey="value"
+                            label={({ name, value }) => `${name}: ${value.toLocaleString()}`}
+                          >
+                            {deliveryData.filter(d => d.value > 0).map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={entry.color} />
+                            ))}
+                          </Pie>
+                          <Tooltip formatter={(value: number) => value.toLocaleString()} />
+                          <Legend />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    ) : (
+                      <div className="text-center text-muted-foreground">
+                        <MessageSquare className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                        <p>No message data available for this period</p>
+                      </div>
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -188,24 +218,33 @@ export default function Report() {
               <Card>
                 <CardHeader>
                   <CardTitle>Daily Engagement</CardTitle>
-                  <CardDescription>Messages sent, read, and replied over the last 7 days.</CardDescription>
+                  <CardDescription>Messages sent, read, and replied over the selected period.</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="h-[300px]">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={dailyStats}>
-                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
-                        <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
-                        <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
-                        <Tooltip 
-                          contentStyle={{ backgroundColor: "hsl(var(--card))", borderColor: "hsl(var(--border))", borderRadius: "var(--radius)" }}
-                        />
-                        <Legend />
-                        <Bar dataKey="sent" name="Sent" fill="#3b82f6" radius={[4, 4, 0, 0]} />
-                        <Bar dataKey="read" name="Read" fill="#22c55e" radius={[4, 4, 0, 0]} />
-                        <Bar dataKey="replied" name="Replied" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
-                      </BarChart>
-                    </ResponsiveContainer>
+                    {dailyStats.length > 0 && dailyStats.some(d => d.sent > 0) ? (
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={dailyStats}>
+                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
+                          <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
+                          <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
+                          <Tooltip 
+                            contentStyle={{ backgroundColor: "hsl(var(--card))", borderColor: "hsl(var(--border))", borderRadius: "var(--radius)" }}
+                          />
+                          <Legend />
+                          <Bar dataKey="sent" name="Sent" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                          <Bar dataKey="read" name="Read" fill="#22c55e" radius={[4, 4, 0, 0]} />
+                          <Bar dataKey="replied" name="Replied" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    ) : (
+                      <div className="flex items-center justify-center h-full text-muted-foreground">
+                        <div className="text-center">
+                          <BarChart3 className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                          <p>No activity data for this period</p>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -219,38 +258,48 @@ export default function Report() {
                 <CardDescription>Detailed breakdown of each campaign's performance.</CardDescription>
               </CardHeader>
               <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Campaign</TableHead>
-                      <TableHead>Type</TableHead>
-                      <TableHead className="text-right">Sent</TableHead>
-                      <TableHead className="text-right">Delivered</TableHead>
-                      <TableHead className="text-right">Read</TableHead>
-                      <TableHead className="text-right">Replied</TableHead>
-                      <TableHead className="text-right">Cost (₹)</TableHead>
-                      <TableHead>Date</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {campaignStats.map((campaign, index) => (
-                      <TableRow key={index}>
-                        <TableCell className="font-medium">{campaign.name}</TableCell>
-                        <TableCell>
-                          <Badge variant={campaign.type === 'Marketing' ? 'default' : 'secondary'}>
-                            {campaign.type}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="text-right">{campaign.sent.toLocaleString()}</TableCell>
-                        <TableCell className="text-right text-green-600">{campaign.delivered.toLocaleString()}</TableCell>
-                        <TableCell className="text-right text-blue-600">{campaign.read.toLocaleString()}</TableCell>
-                        <TableCell className="text-right text-purple-600">{campaign.replied.toLocaleString()}</TableCell>
-                        <TableCell className="text-right">₹{campaign.cost.toFixed(2)}</TableCell>
-                        <TableCell className="text-muted-foreground">{campaign.date}</TableCell>
+                {campaignStats.length > 0 ? (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Campaign</TableHead>
+                        <TableHead>Type</TableHead>
+                        <TableHead className="text-right">Sent</TableHead>
+                        <TableHead className="text-right">Delivered</TableHead>
+                        <TableHead className="text-right">Read</TableHead>
+                        <TableHead className="text-right">Replied</TableHead>
+                        <TableHead className="text-right">Cost (₹)</TableHead>
+                        <TableHead>Date</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                    </TableHeader>
+                    <TableBody>
+                      {campaignStats.map((campaign, index) => (
+                        <TableRow key={index}>
+                          <TableCell className="font-medium">{campaign.name}</TableCell>
+                          <TableCell>
+                            <Badge variant={campaign.type === 'Marketing' ? 'default' : 'secondary'}>
+                              {campaign.type}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-right">{campaign.sent.toLocaleString()}</TableCell>
+                          <TableCell className="text-right text-green-600">{campaign.delivered.toLocaleString()}</TableCell>
+                          <TableCell className="text-right text-blue-600">{campaign.read.toLocaleString()}</TableCell>
+                          <TableCell className="text-right text-purple-600">{campaign.replied.toLocaleString()}</TableCell>
+                          <TableCell className="text-right">₹{campaign.cost.toFixed(2)}</TableCell>
+                          <TableCell className="text-muted-foreground">
+                            {campaign.date ? format(new Date(campaign.date), 'MMM d, yyyy') : 'N/A'}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                ) : (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                    <p>No campaign data available</p>
+                    <p className="text-sm">Create and run campaigns to see performance data here.</p>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
@@ -265,42 +314,50 @@ export default function Report() {
                 <CardDescription>How each template is performing in terms of engagement.</CardDescription>
               </CardHeader>
               <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Template Name</TableHead>
-                      <TableHead className="text-right">Sent</TableHead>
-                      <TableHead className="text-right">Delivered</TableHead>
-                      <TableHead className="text-right">Read</TableHead>
-                      <TableHead className="text-right">Replied</TableHead>
-                      <TableHead className="text-right">Read Rate</TableHead>
-                      <TableHead className="text-right">Reply Rate</TableHead>
-                      <TableHead className="text-right">Cost (₹)</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {templatePerformance.map((template, index) => (
-                      <TableRow key={index}>
-                        <TableCell className="font-medium font-mono text-sm">{template.name}</TableCell>
-                        <TableCell className="text-right">{template.sent.toLocaleString()}</TableCell>
-                        <TableCell className="text-right">{template.delivered.toLocaleString()}</TableCell>
-                        <TableCell className="text-right text-blue-600">{template.read.toLocaleString()}</TableCell>
-                        <TableCell className="text-right text-purple-600">{template.replied.toLocaleString()}</TableCell>
-                        <TableCell className="text-right">
-                          <Badge variant={template.readRate >= 70 ? 'default' : template.readRate >= 50 ? 'secondary' : 'outline'}>
-                            {template.readRate}%
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <Badge variant={template.replyRate >= 25 ? 'default' : template.replyRate >= 15 ? 'secondary' : 'outline'}>
-                            {template.replyRate}%
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="text-right">₹{template.cost.toFixed(2)}</TableCell>
+                {templatePerformance.length > 0 ? (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Template Name</TableHead>
+                        <TableHead className="text-right">Sent</TableHead>
+                        <TableHead className="text-right">Delivered</TableHead>
+                        <TableHead className="text-right">Read</TableHead>
+                        <TableHead className="text-right">Replied</TableHead>
+                        <TableHead className="text-right">Read Rate</TableHead>
+                        <TableHead className="text-right">Reply Rate</TableHead>
+                        <TableHead className="text-right">Cost (₹)</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                    </TableHeader>
+                    <TableBody>
+                      {templatePerformance.map((template, index) => (
+                        <TableRow key={index}>
+                          <TableCell className="font-medium font-mono text-sm">{template.name}</TableCell>
+                          <TableCell className="text-right">{template.sent.toLocaleString()}</TableCell>
+                          <TableCell className="text-right">{template.delivered.toLocaleString()}</TableCell>
+                          <TableCell className="text-right text-blue-600">{template.read.toLocaleString()}</TableCell>
+                          <TableCell className="text-right text-purple-600">{template.replied.toLocaleString()}</TableCell>
+                          <TableCell className="text-right">
+                            <Badge variant={template.readRate >= 70 ? 'default' : template.readRate >= 50 ? 'secondary' : 'outline'}>
+                              {template.readRate}%
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <Badge variant={template.replyRate >= 25 ? 'default' : template.replyRate >= 15 ? 'secondary' : 'outline'}>
+                              {template.replyRate}%
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-right">₹{template.cost.toFixed(2)}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                ) : (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                    <p>No template usage data available</p>
+                    <p className="text-sm">Send messages using templates to see performance data here.</p>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
@@ -321,7 +378,7 @@ export default function Report() {
                   <CardTitle className="text-sm font-medium">Cost per Message</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">₹{(totalCost / totalSent).toFixed(4)}</div>
+                  <div className="text-2xl font-bold">₹{totalSent > 0 ? (totalCost / totalSent).toFixed(4) : '0.00'}</div>
                   <p className="text-xs text-muted-foreground">Average</p>
                 </CardContent>
               </Card>
@@ -330,7 +387,7 @@ export default function Report() {
                   <CardTitle className="text-sm font-medium">Cost per Reply</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">₹{(totalCost / totalReplied).toFixed(2)}</div>
+                  <div className="text-2xl font-bold">₹{totalReplied > 0 ? (totalCost / totalReplied).toFixed(2) : '0.00'}</div>
                   <p className="text-xs text-muted-foreground">Average</p>
                 </CardContent>
               </Card>
@@ -343,19 +400,28 @@ export default function Report() {
               </CardHeader>
               <CardContent>
                 <div className="h-[300px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={costTrend}>
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
-                      <XAxis dataKey="date" stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
-                      <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `₹${value}`} />
-                      <Tooltip 
-                        contentStyle={{ backgroundColor: "hsl(var(--card))", borderColor: "hsl(var(--border))", borderRadius: "var(--radius)" }}
-                        formatter={(value: number, name: string) => [name === 'cost' ? `₹${value}` : value.toLocaleString(), name === 'cost' ? 'Cost' : 'Messages']}
-                      />
-                      <Legend />
-                      <Line type="monotone" dataKey="cost" name="Cost (₹)" stroke="#f59e0b" strokeWidth={2} dot={{ fill: '#f59e0b' }} />
-                    </LineChart>
-                  </ResponsiveContainer>
+                  {costTrend.length > 0 && costTrend.some(d => d.cost > 0) ? (
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={costTrend}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
+                        <XAxis dataKey="date" stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
+                        <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `₹${value}`} />
+                        <Tooltip 
+                          contentStyle={{ backgroundColor: "hsl(var(--card))", borderColor: "hsl(var(--border))", borderRadius: "var(--radius)" }}
+                          formatter={(value: number, name: string) => [name === 'cost' ? `₹${value.toFixed(2)}` : value.toLocaleString(), name === 'cost' ? 'Cost' : 'Messages']}
+                        />
+                        <Legend />
+                        <Line type="monotone" dataKey="cost" name="Cost (₹)" stroke="#f59e0b" strokeWidth={2} dot={{ fill: '#f59e0b' }} />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    <div className="flex items-center justify-center h-full text-muted-foreground">
+                      <div className="text-center">
+                        <DollarSign className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                        <p>No cost data available for this period</p>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>

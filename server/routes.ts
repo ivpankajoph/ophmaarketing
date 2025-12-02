@@ -39,6 +39,217 @@ export async function registerRoutes(
     }
   });
 
+  app.get("/api/reports/campaign", async (req, res) => {
+    try {
+      const days = parseInt(req.query.days as string) || 7;
+      const messages = await storage.getMessages();
+      const campaigns = await storage.getCampaigns();
+      const templates = await storage.getTemplates();
+      const broadcastLogs = await broadcastService.getBroadcastLogs({ limit: 10000 });
+      
+      const now = new Date();
+      const startDate = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
+      
+      const periodMessages = messages.filter(m => new Date(m.timestamp) >= startDate);
+      const outbound = periodMessages.filter(m => m.direction === 'outbound');
+      const inbound = periodMessages.filter(m => m.direction === 'inbound');
+      
+      const totalSent = outbound.length;
+      const delivered = outbound.filter(m => m.status === 'delivered' || m.status === 'read').length;
+      const read = outbound.filter(m => m.status === 'read').length;
+      const replied = inbound.length;
+      const failed = outbound.filter(m => m.status === 'failed').length;
+      
+      const deliveryRate = totalSent > 0 ? Math.round((delivered / totalSent) * 100 * 10) / 10 : 0;
+      const readRate = delivered > 0 ? Math.round((read / delivered) * 100 * 10) / 10 : 0;
+      const replyRate = read > 0 ? Math.round((replied / read) * 100 * 10) / 10 : 0;
+      
+      const deliveryData = [
+        { name: 'Delivered', value: delivered, color: '#22c55e' },
+        { name: 'Read', value: read, color: '#3b82f6' },
+        { name: 'Replied', value: replied, color: '#8b5cf6' },
+        { name: 'Failed', value: failed, color: '#ef4444' },
+      ];
+      
+      const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      const dailyStats = [];
+      for (let i = days - 1; i >= 0; i--) {
+        const date = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
+        const dayMsgs = periodMessages.filter(m => {
+          const msgDate = new Date(m.timestamp);
+          return msgDate.toDateString() === date.toDateString();
+        });
+        const dayOutbound = dayMsgs.filter(m => m.direction === 'outbound');
+        const dayInbound = dayMsgs.filter(m => m.direction === 'inbound');
+        dailyStats.push({
+          name: dayNames[date.getDay()],
+          date: date.toISOString().split('T')[0],
+          sent: dayOutbound.length,
+          read: dayOutbound.filter(m => m.status === 'read').length,
+          replied: dayInbound.length,
+        });
+      }
+      
+      const campaignStats = campaigns.map(c => ({
+        name: c.name,
+        type: 'Marketing',
+        sent: c.sentCount || 0,
+        delivered: c.deliveredCount || 0,
+        read: c.readCount || 0,
+        replied: c.repliedCount || 0,
+        cost: (c.sentCount || 0) * 0.01,
+        date: c.scheduledAt || c.createdAt,
+      })).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 10);
+      
+      const templateUsage: Record<string, { sent: number; delivered: number; read: number; replied: number }> = {};
+      for (const log of broadcastLogs) {
+        if (log.templateName) {
+          if (!templateUsage[log.templateName]) {
+            templateUsage[log.templateName] = { sent: 0, delivered: 0, read: 0, replied: 0 };
+          }
+          templateUsage[log.templateName].sent++;
+          if (log.status === 'delivered' || log.status === 'sent') {
+            templateUsage[log.templateName].delivered++;
+          }
+          if (log.replied) {
+            templateUsage[log.templateName].replied++;
+          }
+        }
+      }
+      
+      for (const msg of periodMessages) {
+        if (msg.content && msg.content.startsWith('[Template:')) {
+          const match = msg.content.match(/\[Template:\s*([^\]]+)\]/);
+          if (match) {
+            const templateName = match[1];
+            if (!templateUsage[templateName]) {
+              templateUsage[templateName] = { sent: 0, delivered: 0, read: 0, replied: 0 };
+            }
+            if (msg.direction === 'outbound') {
+              templateUsage[templateName].sent++;
+              if (msg.status === 'delivered' || msg.status === 'read') {
+                templateUsage[templateName].delivered++;
+              }
+              if (msg.status === 'read') {
+                templateUsage[templateName].read++;
+              }
+            }
+          }
+        }
+      }
+      
+      const templatePerformance = Object.entries(templateUsage).map(([name, stats]) => ({
+        name,
+        sent: stats.sent,
+        delivered: stats.delivered,
+        read: stats.read,
+        replied: stats.replied,
+        readRate: stats.delivered > 0 ? Math.round((stats.read / stats.delivered) * 100) : 0,
+        replyRate: stats.read > 0 ? Math.round((stats.replied / stats.read) * 100) : 0,
+        cost: stats.sent * 0.01,
+      })).sort((a, b) => b.sent - a.sent).slice(0, 10);
+      
+      const totalCost = totalSent * 0.01;
+      const costTrend = dailyStats.map(d => ({
+        date: d.date,
+        cost: d.sent * 0.01,
+        messages: d.sent,
+      }));
+      
+      res.json({
+        totalSent,
+        totalDelivered: delivered,
+        totalRead: read,
+        totalReplied: replied,
+        totalFailed: failed,
+        totalCost,
+        deliveryRate,
+        readRate,
+        replyRate,
+        deliveryData,
+        dailyStats,
+        campaignStats,
+        templatePerformance,
+        costTrend,
+      });
+    } catch (error) {
+      console.error('Failed to get campaign report:', error);
+      res.status(500).json({ message: "Failed to get campaign report" });
+    }
+  });
+
+  app.get("/api/reports/delivery", async (req, res) => {
+    try {
+      const days = parseInt(req.query.days as string) || 7;
+      const messages = await storage.getMessages();
+      const broadcastLogs = await broadcastService.getBroadcastLogs({ limit: 10000 });
+      
+      const now = new Date();
+      const startDate = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
+      
+      const periodMessages = messages.filter(m => new Date(m.timestamp) >= startDate);
+      const outbound = periodMessages.filter(m => m.direction === 'outbound');
+      
+      const totalSent = outbound.length;
+      const delivered = outbound.filter(m => m.status === 'delivered' || m.status === 'read').length;
+      const read = outbound.filter(m => m.status === 'read').length;
+      const failed = outbound.filter(m => m.status === 'failed').length;
+      const pending = outbound.filter(m => m.status === 'sent').length;
+      
+      const deliveryRate = totalSent > 0 ? Math.round((delivered / totalSent) * 100 * 10) / 10 : 0;
+      const readRate = delivered > 0 ? Math.round((read / delivered) * 100 * 10) / 10 : 0;
+      const failureRate = totalSent > 0 ? Math.round((failed / totalSent) * 100 * 10) / 10 : 0;
+      
+      const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      const dailyData = [];
+      for (let i = days - 1; i >= 0; i--) {
+        const date = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
+        const dayMsgs = periodMessages.filter(m => {
+          const msgDate = new Date(m.timestamp);
+          return msgDate.toDateString() === date.toDateString();
+        });
+        const dayOutbound = dayMsgs.filter(m => m.direction === 'outbound');
+        dailyData.push({
+          date: dayNames[date.getDay()],
+          fullDate: date.toISOString().split('T')[0],
+          sent: dayOutbound.length,
+          delivered: dayOutbound.filter(m => m.status === 'delivered' || m.status === 'read').length,
+          read: dayOutbound.filter(m => m.status === 'read').length,
+          failed: dayOutbound.filter(m => m.status === 'failed').length,
+        });
+      }
+      
+      const hourlyData = [];
+      for (let hour = 0; hour < 24; hour++) {
+        const hourMsgs = outbound.filter(m => {
+          const msgDate = new Date(m.timestamp);
+          return msgDate.getHours() === hour;
+        });
+        hourlyData.push({
+          hour: `${hour.toString().padStart(2, '0')}:00`,
+          sent: hourMsgs.length,
+          delivered: hourMsgs.filter(m => m.status === 'delivered' || m.status === 'read').length,
+        });
+      }
+      
+      res.json({
+        totalSent,
+        delivered,
+        read,
+        failed,
+        pending,
+        deliveryRate,
+        readRate,
+        failureRate,
+        dailyData,
+        hourlyData,
+      });
+    } catch (error) {
+      console.error('Failed to get delivery report:', error);
+      res.status(500).json({ message: "Failed to get delivery report" });
+    }
+  });
+
   app.get("/api/contacts", async (req, res) => {
     try {
       // Get contacts from both in-memory storage and MongoDB imported_contacts

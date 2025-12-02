@@ -744,6 +744,18 @@
       "id": "9046b865-f77d-48c8-a79a-9a694c2ff3b1",
       "createdAt": "2025-12-02T04:04:06.317Z",
       "updatedAt": "2025-12-02T04:04:06.317Z"
+    },
+    {
+      "name": "+919810753643",
+      "phone": "919810753643",
+      "email": "",
+      "tags": [
+        "WhatsApp"
+      ],
+      "notes": "Auto-created from WhatsApp message",
+      "id": "10305002-7b99-44aa-922c-e4028c08e8b6",
+      "createdAt": "2025-12-02T04:48:51.075Z",
+      "updatedAt": "2025-12-02T04:48:51.075Z"
     }
   ],
   "messages": [
@@ -5518,6 +5530,42 @@
       "status": "sent",
       "id": "a4d28e88-db71-45f3-b32d-1e81d779877a",
       "timestamp": "2025-12-02T04:30:51.973Z"
+    },
+    {
+      "contactId": "9046b865-f77d-48c8-a79a-9a694c2ff3b1",
+      "content": "Pls send details",
+      "type": "text",
+      "direction": "inbound",
+      "status": "sent",
+      "id": "08689cfa-3977-4bb4-8b5b-1c4dbfbaf5a7",
+      "timestamp": "2025-12-02T04:43:43.661Z"
+    },
+    {
+      "contactId": "9046b865-f77d-48c8-a79a-9a694c2ff3b1",
+      "content": "Hi! I’m Aarohi from Top Life Changers Awards 2026 😊  \nLet’s get started so I can suggest the perfect award category for you 🏆✨  \n\nPlease provide your details in the following format:\n\nName:  \nAward Category / Interest :  \nIndustry / Field:  \nYears of Experience:  \nAny Previous Awards (mention award name or 'None'):",
+      "type": "text",
+      "direction": "outbound",
+      "status": "sent",
+      "id": "a0675623-b06e-460c-851a-7f51328167f0",
+      "timestamp": "2025-12-02T04:43:47.630Z"
+    },
+    {
+      "contactId": "10305002-7b99-44aa-922c-e4028c08e8b6",
+      "content": "Hello! Can I get more info on this?",
+      "type": "text",
+      "direction": "inbound",
+      "status": "sent",
+      "id": "b56c277f-65c8-4245-9a5c-f10b579aeff2",
+      "timestamp": "2025-12-02T04:48:51.081Z"
+    },
+    {
+      "contactId": "10305002-7b99-44aa-922c-e4028c08e8b6",
+      "content": "Hi! I’m Aarohi from Top Life Changers Awards 2026 😊  \nLet’s get started so I can suggest the perfect award category for you 🏆✨  \n\nPlease provide your details in the following format:\n\nName:  \nAward Category / Interest :  \nIndustry / Field:  \nYears of Experience:  \nAny Previous Awards (mention award name or 'None'):",
+      "type": "text",
+      "direction": "outbound",
+      "status": "sent",
+      "id": "554c54cf-9bc9-4b07-bf25-ad8565d4d435",
+      "timestamp": "2025-12-02T04:48:55.997Z"
     }
   ],
   "campaigns": [
@@ -7118,11 +7166,34 @@
         "createdAt": "2025-12-02T04:04:06.317Z",
         "updatedAt": "2025-12-02T04:04:06.317Z"
       },
-      "lastMessage": "Great, nice to meet you Dr. Kumar Gaurav! 🌟\n\nPerfect, Entrepreneur in Sports sounds like a great fit for our awards 🏆\n\nWow, 14 years of experience! That’s really impressive 🙌\n\nGot it! No previous awards, so this could be your big moment 🎉\n\nBased on your background, I’d recommend you for the “Outstanding Sports Entrepreneur of the Year” category! This award is all about honouring leaders like you who make a real difference in the sports industry. 💪\n\nLet me tell you why joining Top Life Changers Awards 2026 can be a game-changer for you, sir:\n\n🏆 National Recognition for your work  \n📸 Your award could be presented by top celebrities  \n📰 Media & Press Coverage  \n🎤 2–3 Minute Interview about your journey  \n🎙️ Red Carpet Entry  \n🤝 Meet and network with achievers from all over India  \n🚀 Boost your brand visibility  \n🌟 Social Media Promotion  \n🔮 Future business opportunities  \n✔️ Builds your credibility and trust  \n📈 Long-term branding for your name  \n👥 Team Motivation  \n🍽️ VIP Lunch and Premium Experience\n\nEven Bollywood awards are paid, because these events give huge value and connections. Brands and professionals invest in such awards for networking, motivation, brand building, and growth 🚀\n\nWe are in talks with top celebrities like Saurabh Raj Jain, Amrita Rao, Harbhajan Singh, and more. The final celebrity will be revealed just before the event for maximum excitement! ⭐\n\nSlots are filling up fast for our grand event at Radisson Blu, Delhi, on 31st Jan 2026. Would you like to secure your spot and create an inspiring story for your brand? 😊\n\nLet me know how you’d like to proceed or if you have any questions!",
-      "lastMessageTime": "2025-12-02T04:30:51.973Z",
-      "lastInboundMessageTime": "2025-12-02T04:30:41.802Z",
-      "lastInboundMessage": "Dr. Kumar Gaurav \nEnterpreneur \nSports\n14 years \nNone",
-      "unreadCount": 3,
+      "lastMessage": "Hi! I’m Aarohi from Top Life Changers Awards 2026 😊  \nLet’s get started so I can suggest the perfect award category for you 🏆✨  \n\nPlease provide your details in the following format:\n\nName:  \nAward Category / Interest :  \nIndustry / Field:  \nYears of Experience:  \nAny Previous Awards (mention award name or 'None'):",
+      "lastMessageTime": "2025-12-02T04:43:47.630Z",
+      "lastInboundMessageTime": "2025-12-02T04:43:43.661Z",
+      "lastInboundMessage": "Pls send details",
+      "unreadCount": 4,
+      "status": "open",
+      "notes": []
+    },
+    {
+      "id": "chat-10305002-7b99-44aa-922c-e4028c08e8b6",
+      "contactId": "10305002-7b99-44aa-922c-e4028c08e8b6",
+      "contact": {
+        "name": "+919810753643",
+        "phone": "919810753643",
+        "email": "",
+        "tags": [
+          "WhatsApp"
+        ],
+        "notes": "Auto-created from WhatsApp message",
+        "id": "10305002-7b99-44aa-922c-e4028c08e8b6",
+        "createdAt": "2025-12-02T04:48:51.075Z",
+        "updatedAt": "2025-12-02T04:48:51.075Z"
+      },
+      "lastMessage": "Hi! I’m Aarohi from Top Life Changers Awards 2026 😊  \nLet’s get started so I can suggest the perfect award category for you 🏆✨  \n\nPlease provide your details in the following format:\n\nName:  \nAward Category / Interest :  \nIndustry / Field:  \nYears of Experience:  \nAny Previous Awards (mention award name or 'None'):",
+      "lastMessageTime": "2025-12-02T04:48:55.997Z",
+      "lastInboundMessageTime": "2025-12-02T04:48:51.081Z",
+      "lastInboundMessage": "Hello! Can I get more info on this?",
+      "unreadCount": 1,
       "status": "open",
       "notes": []
     }
