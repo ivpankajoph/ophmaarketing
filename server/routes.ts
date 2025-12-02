@@ -17,6 +17,7 @@ import whatsappRoutes from "./modules/whatsapp/whatsapp.routes";
 import leadAutoReplyRoutes from "./modules/leadAutoReply/leadAutoReply.routes";
 import broadcastRoutes from "./modules/broadcast/broadcast.routes";
 import aiAnalyticsRoutes from "./modules/aiAnalytics/aiAnalytics.routes";
+import prefilledTextRoutes from "./modules/prefilledText/prefilledText.routes";
 import * as broadcastService from "./modules/broadcast/broadcast.service";
 import * as agentService from "./modules/aiAgents/agent.service";
 import * as openaiService from "./modules/openai/openai.service";
@@ -1022,6 +1023,49 @@ export async function registerRoutes(
   app.use("/api/leads/auto-reply", leadAutoReplyRoutes);
   app.use("/api/broadcast", broadcastRoutes);
   app.use("/api/ai-analytics", aiAnalyticsRoutes);
+  app.use("/api/prefilled-text", prefilledTextRoutes);
+
+  app.get("/api/chats/whatsapp-leads", async (req, res) => {
+    try {
+      const allChats = await storage.getChats();
+      
+      const memContacts = await storage.getContacts();
+      const importedContacts = await mongodb.readCollection<{
+        id: string;
+        name: string;
+        phone: string;
+        email?: string;
+        tags?: string[];
+      }>('imported_contacts');
+      
+      const knownPhones = new Set<string>();
+      for (const contact of memContacts) {
+        const normalized = contact.phone.replace(/\D/g, '');
+        knownPhones.add(normalized);
+        if (normalized.length >= 10) {
+          knownPhones.add(normalized.slice(-10));
+        }
+      }
+      for (const contact of importedContacts) {
+        const normalized = contact.phone.replace(/\D/g, '');
+        knownPhones.add(normalized);
+        if (normalized.length >= 10) {
+          knownPhones.add(normalized.slice(-10));
+        }
+      }
+      
+      const leadChats = allChats.filter(chat => {
+        const chatPhone = chat.contact.phone.replace(/\D/g, '');
+        const chatPhoneLast10 = chatPhone.slice(-10);
+        return !knownPhones.has(chatPhone) && !knownPhones.has(chatPhoneLast10);
+      });
+      
+      res.json(leadChats);
+    } catch (error) {
+      console.error("Error fetching WhatsApp leads:", error);
+      res.status(500).json({ message: "Failed to get WhatsApp leads" });
+    }
+  });
 
   return httpServer;
 }

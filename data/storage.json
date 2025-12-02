@@ -708,6 +708,42 @@
       "id": "4d8c4f27-f66a-4401-8584-e582f39db66a",
       "createdAt": "2025-12-01T08:44:46.315Z",
       "updatedAt": "2025-12-01T08:44:46.315Z"
+    },
+    {
+      "name": "+918860434174",
+      "phone": "918860434174",
+      "email": "",
+      "tags": [
+        "WhatsApp"
+      ],
+      "notes": "Auto-created from WhatsApp message",
+      "id": "a1e15736-4bb4-495b-a1bc-a6e932cc8076",
+      "createdAt": "2025-12-01T17:28:01.038Z",
+      "updatedAt": "2025-12-01T17:28:01.038Z"
+    },
+    {
+      "name": "+919211660123",
+      "phone": "919211660123",
+      "email": "",
+      "tags": [
+        "WhatsApp"
+      ],
+      "notes": "Auto-created from WhatsApp message",
+      "id": "24b79d51-5ac7-469f-9266-bcba8638e265",
+      "createdAt": "2025-12-01T17:48:53.485Z",
+      "updatedAt": "2025-12-01T17:48:53.485Z"
+    },
+    {
+      "name": "+919045558765",
+      "phone": "919045558765",
+      "email": "",
+      "tags": [
+        "WhatsApp"
+      ],
+      "notes": "Auto-created from WhatsApp message",
+      "id": "9046b865-f77d-48c8-a79a-9a694c2ff3b1",
+      "createdAt": "2025-12-02T04:04:06.317Z",
+      "updatedAt": "2025-12-02T04:04:06.317Z"
     }
   ],
   "messages": [
@@ -5302,6 +5338,186 @@
       "status": "sent",
       "id": "2f896642-50d0-4152-8821-bc79420501ed",
       "timestamp": "2025-12-01T09:10:29.713Z"
+    },
+    {
+      "contactId": "a1e15736-4bb4-495b-a1bc-a6e932cc8076",
+      "content": "Hello! Can I get more info on this?",
+      "type": "text",
+      "direction": "inbound",
+      "status": "read",
+      "id": "ed7e430c-8519-4b81-ac3d-e6f71283b4ad",
+      "timestamp": "2025-12-01T17:28:01.052Z"
+    },
+    {
+      "contactId": "a1e15736-4bb4-495b-a1bc-a6e932cc8076",
+      "content": "Hi! I’m Aarohi from Top Life Changers Awards 2026 😊  \nLet’s get started so I can suggest the perfect award category for you 🏆✨  \n\nPlease provide your details in the following format:\n\nName:  \nAward Category / Interest:  \nIndustry / Field:  \nYears of Experience:  \nAny Previous Awards (mention award name or 'None'): \n\nOnce I have these details, I’ll share all the info you need—including event highlights, benefits, and why this is a top opportunity for you! 😊",
+      "type": "text",
+      "direction": "outbound",
+      "status": "sent",
+      "id": "4d495bc5-54f9-4c4c-9724-800c43bf1987",
+      "timestamp": "2025-12-01T17:28:07.094Z"
+    },
+    {
+      "contactId": "a1e15736-4bb4-495b-a1bc-a6e932cc8076",
+      "content": "[Image] https://www.instagram.com/siddharthnigam247?utm_source=qr&igsh=cm5rY3ltdjNhdjVs",
+      "type": "text",
+      "direction": "inbound",
+      "status": "read",
+      "id": "72a9ad10-ce22-4b59-879b-8fa009ff0770",
+      "timestamp": "2025-12-01T17:28:08.485Z"
+    },
+    {
+      "contactId": "8a9e2cfc-5b0b-4473-a1e1-ed26edeaa049",
+      "content": "Hello! Can I get more info on this?",
+      "type": "text",
+      "direction": "inbound",
+      "status": "read",
+      "id": "a3f54fa3-6668-46a1-adb8-06893b79e7ac",
+      "timestamp": "2025-12-01T17:41:08.549Z"
+    },
+    {
+      "contactId": "8a9e2cfc-5b0b-4473-a1e1-ed26edeaa049",
+      "content": "Hi! I’m Aarohi from Top Life Changers Awards 2026 😊  \nThanks for your interest! I’d love to share all the details and see which award is best for you 🏆✨\n\nFirst, can you please share your details in this format so I can suggest the perfect category:\n\nName:  \nAward Category / Interest:  \nIndustry / Field:  \nYears of Experience:  \nAny Previous Awards (mention award name or 'None'):\n\nOnce you share, I’ll explain everything step-by-step—including benefits, celebrity presenters, event perks, and why this is such a valuable opportunity for achievers like you! 😊",
+      "type": "text",
+      "direction": "outbound",
+      "status": "sent",
+      "id": "ace6e97b-e212-4fde-9538-df1db2d8e126",
+      "timestamp": "2025-12-01T17:41:14.919Z"
+    },
+    {
+      "contactId": "8a9e2cfc-5b0b-4473-a1e1-ed26edeaa049",
+      "content": "ok",
+      "type": "text",
+      "direction": "outbound",
+      "status": "sent",
+      "id": "daf63679-a3bf-4e33-96a1-00da662d5a43",
+      "timestamp": "2025-12-01T17:42:08.682Z"
+    },
+    {
+      "contactId": "8a9e2cfc-5b0b-4473-a1e1-ed26edeaa049",
+      "content": "i have youtube channel",
+      "type": "text",
+      "direction": "inbound",
+      "status": "read",
+      "id": "c90a026f-0b56-4b61-bfde-1d9b81daa4df",
+      "timestamp": "2025-12-01T17:42:27.723Z"
+    },
+    {
+      "contactId": "8a9e2cfc-5b0b-4473-a1e1-ed26edeaa049",
+      "content": "That’s awesome! 😊 YouTube is such a powerful platform nowadays. Can you please share a few more details so I can suggest the best award category for you?\n\nJust fill these quick details:\n\nName:  \nAward Category / Interest: (For example – Best YouTuber, Content Creator, Influencer, etc.)  \nIndustry / Field: (Like Education, Entertainment, Vlogs, Tech, etc.)  \nYears of Experience:  \nAny Previous Awards (mention award name or 'None'):\n\nOnce I have this info, I’ll guide you with all the benefits, event details, and how this can help your channel grow even more! 🚀",
+      "type": "text",
+      "direction": "outbound",
+      "status": "sent",
+      "id": "746d05ea-e3e8-4963-831b-25554b04cc1e",
+      "timestamp": "2025-12-01T17:42:33.927Z"
+    },
+    {
+      "contactId": "24b79d51-5ac7-469f-9266-bcba8638e265",
+      "content": "Hello! Can I get more info on this?",
+      "type": "text",
+      "direction": "inbound",
+      "status": "sent",
+      "id": "f634d40a-3f6b-4585-8e43-3c24819575b0",
+      "timestamp": "2025-12-01T17:48:53.491Z"
+    },
+    {
+      "contactId": "24b79d51-5ac7-469f-9266-bcba8638e265",
+      "content": "Hi! I’m Aarohi from Top Life Changers Awards 2026 😊  \nThank you for your interest! This is India’s most exciting awards event happening on 31st Jan 2026 at Radisson Blu, Delhi. National recognition, celebrity presence, media coverage, and so many benefits waiting for you! 🏆✨\n\nLet’s get started so I can suggest the perfect award category for you. Please share your details in this format:\n\nName:  \nAward Category / Interest:  \nIndustry / Field:  \nYears of Experience:  \nAny Previous Awards (mention award name or 'None'):\n\nOnce you share these, I’ll guide you on next steps, all the benefits, and how you can shine at the event! 😊",
+      "type": "text",
+      "direction": "outbound",
+      "status": "sent",
+      "id": "ef18d124-3e40-44d5-bbea-6a7d8f19e7f0",
+      "timestamp": "2025-12-01T17:48:58.450Z"
+    },
+    {
+      "contactId": "84564afd-9931-4f71-8a4c-4cd16b70a514",
+      "content": "Awarded \" *Pride of Central India* (मध्यांचल की शान) \" by the Deputy Chief Minister of Uttar Pradesh, Hon'ble Keshav Prasad Maurya.\n\n https://www.instagram.com/reel/DO_Rpw1ksa0/?igsh=eTFkNmkwZng3aDM0",
+      "type": "text",
+      "direction": "inbound",
+      "status": "sent",
+      "id": "45b067e6-cac3-4df4-924e-a9f8951f719a",
+      "timestamp": "2025-12-01T17:52:36.092Z"
+    },
+    {
+      "contactId": "84564afd-9931-4f71-8a4c-4cd16b70a514",
+      "content": "Wow! That’s a huge achievement! 🎉👏  \nGetting the \"Pride of Central India (मध्यांचल की शान)\" award from Hon'ble Keshav Prasad Maurya ji is truly special. You are definitely an inspiration! 🌟\n\nLet’s make your journey even more memorable at the Top Life Changers Awards 2026 in Delhi.  \nCan you please share your details in this format so I can suggest the best award category for you?\n\nName:  \nAward Category / Interest:  \nIndustry / Field:  \nYears of Experience:  \nAny Previous Awards (you already shared one, if any more please mention, or say 'None'):\n\nOnce I get your details, I’ll guide you with the next steps and share all the big benefits waiting for you! 😊",
+      "type": "text",
+      "direction": "outbound",
+      "status": "sent",
+      "id": "d87b2c47-cc23-45a8-83f6-3beda501fa39",
+      "timestamp": "2025-12-01T17:52:43.129Z"
+    },
+    {
+      "contactId": "9046b865-f77d-48c8-a79a-9a694c2ff3b1",
+      "content": "Hello! Can I get more info on this?",
+      "type": "text",
+      "direction": "inbound",
+      "status": "sent",
+      "id": "05c92c4e-af33-4003-b578-4fa4c6e5c209",
+      "timestamp": "2025-12-02T04:04:06.323Z"
+    },
+    {
+      "contactId": "9046b865-f77d-48c8-a79a-9a694c2ff3b1",
+      "content": "Hi! I’m Aarohi from Top Life Changers Awards 2026 😊  \nLet’s get started so I can suggest the perfect award category for you 🏆✨  \n\nPlease provide your details in the following format:\n\nName:  \nAward Category / Interest :  \nIndustry / Field:  \nYears of Experience:  \nAny Previous Awards (mention award name or 'None'):\n\nOnce I have these details, I’ll share all the exciting benefits and how this event can help you grow 🚀",
+      "type": "text",
+      "direction": "outbound",
+      "status": "sent",
+      "id": "5aada8af-6afe-4102-9207-ee5d9af673ab",
+      "timestamp": "2025-12-02T04:04:12.968Z"
+    },
+    {
+      "contactId": "84564afd-9931-4f71-8a4c-4cd16b70a514",
+      "content": "My unique teaching methods which blend Chemistry concepts with Ramayan, Mahabharat, Bollywood, Memes and Cricket have transformed the way Chemistry is being taught to the students.\n\nThis cool and innovative style has made learning a joyful and engaging experience for the students enabling them crack toughest exams like JEE and NEET and make their way into IITs, NITs & AIIMS.\n\nIn current scenario when cases of students' suicide are rising, this method has transformed *Pressure into Pleasure* and students fondly call me *GURUCOOL* .\n\nThis innovative method of teaching Chemistry concepts offline using ancient sculptors, songs, movie dialogues, Memes etc is unprecedented and unique in the country.\n\nIn Gwalior, my students have excelled in Chemistry in a grand manner. In JEE Advanced examination, Chemistry marks of my students who have scored All India Ranks in range of 10000 to 25000 are better than Chemistry marks of national toppers (having rank under 1000).\n\nThis unique teaching method has enabled students to get selected in most prestigious institutes like IIT-Bombay, IIT- Delhi, IIT-BHU.\n\nमेरा यही प्रयास है कि बच्चों पर अध्यापक का *दबाव नहीं प्रभाव* हो, जिससे हर बच्चा अपने Passion को अपना Profession बना सके |",
+      "type": "text",
+      "direction": "inbound",
+      "status": "sent",
+      "id": "c4067a35-bb5d-47b9-ab8a-0faf832f4564",
+      "timestamp": "2025-12-02T04:07:34.718Z"
+    },
+    {
+      "contactId": "84564afd-9931-4f71-8a4c-4cd16b70a514",
+      "content": "Wow! That’s truly amazing and heart-touching! 🙏✨  \nYour way of teaching—mixing Chemistry with Ramayan, Mahabharat, Bollywood, memes, and cricket—not just helps students learn, but also makes their life easier and happier. Pressure into Pleasure—what a cool line! 😎🌟\n\nYou are really \"GURUCOOL\", and your impact is visible in your students’ results—getting into IITs, NITs, AIIMS and scoring so well in JEE Advanced! Your approach is truly unique and inspiring for the whole education community. 🎓🔥\n\nLet’s make sure the whole nation knows about your contribution!  \nCan you please share these details so I can suggest the *perfect award category* for you in our event?\n\nName:  \nAward Category / Interest:  \nIndustry / Field:  \nYears of Experience:  \nAny Previous Awards (besides \"Pride of Central India\"):\n\nThis will help me nominate you for the right award and tell you all the amazing benefits you’ll get! 🏆😊",
+      "type": "text",
+      "direction": "outbound",
+      "status": "sent",
+      "id": "f5155fa3-fb93-4ed8-9b7f-76a2760e1fd5",
+      "timestamp": "2025-12-02T04:07:42.552Z"
+    },
+    {
+      "contactId": "9046b865-f77d-48c8-a79a-9a694c2ff3b1",
+      "content": "Kindly provide catagory and fields",
+      "type": "text",
+      "direction": "inbound",
+      "status": "sent",
+      "id": "258505f7-5444-4001-9dd1-ac917af3bb34",
+      "timestamp": "2025-12-02T04:08:07.678Z"
+    },
+    {
+      "contactId": "9046b865-f77d-48c8-a79a-9a694c2ff3b1",
+      "content": "Of course! 😊 Here are some popular award categories and fields you can choose from:\n\n🏆 Award Categories:\n- Entrepreneur of the Year\n- Young Achiever\n- Best Startup\n- Rising Star\n- Women Leadership\n- Best Innovator\n- Social Impact Leader\n- Business Excellence\n- Outstanding Educator\n- Healthcare Excellence\n- Best Digital Marketer\n- Influencer of the Year\n- Creative Professional\n- Lifetime Achievement\n\n🌟 Fields/Industries:\n- Business & Entrepreneurship\n- Education & Training\n- Healthcare & Wellness\n- IT & Digital\n- Marketing & Advertising\n- Real Estate\n- Finance & Banking\n- Social Work/NGO\n- Media & Entertainment\n- Hospitality & Tourism\n- Art & Culture\n- Sports & Fitness\n- Manufacturing\n\nYou can pick the one that matches your work or passion best!  \nJust share your details in this format, and I’ll suggest the most suitable category for you:\n\nName:  \nAward Category / Interest :  \nIndustry / Field:  \nYears of Experience:  \nAny Previous Awards (mention award name or 'None'):\n\nI’m excited to help you shine! ✨",
+      "type": "text",
+      "direction": "outbound",
+      "status": "sent",
+      "id": "a5fa8984-b3cd-4df6-be23-71a4ca8c2c44",
+      "timestamp": "2025-12-02T04:08:15.574Z"
+    },
+    {
+      "contactId": "9046b865-f77d-48c8-a79a-9a694c2ff3b1",
+      "content": "Dr. Kumar Gaurav \nEnterpreneur \nSports\n14 years \nNone",
+      "type": "text",
+      "direction": "inbound",
+      "status": "sent",
+      "id": "972c646f-5548-460b-9d96-dd26ab3aa20e",
+      "timestamp": "2025-12-02T04:30:41.802Z"
+    },
+    {
+      "contactId": "9046b865-f77d-48c8-a79a-9a694c2ff3b1",
+      "content": "Great, nice to meet you Dr. Kumar Gaurav! 🌟\n\nPerfect, Entrepreneur in Sports sounds like a great fit for our awards 🏆\n\nWow, 14 years of experience! That’s really impressive 🙌\n\nGot it! No previous awards, so this could be your big moment 🎉\n\nBased on your background, I’d recommend you for the “Outstanding Sports Entrepreneur of the Year” category! This award is all about honouring leaders like you who make a real difference in the sports industry. 💪\n\nLet me tell you why joining Top Life Changers Awards 2026 can be a game-changer for you, sir:\n\n🏆 National Recognition for your work  \n📸 Your award could be presented by top celebrities  \n📰 Media & Press Coverage  \n🎤 2–3 Minute Interview about your journey  \n🎙️ Red Carpet Entry  \n🤝 Meet and network with achievers from all over India  \n🚀 Boost your brand visibility  \n🌟 Social Media Promotion  \n🔮 Future business opportunities  \n✔️ Builds your credibility and trust  \n📈 Long-term branding for your name  \n👥 Team Motivation  \n🍽️ VIP Lunch and Premium Experience\n\nEven Bollywood awards are paid, because these events give huge value and connections. Brands and professionals invest in such awards for networking, motivation, brand building, and growth 🚀\n\nWe are in talks with top celebrities like Saurabh Raj Jain, Amrita Rao, Harbhajan Singh, and more. The final celebrity will be revealed just before the event for maximum excitement! ⭐\n\nSlots are filling up fast for our grand event at Radisson Blu, Delhi, on 31st Jan 2026. Would you like to secure your spot and create an inspiring story for your brand? 😊\n\nLet me know how you’d like to proceed or if you have any questions!",
+      "type": "text",
+      "direction": "outbound",
+      "status": "sent",
+      "id": "a4d28e88-db71-45f3-b32d-1e81d779877a",
+      "timestamp": "2025-12-02T04:30:51.973Z"
     }
   ],
   "campaigns": [
@@ -5637,10 +5853,10 @@
         "createdAt": "2025-11-27T22:31:14.359Z",
         "updatedAt": "2025-11-27T22:31:14.359Z"
       },
-      "lastMessage": "Hi! 😊 Aarohi here from Top Life Changers Awards 2026. Ready for national recognition & a VIP celeb experience? Let’s connect and make this your big moment! 🌟",
-      "lastMessageTime": "2025-11-30T11:29:11.365Z",
-      "lastInboundMessageTime": "2025-11-30T11:25:15.850Z",
-      "lastInboundMessage": "not interested",
+      "lastMessage": "That’s awesome! 😊 YouTube is such a powerful platform nowadays. Can you please share a few more details so I can suggest the best award category for you?\n\nJust fill these quick details:\n\nName:  \nAward Category / Interest: (For example – Best YouTuber, Content Creator, Influencer, etc.)  \nIndustry / Field: (Like Education, Entertainment, Vlogs, Tech, etc.)  \nYears of Experience:  \nAny Previous Awards (mention award name or 'None'):\n\nOnce I have this info, I’ll guide you with all the benefits, event details, and how this can help your channel grow even more! 🚀",
+      "lastMessageTime": "2025-12-01T17:42:33.927Z",
+      "lastInboundMessageTime": "2025-12-01T17:42:27.723Z",
+      "lastInboundMessage": "i have youtube channel",
       "unreadCount": 0,
       "status": "open",
       "notes": []
@@ -6166,11 +6382,11 @@
         "createdAt": "2025-11-29T08:00:25.356Z",
         "updatedAt": "2025-11-29T08:00:25.356Z"
       },
-      "lastMessage": "Thank you for sharing your Instagram reel link! 😊 It’s always inspiring to see passionate educators making a difference.\n\nLet’s move one step ahead so I can suggest the best award category for you at the Top Life Changers Awards 2026 in Delhi! 🏆✨\n\nPlease provide your details in this format:\n\nName:  \nAward Category / Interest:  \nIndustry / Field:  \nYears of Experience:  \nAny Previous Awards (mention award name or 'None'):\n\nOnce you share your details, I’ll tell you about the amazing benefits and opportunities waiting for you! 🌟",
-      "lastMessageTime": "2025-12-01T07:37:52.489Z",
-      "lastInboundMessageTime": "2025-12-01T07:37:44.142Z",
-      "lastInboundMessage": "https://www.instagram.com/reel/DM22I-XyBq3/?igsh=NzNvYmM5bWk0Mzh1",
-      "unreadCount": 0,
+      "lastMessage": "Wow! That’s truly amazing and heart-touching! 🙏✨  \nYour way of teaching—mixing Chemistry with Ramayan, Mahabharat, Bollywood, memes, and cricket—not just helps students learn, but also makes their life easier and happier. Pressure into Pleasure—what a cool line! 😎🌟\n\nYou are really \"GURUCOOL\", and your impact is visible in your students’ results—getting into IITs, NITs, AIIMS and scoring so well in JEE Advanced! Your approach is truly unique and inspiring for the whole education community. 🎓🔥\n\nLet’s make sure the whole nation knows about your contribution!  \nCan you please share these details so I can suggest the *perfect award category* for you in our event?\n\nName:  \nAward Category / Interest:  \nIndustry / Field:  \nYears of Experience:  \nAny Previous Awards (besides \"Pride of Central India\"):\n\nThis will help me nominate you for the right award and tell you all the amazing benefits you’ll get! 🏆😊",
+      "lastMessageTime": "2025-12-02T04:07:42.552Z",
+      "lastInboundMessageTime": "2025-12-02T04:07:34.718Z",
+      "lastInboundMessage": "My unique teaching methods which blend Chemistry concepts with Ramayan, Mahabharat, Bollywood, Memes and Cricket have transformed the way Chemistry is being taught to the students.\n\nThis cool and innovative style has made learning a joyful and engaging experience for the students enabling them crack toughest exams like JEE and NEET and make their way into IITs, NITs & AIIMS.\n\nIn current scenario when cases of students' suicide are rising, this method has transformed *Pressure into Pleasure* and students fondly call me *GURUCOOL* .\n\nThis innovative method of teaching Chemistry concepts offline using ancient sculptors, songs, movie dialogues, Memes etc is unprecedented and unique in the country.\n\nIn Gwalior, my students have excelled in Chemistry in a grand manner. In JEE Advanced examination, Chemistry marks of my students who have scored All India Ranks in range of 10000 to 25000 are better than Chemistry marks of national toppers (having rank under 1000).\n\nThis unique teaching method has enabled students to get selected in most prestigious institutes like IIT-Bombay, IIT- Delhi, IIT-BHU.\n\nमेरा यही प्रयास है कि बच्चों पर अध्यापक का *दबाव नहीं प्रभाव* हो, जिससे हर बच्चा अपने Passion को अपना Profession बना सके |",
+      "unreadCount": 2,
       "status": "open",
       "notes": []
     },
@@ -6838,6 +7054,75 @@
       "lastInboundMessageTime": "2025-12-01T08:44:46.321Z",
       "lastInboundMessage": "Hi",
       "unreadCount": 0,
+      "status": "open",
+      "notes": []
+    },
+    {
+      "id": "chat-a1e15736-4bb4-495b-a1bc-a6e932cc8076",
+      "contactId": "a1e15736-4bb4-495b-a1bc-a6e932cc8076",
+      "contact": {
+        "name": "+918860434174",
+        "phone": "918860434174",
+        "email": "",
+        "tags": [
+          "WhatsApp"
+        ],
+        "notes": "Auto-created from WhatsApp message",
+        "id": "a1e15736-4bb4-495b-a1bc-a6e932cc8076",
+        "createdAt": "2025-12-01T17:28:01.038Z",
+        "updatedAt": "2025-12-01T17:28:01.038Z"
+      },
+      "lastMessage": "[Image] https://www.instagram.com/siddharthnigam247?utm_source=qr&igsh=cm5rY3ltdjNhdjVs",
+      "lastMessageTime": "2025-12-01T17:28:08.485Z",
+      "lastInboundMessageTime": "2025-12-01T17:28:08.485Z",
+      "lastInboundMessage": "[Image] https://www.instagram.com/siddharthnigam247?utm_source=qr&igsh=cm5rY3ltdjNhdjVs",
+      "unreadCount": 0,
+      "status": "open",
+      "notes": []
+    },
+    {
+      "id": "chat-24b79d51-5ac7-469f-9266-bcba8638e265",
+      "contactId": "24b79d51-5ac7-469f-9266-bcba8638e265",
+      "contact": {
+        "name": "+919211660123",
+        "phone": "919211660123",
+        "email": "",
+        "tags": [
+          "WhatsApp"
+        ],
+        "notes": "Auto-created from WhatsApp message",
+        "id": "24b79d51-5ac7-469f-9266-bcba8638e265",
+        "createdAt": "2025-12-01T17:48:53.485Z",
+        "updatedAt": "2025-12-01T17:48:53.485Z"
+      },
+      "lastMessage": "Hi! I’m Aarohi from Top Life Changers Awards 2026 😊  \nThank you for your interest! This is India’s most exciting awards event happening on 31st Jan 2026 at Radisson Blu, Delhi. National recognition, celebrity presence, media coverage, and so many benefits waiting for you! 🏆✨\n\nLet’s get started so I can suggest the perfect award category for you. Please share your details in this format:\n\nName:  \nAward Category / Interest:  \nIndustry / Field:  \nYears of Experience:  \nAny Previous Awards (mention award name or 'None'):\n\nOnce you share these, I’ll guide you on next steps, all the benefits, and how you can shine at the event! 😊",
+      "lastMessageTime": "2025-12-01T17:48:58.450Z",
+      "lastInboundMessageTime": "2025-12-01T17:48:53.491Z",
+      "lastInboundMessage": "Hello! Can I get more info on this?",
+      "unreadCount": 1,
+      "status": "open",
+      "notes": []
+    },
+    {
+      "id": "chat-9046b865-f77d-48c8-a79a-9a694c2ff3b1",
+      "contactId": "9046b865-f77d-48c8-a79a-9a694c2ff3b1",
+      "contact": {
+        "name": "+919045558765",
+        "phone": "919045558765",
+        "email": "",
+        "tags": [
+          "WhatsApp"
+        ],
+        "notes": "Auto-created from WhatsApp message",
+        "id": "9046b865-f77d-48c8-a79a-9a694c2ff3b1",
+        "createdAt": "2025-12-02T04:04:06.317Z",
+        "updatedAt": "2025-12-02T04:04:06.317Z"
+      },
+      "lastMessage": "Great, nice to meet you Dr. Kumar Gaurav! 🌟\n\nPerfect, Entrepreneur in Sports sounds like a great fit for our awards 🏆\n\nWow, 14 years of experience! That’s really impressive 🙌\n\nGot it! No previous awards, so this could be your big moment 🎉\n\nBased on your background, I’d recommend you for the “Outstanding Sports Entrepreneur of the Year” category! This award is all about honouring leaders like you who make a real difference in the sports industry. 💪\n\nLet me tell you why joining Top Life Changers Awards 2026 can be a game-changer for you, sir:\n\n🏆 National Recognition for your work  \n📸 Your award could be presented by top celebrities  \n📰 Media & Press Coverage  \n🎤 2–3 Minute Interview about your journey  \n🎙️ Red Carpet Entry  \n🤝 Meet and network with achievers from all over India  \n🚀 Boost your brand visibility  \n🌟 Social Media Promotion  \n🔮 Future business opportunities  \n✔️ Builds your credibility and trust  \n📈 Long-term branding for your name  \n👥 Team Motivation  \n🍽️ VIP Lunch and Premium Experience\n\nEven Bollywood awards are paid, because these events give huge value and connections. Brands and professionals invest in such awards for networking, motivation, brand building, and growth 🚀\n\nWe are in talks with top celebrities like Saurabh Raj Jain, Amrita Rao, Harbhajan Singh, and more. The final celebrity will be revealed just before the event for maximum excitement! ⭐\n\nSlots are filling up fast for our grand event at Radisson Blu, Delhi, on 31st Jan 2026. Would you like to secure your spot and create an inspiring story for your brand? 😊\n\nLet me know how you’d like to proceed or if you have any questions!",
+      "lastMessageTime": "2025-12-02T04:30:51.973Z",
+      "lastInboundMessageTime": "2025-12-02T04:30:41.802Z",
+      "lastInboundMessage": "Dr. Kumar Gaurav \nEnterpreneur \nSports\n14 years \nNone",
+      "unreadCount": 3,
       "status": "open",
       "notes": []
     }

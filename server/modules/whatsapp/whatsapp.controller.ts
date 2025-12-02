@@ -7,6 +7,7 @@ import { storage } from '../../storage';
 import * as aiAnalytics from '../aiAnalytics/aiAnalytics.service';
 import * as broadcastService from '../broadcast/broadcast.service';
 import * as contactAgentService from '../contactAgent/contactAgent.service';
+import * as prefilledTextService from '../prefilledText/prefilledText.service';
 
 const WHATSAPP_TOKEN = process.env.WHATSAPP_TOKEN_NEW || process.env.WHATSAPP_TOKEN;
 const PHONE_NUMBER_ID = process.env.PHONE_NUMBER_ID;
@@ -196,16 +197,37 @@ export async function handleWebhook(req: Request, res: Response) {
       agentToUse = await getAgentById(contactAgentAssignment.agentId);
       useStoredHistory = true;
     } else {
-      // Fall back to lead-form mapping only if auto-reply is not disabled
-      const lead = await findLeadByPhone(from);
-      if (lead) {
-        const mapping = await getMappingByFormId(lead.formId);
-        if (mapping && mapping.isActive) {
-          agentToUse = await getAgentById(mapping.agentId);
+      // Check for pre-filled text mapping FIRST (for WhatsApp leads)
+      const prefilledMapping = await prefilledTextService.findMatchingAgentForMessage(contentForAI);
+      if (prefilledMapping) {
+        console.log(`[Webhook] Found pre-filled text mapping for "${contentForAI}" -> Agent: ${prefilledMapping.agentName}`);
+        agentToUse = await getAgentById(prefilledMapping.agentId);
+        
+        // Auto-assign this agent to the contact for future messages
+        if (agentToUse) {
+          await contactAgentService.assignAgentToContact(
+            '', // contactId - will be set later
+            from,
+            prefilledMapping.agentId,
+            prefilledMapping.agentName
+          );
+          useStoredHistory = true;
+          console.log(`[Webhook] Auto-assigned agent ${prefilledMapping.agentName} to WhatsApp lead ${from}`);
+        }
+      }
+      
+      // Fall back to lead-form mapping if no pre-filled text match
+      if (!agentToUse) {
+        const lead = await findLeadByPhone(from);
+        if (lead) {
+          const mapping = await getMappingByFormId(lead.formId);
+          if (mapping && mapping.isActive) {
+            agentToUse = await getAgentById(mapping.agentId);
+          }
         }
       }
 
-      // Fall back to any active agent only if auto-reply is not disabled
+      // Fall back to any active agent only if nothing else matched
       if (!agentToUse) {
         const agents = await getAllAgents();
         agentToUse = agents.find((a: any) => a.isActive);

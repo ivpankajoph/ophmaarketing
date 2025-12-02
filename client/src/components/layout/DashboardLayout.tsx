@@ -19,7 +19,8 @@ import {
   ChevronDown,
   ChevronRight,
   Facebook,
-  Clock
+  Clock,
+  UserPlus
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -82,6 +83,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       badge: windowUnreadCount > 0 ? windowUnreadCount : undefined,
     },
     {
+      icon: UserPlus,
+      label: "WhatsApp Leads",
+      href: "/inbox/leads",
+    },
+    {
       icon: MessageSquare,
       label: "Inbox",
       href: "/inbox",
@@ -134,6 +140,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         { label: "All Agents", href: "/ai/agents" },
         { label: "New Agent", href: "/ai/new" },
         { label: "Agent Mapping", href: "/ai/map" },
+        { label: "Pre-filled Text", href: "/ai/prefilled" },
         { label: "AI Reports", href: "/ai/reports" },
       ]
     },

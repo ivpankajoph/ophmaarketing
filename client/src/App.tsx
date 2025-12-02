@@ -7,6 +7,7 @@ import NotFound from "@/pages/not-found";
 import Dashboard from "@/pages/dashboard";
 import Inbox from "@/pages/inbox";
 import WindowInbox from "@/pages/inbox/WindowInbox";
+import WhatsAppLeads from "@/pages/inbox/WhatsAppLeads";
 import Campaigns from "@/pages/campaigns";
 import Automation from "@/pages/automation";
 import Contacts from "@/pages/contacts";
@@ -44,6 +45,7 @@ import ManageAgents from "@/pages/ai/ManageAgents";
 import AgentsPage from "@/pages/ai/AgentsPage";
 import MapAgent from "@/pages/ai/MapAgent";
 import AgentReports from "@/pages/ai/AgentReports";
+import PrefilledTextMappings from "@/pages/ai/PrefilledTextMappings";
 
 import LeadForms from "@/pages/facebook/LeadForms";
 import Leads from "@/pages/facebook/Leads";
@@ -62,6 +64,7 @@ function Router() {
     <Switch>
       <Route path="/" component={Dashboard} />
       <Route path="/inbox/window" component={WindowInbox} />
+      <Route path="/inbox/leads" component={WhatsAppLeads} />
       <Route path="/inbox" component={Inbox} />
       
       {/* Campaigns */}
@@ -95,6 +98,7 @@ function Router() {
       <Route path="/ai/manage" component={AgentsPage} />
       <Route path="/ai/agents" component={AgentsPage} />
       <Route path="/ai/map" component={MapAgent} />
+      <Route path="/ai/prefilled" component={PrefilledTextMappings} />
       <Route path="/ai/reports" component={AgentReports} />
 
       {/* Facebook */}

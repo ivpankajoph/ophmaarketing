@@ -27,7 +27,13 @@ The system incorporates a modular backend structure, allowing for independent de
 - **WhatsApp Business API**: For sending and receiving WhatsApp messages.
 - **Meta Business Suite**: For syncing and approving message templates.
 
-## Recent Changes (November 29, 2025)
+## Recent Changes (December 2, 2025)
+- **WhatsApp Leads Page**: New inbox page for managing messages from unknown contacts (not in contact list). Unlike the 24-Hour Window, there's no expiration constraint. Supports the same features as other inbox pages including bulk messaging, AI agent assignment, and conversation management.
+- **Pre-filled Text Mappings**: New feature to automatically assign AI agents based on what unknown users first text. When a new contact sends a message matching a pre-filled text pattern, the assigned AI agent will automatically respond and handle the conversation.
+- **Backend Pre-filled Text API**: MongoDB collection `prefilled_text_mappings` stores text-to-agent mappings. Webhook checks for matches before falling back to lead-form or active agents.
+- **Message Alignment Fix**: Fixed message alignment bug so outbound messages appear on the right and inbound messages on the left in all inbox pages.
+
+## Previous Changes (November 29, 2025)
 - **Auto-Reply Control**: After sending a "Thanks for your feedback" auto-reply to button responses, the AI will not automatically respond to subsequent messages. Users must manually select an agent in the 24-Hour Window Inbox to re-enable AI responses for that contact. This prevents unwanted automated follow-ups.
 - **AI Model Options**: Added more OpenAI model options with friendly display names (Bot 1 through Bot 4). Bot 1 is gpt-4o (Most Intelligent), Bot 2 is gpt-4o-mini (Smart & Fast), Bot 3 is gpt-4-turbo (Premium), Bot 4 is gpt-3.5-turbo (Economy). Default model is Bot 1.
 - **AI Agent Persistence Per Contact**: Implemented contact-to-agent assignment system. When an AI agent is selected to respond in the 24-Hour Window Inbox, that agent is now permanently assigned to the contact. All subsequent webhook responses use the assigned agent with full conversation history. Uses MongoDB `contact_agents` collection to persist assignments.
