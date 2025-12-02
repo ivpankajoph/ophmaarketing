@@ -170,6 +170,136 @@ const ContactAgentSchema = new Schema({
   updatedAt: { type: String, required: true },
 }, { collection: 'contact_agents' });
 
+const ContactSchema = new Schema({
+  id: { type: String, required: true, unique: true },
+  name: { type: String, required: true },
+  phone: { type: String, required: true, index: true },
+  email: { type: String, default: '' },
+  tags: { type: [String], default: [] },
+  notes: { type: String, default: '' },
+  createdAt: { type: String, required: true },
+  updatedAt: { type: String, required: true },
+}, { collection: 'contacts' });
+
+const MessageSchema = new Schema({
+  id: { type: String, required: true, unique: true },
+  contactId: { type: String, required: true, index: true },
+  content: { type: String, required: true },
+  type: { type: String, default: 'text' },
+  direction: { type: String, enum: ['inbound', 'outbound'], required: true },
+  status: { type: String, default: 'sent' },
+  timestamp: { type: String, required: true },
+  agentId: { type: String },
+  replyToMessageId: { type: String },
+  replyToContent: { type: String },
+  mediaUrl: { type: String },
+  whatsappMessageId: { type: String, index: true },
+}, { collection: 'messages' });
+
+const ChatSchema = new Schema({
+  id: { type: String, required: true, unique: true },
+  contactId: { type: String, required: true, unique: true, index: true },
+  lastMessage: { type: String },
+  lastMessageTime: { type: String },
+  lastInboundMessageTime: { type: String },
+  lastInboundMessage: { type: String },
+  unreadCount: { type: Number, default: 0 },
+  status: { type: String, enum: ['open', 'closed'], default: 'open' },
+  notes: { type: [String], default: [] },
+}, { collection: 'chats' });
+
+const CampaignSchema = new Schema({
+  id: { type: String, required: true, unique: true },
+  name: { type: String, required: true },
+  message: { type: String },
+  contactIds: { type: [String], default: [] },
+  status: { type: String, default: 'draft' },
+  scheduledAt: { type: String },
+  sentCount: { type: Number, default: 0 },
+  deliveredCount: { type: Number, default: 0 },
+  readCount: { type: Number, default: 0 },
+  repliedCount: { type: Number, default: 0 },
+  createdAt: { type: String, required: true },
+  updatedAt: { type: String, required: true },
+}, { collection: 'campaigns' });
+
+const TemplateSchema = new Schema({
+  id: { type: String, required: true, unique: true },
+  name: { type: String, required: true },
+  category: { type: String, default: 'utility' },
+  content: { type: String, required: true },
+  variables: { type: [String], default: [] },
+  status: { type: String, default: 'pending' },
+  createdAt: { type: String, required: true },
+  updatedAt: { type: String, required: true },
+}, { collection: 'templates' });
+
+const AutomationSchema = new Schema({
+  id: { type: String, required: true, unique: true },
+  name: { type: String, required: true },
+  type: { type: String, required: true },
+  trigger: { type: String, required: true },
+  message: { type: String },
+  delay: { type: Number },
+  delayUnit: { type: String },
+  isActive: { type: Boolean, default: true },
+  createdAt: { type: String, required: true },
+  updatedAt: { type: String, required: true },
+}, { collection: 'automations' });
+
+const UserSchema = new Schema({
+  id: { type: String, required: true, unique: true },
+  username: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  name: { type: String, required: true },
+  email: { type: String },
+  role: { type: String, default: 'user' },
+  createdAt: { type: String, required: true },
+}, { collection: 'users' });
+
+const TeamMemberSchema = new Schema({
+  id: { type: String, required: true, unique: true },
+  userId: { type: String, required: true },
+  name: { type: String, required: true },
+  email: { type: String },
+  role: { type: String, default: 'agent' },
+  permissions: { type: [String], default: [] },
+  isActive: { type: Boolean, default: true },
+  createdAt: { type: String, required: true },
+}, { collection: 'team_members' });
+
+const WhatsappSettingsSchema = new Schema({
+  id: { type: String, required: true, unique: true },
+  phoneNumberId: { type: String },
+  businessAccountId: { type: String },
+  accessToken: { type: String },
+  webhookVerifyToken: { type: String },
+  createdAt: { type: String, required: true },
+  updatedAt: { type: String, required: true },
+}, { collection: 'whatsapp_settings' });
+
+const BillingSchema = new Schema({
+  id: { type: String, required: true, unique: true },
+  credits: { type: Number, default: 0 },
+  transactions: [{
+    id: { type: String },
+    type: { type: String, enum: ['purchase', 'usage'] },
+    amount: { type: Number },
+    description: { type: String },
+    createdAt: { type: String },
+  }],
+}, { collection: 'billing' });
+
+const PrefilledTextMappingSchema = new Schema({
+  id: { type: String, required: true, unique: true },
+  text: { type: String, required: true },
+  agentId: { type: String, required: true },
+  agentName: { type: String },
+  isActive: { type: Boolean, default: true },
+  createdAt: { type: String, required: true },
+  updatedAt: { type: String, required: true },
+}, { collection: 'prefilled_text_mappings' });
+
 export const Agent = mongoose.models.Agent || mongoose.model('Agent', AgentSchema);
 export const Form = mongoose.models.Form || mongoose.model('Form', FormSchema);
 export const Lead = mongoose.models.Lead || mongoose.model('Lead', LeadSchema);
@@ -180,6 +310,17 @@ export const ScheduledMessage = mongoose.models.ScheduledMessage || mongoose.mod
 export const BroadcastLog = mongoose.models.BroadcastLog || mongoose.model('BroadcastLog', BroadcastLogSchema);
 export const ImportedContact = mongoose.models.ImportedContact || mongoose.model('ImportedContact', ImportedContactSchema);
 export const ContactAgent = mongoose.models.ContactAgent || mongoose.model('ContactAgent', ContactAgentSchema);
+export const Contact = mongoose.models.Contact || mongoose.model('Contact', ContactSchema);
+export const Message = mongoose.models.Message || mongoose.model('Message', MessageSchema);
+export const Chat = mongoose.models.Chat || mongoose.model('Chat', ChatSchema);
+export const Campaign = mongoose.models.Campaign || mongoose.model('Campaign', CampaignSchema);
+export const Template = mongoose.models.Template || mongoose.model('Template', TemplateSchema);
+export const Automation = mongoose.models.Automation || mongoose.model('Automation', AutomationSchema);
+export const User = mongoose.models.User || mongoose.model('User', UserSchema);
+export const TeamMember = mongoose.models.TeamMember || mongoose.model('TeamMember', TeamMemberSchema);
+export const WhatsappSettings = mongoose.models.WhatsappSettings || mongoose.model('WhatsappSettings', WhatsappSettingsSchema);
+export const Billing = mongoose.models.Billing || mongoose.model('Billing', BillingSchema);
+export const PrefilledTextMapping = mongoose.models.PrefilledTextMapping || mongoose.model('PrefilledTextMapping', PrefilledTextMappingSchema);
 
 const modelMap: Record<string, Model<any>> = {
   agents: Agent,
@@ -192,6 +333,17 @@ const modelMap: Record<string, Model<any>> = {
   broadcast_logs: BroadcastLog,
   imported_contacts: ImportedContact,
   contact_agents: ContactAgent,
+  contacts: Contact,
+  messages: Message,
+  chats: Chat,
+  campaigns: Campaign,
+  templates: Template,
+  automations: Automation,
+  users: User,
+  team_members: TeamMember,
+  whatsapp_settings: WhatsappSettings,
+  billing: Billing,
+  prefilled_text_mappings: PrefilledTextMapping,
 };
 
 export async function readCollection<T>(collectionName: string): Promise<T[]> {
