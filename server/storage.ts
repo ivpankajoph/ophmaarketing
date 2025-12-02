@@ -66,6 +66,7 @@ export interface IStorage {
   updateChat(id: string, chat: Partial<Chat>): Promise<Chat | undefined>;
   updateChatInboundTime(contactId: string): Promise<void>;
   markMessagesAsRead(contactId: string): Promise<void>;
+  markMessagesAsUnread(contactId: string): Promise<void>;
   incrementUnreadCount(contactId: string): Promise<void>;
 }
 
@@ -536,6 +537,10 @@ export class MongoStorage implements IStorage {
     }
     
     await mongodb.updateOne('chats', { contactId }, { unreadCount: 0 });
+  }
+
+  async markMessagesAsUnread(contactId: string): Promise<void> {
+    await mongodb.updateOne('chats', { contactId }, { unreadCount: 1 });
   }
 
   async incrementUnreadCount(contactId: string): Promise<void> {

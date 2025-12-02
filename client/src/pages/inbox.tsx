@@ -52,6 +52,7 @@ interface Message {
   timestamp: string;
   replyToMessageId?: string;
   replyToContent?: string;
+  mediaUrl?: string;
 }
 
 interface Chat {
