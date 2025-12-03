@@ -18,6 +18,10 @@ import {
   Plus,
   Search,
   AlertCircle,
+  Clock,
+  X,
+  Trash2,
+  RefreshCw,
 } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -77,6 +81,21 @@ interface SavedContact {
   email?: string;
   tags?: string[];
   source?: string;
+}
+
+interface ScheduledBroadcast {
+  id: string;
+  campaignName: string;
+  messageType: "template" | "custom" | "ai_agent";
+  templateName?: string;
+  customMessage?: string;
+  agentId?: string;
+  contacts: Array<{ name: string; phone: string }>;
+  scheduledAt: string;
+  status: "scheduled" | "sending" | "sent" | "failed" | "cancelled";
+  createdAt: string;
+  sentCount?: number;
+  failedCount?: number;
 }
 
 export default function Broadcast() {
@@ -163,6 +182,50 @@ export default function Broadcast() {
       const res = await fetch("/api/broadcast/lists");
       if (!res.ok) throw new Error("Failed to fetch broadcast lists");
       return res.json();
+    },
+  });
+
+  const { data: scheduledBroadcasts = [], isLoading: isLoadingScheduled, refetch: refetchScheduled } = useQuery<ScheduledBroadcast[]>({
+    queryKey: ["/api/broadcast/scheduled-broadcasts"],
+    queryFn: async () => {
+      const res = await fetch("/api/broadcast/scheduled-broadcasts");
+      if (!res.ok) throw new Error("Failed to fetch scheduled broadcasts");
+      return res.json();
+    },
+    refetchInterval: 30000,
+  });
+
+  const cancelScheduledMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const res = await fetch(`/api/broadcast/scheduled-broadcasts/${id}/cancel`, {
+        method: "POST",
+      });
+      if (!res.ok) throw new Error("Failed to cancel scheduled broadcast");
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/broadcast/scheduled-broadcasts"] });
+      toast.success("Scheduled broadcast cancelled");
+    },
+    onError: () => {
+      toast.error("Failed to cancel scheduled broadcast");
+    },
+  });
+
+  const deleteScheduledMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const res = await fetch(`/api/broadcast/scheduled-broadcasts/${id}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) throw new Error("Failed to delete scheduled broadcast");
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/broadcast/scheduled-broadcasts"] });
+      toast.success("Scheduled broadcast deleted");
+    },
+    onError: () => {
+      toast.error("Failed to delete scheduled broadcast");
     },
   });
 
@@ -757,6 +820,138 @@ export default function Broadcast() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Scheduled Broadcasts Section */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <Clock className="h-5 w-5" />
+                  Scheduled Broadcasts
+                </CardTitle>
+                <CardDescription>
+                  View and manage your scheduled broadcasts
+                </CardDescription>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => refetchScheduled()}
+                disabled={isLoadingScheduled}
+              >
+                {isLoadingScheduled ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <RefreshCw className="h-4 w-4" />
+                )}
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {isLoadingScheduled ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+              </div>
+            ) : scheduledBroadcasts.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                <Clock className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                <p>No scheduled broadcasts</p>
+                <p className="text-sm">Schedule a broadcast above to see it here</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {scheduledBroadcasts
+                  .sort((a, b) => new Date(a.scheduledAt).getTime() - new Date(b.scheduledAt).getTime())
+                  .map((broadcast) => {
+                    const scheduledDate = new Date(broadcast.scheduledAt);
+                    const isPast = scheduledDate <= new Date();
+                    const statusColors: Record<string, string> = {
+                      scheduled: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
+                      sending: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300",
+                      sent: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
+                      failed: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
+                      cancelled: "bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300",
+                    };
+
+                    return (
+                      <div
+                        key={broadcast.id}
+                        className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50"
+                      >
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="font-medium">{broadcast.campaignName}</span>
+                            <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusColors[broadcast.status]}`}>
+                              {broadcast.status.charAt(0).toUpperCase() + broadcast.status.slice(1)}
+                            </span>
+                          </div>
+                          <div className="text-sm text-muted-foreground space-y-1">
+                            <p>
+                              <span className="font-medium">Type:</span>{" "}
+                              {broadcast.messageType === "template"
+                                ? `Template (${broadcast.templateName || "hello_world"})`
+                                : broadcast.messageType === "custom"
+                                  ? "Custom Message"
+                                  : "AI Agent"}
+                            </p>
+                            <p>
+                              <span className="font-medium">Recipients:</span>{" "}
+                              {broadcast.contacts?.length || 0} contacts
+                            </p>
+                            <p className={isPast && broadcast.status === "scheduled" ? "text-amber-600 dark:text-amber-400" : ""}>
+                              <span className="font-medium">Scheduled:</span>{" "}
+                              {scheduledDate.toLocaleString()}
+                              {isPast && broadcast.status === "scheduled" && " (Processing...)"}
+                            </p>
+                            {broadcast.status === "sent" && (
+                              <p>
+                                <span className="font-medium">Results:</span>{" "}
+                                {broadcast.sentCount || 0} sent, {broadcast.failedCount || 0} failed
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {broadcast.status === "scheduled" && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => cancelScheduledMutation.mutate(broadcast.id)}
+                              disabled={cancelScheduledMutation.isPending}
+                            >
+                              {cancelScheduledMutation.isPending ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                              ) : (
+                                <X className="h-4 w-4" />
+                              )}
+                              <span className="ml-1 hidden sm:inline">Cancel</span>
+                            </Button>
+                          )}
+                          {(broadcast.status === "sent" || broadcast.status === "failed" || broadcast.status === "cancelled") && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => deleteScheduledMutation.mutate(broadcast.id)}
+                              disabled={deleteScheduledMutation.isPending}
+                              className="text-red-600 hover:text-red-700"
+                            >
+                              {deleteScheduledMutation.isPending ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                              ) : (
+                                <Trash2 className="h-4 w-4" />
+                              )}
+                              <span className="ml-1 hidden sm:inline">Delete</span>
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </DashboardLayout>
   );

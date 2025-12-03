@@ -300,6 +300,26 @@ const PrefilledTextMappingSchema = new Schema({
   updatedAt: { type: String, required: true },
 }, { collection: 'prefilled_text_mappings' });
 
+const ScheduledBroadcastSchema = new Schema({
+  id: { type: String, required: true, unique: true },
+  contacts: [{
+    name: { type: String },
+    phone: { type: String },
+    email: { type: String },
+    tags: { type: [String] },
+  }],
+  messageType: { type: String, enum: ['template', 'custom', 'ai_agent'], required: true },
+  templateName: { type: String },
+  customMessage: { type: String },
+  agentId: { type: String },
+  campaignName: { type: String, required: true },
+  scheduledAt: { type: String, required: true },
+  status: { type: String, enum: ['scheduled', 'sending', 'sent', 'failed', 'cancelled'], default: 'scheduled' },
+  createdAt: { type: String, required: true },
+  sentCount: { type: Number, default: 0 },
+  failedCount: { type: Number, default: 0 },
+}, { collection: 'scheduled_broadcasts' });
+
 export const Agent = mongoose.models.Agent || mongoose.model('Agent', AgentSchema);
 export const Form = mongoose.models.Form || mongoose.model('Form', FormSchema);
 export const Lead = mongoose.models.Lead || mongoose.model('Lead', LeadSchema);
@@ -321,6 +341,7 @@ export const TeamMember = mongoose.models.TeamMember || mongoose.model('TeamMemb
 export const WhatsappSettings = mongoose.models.WhatsappSettings || mongoose.model('WhatsappSettings', WhatsappSettingsSchema);
 export const Billing = mongoose.models.Billing || mongoose.model('Billing', BillingSchema);
 export const PrefilledTextMapping = mongoose.models.PrefilledTextMapping || mongoose.model('PrefilledTextMapping', PrefilledTextMappingSchema);
+export const ScheduledBroadcast = mongoose.models.ScheduledBroadcast || mongoose.model('ScheduledBroadcast', ScheduledBroadcastSchema);
 
 const modelMap: Record<string, Model<any>> = {
   agents: Agent,
@@ -344,6 +365,7 @@ const modelMap: Record<string, Model<any>> = {
   whatsapp_settings: WhatsappSettings,
   billing: Billing,
   prefilled_text_mappings: PrefilledTextMapping,
+  scheduled_broadcasts: ScheduledBroadcast,
 };
 
 export async function readCollection<T>(collectionName: string): Promise<T[]> {

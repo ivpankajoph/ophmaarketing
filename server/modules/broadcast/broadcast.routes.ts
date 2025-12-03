@@ -371,6 +371,34 @@ router.get('/scheduled-broadcasts', async (req: Request, res: Response) => {
   }
 });
 
+router.post('/scheduled-broadcasts/:id/cancel', async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const success = await broadcastService.cancelScheduledBroadcast(id);
+    if (success) {
+      res.json({ message: 'Broadcast cancelled successfully' });
+    } else {
+      res.status(400).json({ error: 'Failed to cancel broadcast' });
+    }
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to cancel broadcast' });
+  }
+});
+
+router.delete('/scheduled-broadcasts/:id', async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const success = await broadcastService.deleteScheduledBroadcast(id);
+    if (success) {
+      res.json({ message: 'Broadcast deleted successfully' });
+    } else {
+      res.status(404).json({ error: 'Broadcast not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to delete broadcast' });
+  }
+});
+
 router.get('/logs', async (req: Request, res: Response) => {
   try {
     const { campaignName, status, phone, limit, offset } = req.query;

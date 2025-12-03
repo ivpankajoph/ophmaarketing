@@ -44,7 +44,7 @@ export interface ScheduledBroadcast {
   agentId?: string;
   campaignName: string;
   scheduledAt: string;
-  status: 'scheduled' | 'sending' | 'sent' | 'failed';
+  status: 'scheduled' | 'sending' | 'sent' | 'failed' | 'cancelled';
   createdAt: string;
   sentCount?: number;
   failedCount?: number;
@@ -865,5 +865,48 @@ export function stopScheduler(): void {
     clearInterval(schedulerInterval);
     schedulerInterval = null;
     console.log('[Scheduler] Broadcast scheduler stopped');
+  }
+}
+
+export async function cancelScheduledBroadcast(id: string): Promise<boolean> {
+  try {
+    const broadcast = await mongodb.findOne<ScheduledBroadcast>('scheduled_broadcasts', { id });
+    if (!broadcast) {
+      console.error(`[ScheduledBroadcast] Broadcast not found: ${id}`);
+      return false;
+    }
+    
+    if (broadcast.status !== 'scheduled') {
+      console.error(`[ScheduledBroadcast] Cannot cancel broadcast with status: ${broadcast.status}`);
+      return false;
+    }
+    
+    await mongodb.updateOne('scheduled_broadcasts', { id }, {
+      ...broadcast,
+      status: 'cancelled',
+    });
+    
+    console.log(`[ScheduledBroadcast] Cancelled broadcast: ${id}`);
+    return true;
+  } catch (error) {
+    console.error('[ScheduledBroadcast] Failed to cancel broadcast:', error);
+    return false;
+  }
+}
+
+export async function deleteScheduledBroadcast(id: string): Promise<boolean> {
+  try {
+    const broadcast = await mongodb.findOne<ScheduledBroadcast>('scheduled_broadcasts', { id });
+    if (!broadcast) {
+      console.error(`[ScheduledBroadcast] Broadcast not found for deletion: ${id}`);
+      return false;
+    }
+    
+    await mongodb.deleteOne('scheduled_broadcasts', { id });
+    console.log(`[ScheduledBroadcast] Deleted broadcast: ${id}`);
+    return true;
+  } catch (error) {
+    console.error('[ScheduledBroadcast] Failed to delete broadcast:', error);
+    return false;
   }
 }
