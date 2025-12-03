@@ -27,7 +27,13 @@ The system incorporates a modular backend structure, allowing for independent de
 - **WhatsApp Business API**: For sending and receiving WhatsApp messages.
 - **Meta Business Suite**: For syncing and approving message templates.
 
-## Recent Changes (December 2, 2025)
+## Recent Changes (December 3, 2025)
+- **Broadcast Scheduling Fix**: Fixed scheduled broadcasts not sending at the scheduled time. The `scheduled_broadcasts` MongoDB collection was missing from the model registry. Added proper schema with fields for campaignName, contacts, message type, scheduledAt, status (scheduled/sending/sent/failed/cancelled), and counts.
+- **Scheduled Broadcasts UI**: Added new section in Broadcast page to view and manage all scheduled broadcasts. Users can see status, scheduled time, recipient count, and cancel or delete scheduled broadcasts.
+- **Scheduler Implementation**: Server-side scheduler runs every 30 seconds checking for due broadcasts. When a broadcast's scheduled time arrives, it automatically processes all recipients and sends messages.
+- **Cancel/Delete API**: Added PUT `/api/broadcast/scheduled-broadcasts/:id/cancel` to cancel pending broadcasts and DELETE `/api/broadcast/scheduled-broadcasts/:id` to remove them. Proper 404 handling when broadcast not found.
+
+## Previous Changes (December 2, 2025)
 - **Real-Time Reports System**: All report pages now display real calculated data from actual system usage - no static/mock data. Campaign reports show performance by campaign with sent/delivered/read/replied metrics. Delivery reports provide daily/hourly breakdowns with delivery rates and failure tracking.
 - **Report API Endpoints**: Added `/api/reports/campaigns` and `/api/reports/delivery` endpoints that calculate metrics from messages, campaigns, and broadcast_logs collections with configurable date ranges.
 - **WhatsApp Leads Page**: New inbox page for managing messages from unknown contacts (not in contact list). Unlike the 24-Hour Window, there's no expiration constraint. Supports the same features as other inbox pages including bulk messaging, AI agent assignment, and conversation management.
