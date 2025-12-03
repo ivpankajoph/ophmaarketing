@@ -389,7 +389,7 @@ export default function Broadcast() {
         agentId: messageType === "ai_agent" ? selectedAgentId : undefined,
         campaignName: campaignName.trim(),
         isScheduled,
-        scheduledTime: isScheduled ? scheduledTime : undefined,
+        scheduledTime: isScheduled ? new Date(scheduledTime).toISOString() : undefined,
       };
 
       console.log("📤 Sending broadcast payload:", payload);
