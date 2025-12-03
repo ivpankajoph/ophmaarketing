@@ -1278,5 +1278,8 @@ export async function registerRoutes(
     }
   });
 
+  // Start the broadcast scheduler
+  broadcastService.startScheduler();
+
   return httpServer;
 }

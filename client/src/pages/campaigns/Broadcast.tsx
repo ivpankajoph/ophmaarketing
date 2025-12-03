@@ -301,6 +301,20 @@ export default function Broadcast() {
       return;
     }
 
+    // Handle scheduling validation
+    if (isScheduled) {
+      if (!scheduledTime) {
+        toast.error("Please select a schedule time");
+        return;
+      }
+      const scheduledDate = new Date(scheduledTime);
+      const now = new Date();
+      if (scheduledDate <= now) {
+        toast.error("Scheduled time must be in the future");
+        return;
+      }
+    }
+
     setIsSending(true);
 
     try {
@@ -311,7 +325,11 @@ export default function Broadcast() {
         customMessage: messageType === "custom" ? message : undefined,
         agentId: messageType === "ai_agent" ? selectedAgentId : undefined,
         campaignName: campaignName.trim(),
+        isScheduled,
+        scheduledTime: isScheduled ? scheduledTime : undefined,
       };
+
+      console.log("📤 Sending broadcast payload:", payload);
 
       const res = await fetch("/api/broadcast/send", {
         method: "POST",
@@ -320,6 +338,7 @@ export default function Broadcast() {
       });
 
       const result = await res.json();
+      console.log("📥 Broadcast response:", result);
 
       if (!res.ok) {
         toast.error(result.error || `Failed to send broadcast (${res.status})`);
@@ -327,20 +346,26 @@ export default function Broadcast() {
         return;
       }
 
-      if (result.failed > 0) {
+      if (isScheduled) {
+        toast.success(`Broadcast scheduled successfully for ${new Date(scheduledTime).toLocaleString()}`);
+      } else if (result.failed > 0) {
         toast.warning(`Broadcast partially sent: ${result.successful} successful, ${result.failed} failed`);
       } else {
         toast.success(`Broadcast sent successfully to ${result.successful} contacts`);
       }
 
+      // Reset form
       setSelectedContactIds([]);
       setImportedContacts([]);
       setCampaignName("");
       setSelectedTemplateId("");
       setSelectedTemplateName("");
       setMessage("");
+      setIsScheduled(false);
+      setScheduledTime("");
       setIsSending(false);
     } catch (error: any) {
+      console.error("❌ Broadcast error:", error);
       toast.error(error.message || "Failed to send broadcast");
       setIsSending(false);
     }
@@ -496,7 +521,7 @@ export default function Broadcast() {
                       <SelectValue placeholder="Choose a broadcast list..." />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="none">None (Select manually)</SelectItem>
+                      <SelectItem value="">None (Select manually)</SelectItem>
                       {broadcastLists.map((list) => (
                         <SelectItem key={list.id} value={list.id}>
                           {list.name} ({list.contacts.length} contacts)
@@ -699,6 +724,9 @@ export default function Broadcast() {
                     onChange={(e) => setScheduledTime(e.target.value)}
                     min={new Date().toISOString().slice(0, 16)}
                   />
+                  {scheduledTime && new Date(scheduledTime) <= new Date() && (
+                    <p className="text-xs text-red-500">Time must be in the future</p>
+                  )}
                 </div>
               )}
 
@@ -716,7 +744,7 @@ export default function Broadcast() {
                   <Send className="mr-2 h-4 w-4" />
                 )}
                 {isSending
-                  ? "Sending..."
+                  ? "Processing..."
                   : isScheduled
                     ? "Schedule Broadcast"
                     : `Send to ${totalSelected} Contacts`}

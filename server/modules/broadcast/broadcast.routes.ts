@@ -243,16 +243,46 @@ router.delete('/schedules/:id', async (req: Request, res: Response) => {
 
 router.post('/send', async (req: Request, res: Response) => {
   try {
-    const { contacts, messageType, templateName, customMessage, agentId, campaignName } = req.body;
-    
-    console.log('[Broadcast API] Received request:', { contacts: contacts?.length, messageType, templateName, campaignName });
-    
+    const {
+      contacts,
+      messageType,
+      templateName,
+      customMessage,
+      agentId,
+      campaignName,
+      isScheduled = false,
+      scheduledTime
+    } = req.body;
+
+    console.log('[Broadcast API] Received request:', { 
+      contacts: contacts?.length, 
+      messageType, 
+      templateName, 
+      campaignName,
+      isScheduled,
+      scheduledTime
+    });
+
     if (!contacts || !Array.isArray(contacts) || contacts.length === 0) {
       return res.status(400).json({ error: 'Contacts are required' });
     }
-    
+
     if (!messageType) {
       return res.status(400).json({ error: 'Message type is required' });
+    }
+
+    // Validate scheduling
+    if (isScheduled) {
+      if (!scheduledTime) {
+        return res.status(400).json({ error: 'scheduledTime is required when scheduling' });
+      }
+      const scheduledDate = new Date(scheduledTime);
+      if (isNaN(scheduledDate.getTime())) {
+        return res.status(400).json({ error: 'Invalid scheduledTime format' });
+      }
+      if (scheduledDate <= new Date()) {
+        return res.status(400).json({ error: 'Scheduled time must be in the future' });
+      }
     }
 
     const result = await broadcastService.sendBroadcast(contacts, messageType, {
@@ -260,18 +290,19 @@ router.post('/send', async (req: Request, res: Response) => {
       customMessage,
       agentId,
       campaignName,
+      isScheduled,
+      scheduledTime,
     });
-    
+
     console.log('[Broadcast API] Result:', result);
-    
-    // Return error status if credentials are missing
+
     if (result.credentialError) {
       return res.status(400).json({ 
         error: result.credentialError,
         ...result,
       });
     }
-    
+
     res.json(result);
   } catch (error) {
     console.error('Broadcast send error:', error);
@@ -328,6 +359,15 @@ router.post('/send-to-list/:listId', async (req: Request, res: Response) => {
   } catch (error) {
     console.error('List broadcast send error:', error);
     res.status(500).json({ error: 'Failed to send broadcast to list' });
+  }
+});
+
+router.get('/scheduled-broadcasts', async (req: Request, res: Response) => {
+  try {
+    const broadcasts = await broadcastService.getScheduledBroadcasts();
+    res.json(broadcasts);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to get scheduled broadcasts' });
   }
 });
 

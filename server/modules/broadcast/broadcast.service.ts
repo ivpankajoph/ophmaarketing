@@ -35,6 +35,21 @@ export interface ScheduledMessage {
   createdAt: string;
 }
 
+export interface ScheduledBroadcast {
+  id: string;
+  contacts: BroadcastContact[];
+  messageType: 'template' | 'custom' | 'ai_agent';
+  templateName?: string;
+  customMessage?: string;
+  agentId?: string;
+  campaignName: string;
+  scheduledAt: string;
+  status: 'scheduled' | 'sending' | 'sent' | 'failed';
+  createdAt: string;
+  sentCount?: number;
+  failedCount?: number;
+}
+
 export interface SendMessageResult {
   success: boolean;
   messageId?: string;
@@ -373,12 +388,47 @@ export async function sendBroadcast(
     customMessage?: string;
     agentId?: string;
     campaignName?: string;
+    isScheduled?: boolean;
+    scheduledTime?: string;
   }
-): Promise<{ total: number; successful: number; failed: number; results: Array<{ phone: string; success: boolean; error?: string }>; credentialError?: string }> {
+): Promise<{ total: number; successful: number; failed: number; results: Array<{ phone: string; success: boolean; error?: string }>; credentialError?: string; scheduled?: boolean; scheduledAt?: string }> {
+  const campaignName = options.campaignName || `Broadcast ${new Date().toISOString()}`;
+
+  // Handle scheduled broadcasts
+  if (options.isScheduled && options.scheduledTime) {
+    const scheduledDate = new Date(options.scheduledTime);
+    console.log(`[Broadcast] Scheduling broadcast for ${scheduledDate.toISOString()}`);
+    
+    // Store the scheduled broadcast
+    const scheduleData: ScheduledBroadcast = {
+      id: `scheduled-${Date.now()}`,
+      contacts,
+      messageType,
+      templateName: options.templateName,
+      customMessage: options.customMessage,
+      agentId: options.agentId,
+      campaignName,
+      scheduledAt: scheduledDate.toISOString(),
+      status: 'scheduled',
+      createdAt: new Date().toISOString(),
+    };
+    
+    await mongodb.insertOne('scheduled_broadcasts', scheduleData);
+    console.log(`[Broadcast] Scheduled broadcast saved with ID: ${scheduleData.id}`);
+    
+    return {
+      total: contacts.length,
+      successful: 0,
+      failed: 0,
+      results: [],
+      scheduled: true,
+      scheduledAt: scheduledDate.toISOString(),
+    };
+  }
+
   const results: Array<{ phone: string; success: boolean; error?: string }> = [];
   let successful = 0;
   let failed = 0;
-  const campaignName = options.campaignName || `Broadcast ${new Date().toISOString()}`;
 
   console.log(`[Broadcast] Starting broadcast to ${contacts.length} contacts`);
   console.log(`[Broadcast] Campaign: ${campaignName}, Type: ${messageType}`);
@@ -686,5 +736,134 @@ export async function deleteImportedContact(id: string): Promise<boolean> {
   } catch (error) {
     console.error('[ImportContacts] Failed to delete contact:', error);
     return false;
+  }
+}
+
+// Scheduled Broadcasts Functions
+export async function getScheduledBroadcasts(): Promise<ScheduledBroadcast[]> {
+  try {
+    return await mongodb.readCollection<ScheduledBroadcast>('scheduled_broadcasts');
+  } catch (error) {
+    console.error('[ScheduledBroadcasts] Failed to get scheduled broadcasts:', error);
+    return [];
+  }
+}
+
+export async function processScheduledBroadcasts(): Promise<void> {
+  const now = new Date();
+  console.log(`[Scheduler] Checking for due broadcasts at ${now.toISOString()}`);
+  
+  try {
+    const scheduled = await mongodb.readCollection<ScheduledBroadcast>('scheduled_broadcasts');
+    const duebroadcasts = scheduled.filter(s => 
+      s.status === 'scheduled' && new Date(s.scheduledAt) <= now
+    );
+    
+    if (duebroadcasts.length === 0) {
+      return;
+    }
+    
+    console.log(`[Scheduler] Found ${duebroadcasts.length} due broadcasts`);
+    
+    for (const broadcast of duebroadcasts) {
+      console.log(`[Scheduler] Processing broadcast: ${broadcast.id} - ${broadcast.campaignName}`);
+      
+      // Update status to sending
+      await mongodb.updateOne('scheduled_broadcasts', { id: broadcast.id }, { 
+        ...broadcast, 
+        status: 'sending' 
+      });
+      
+      let successful = 0;
+      let failed = 0;
+      
+      const credentials = getWhatsAppCredentials();
+      if (!credentials) {
+        console.error(`[Scheduler] WhatsApp credentials not configured for broadcast ${broadcast.id}`);
+        await mongodb.updateOne('scheduled_broadcasts', { id: broadcast.id }, {
+          ...broadcast,
+          status: 'failed',
+          sentCount: 0,
+          failedCount: broadcast.contacts.length,
+        });
+        continue;
+      }
+      
+      for (const contact of broadcast.contacts) {
+        let result: SendMessageResult;
+        let messageContent = '';
+        
+        switch (broadcast.messageType) {
+          case 'template':
+            result = await sendTemplateMessage(contact.phone, broadcast.templateName || 'hello_world', contact.name);
+            messageContent = `[Template: ${broadcast.templateName || 'hello_world'}]`;
+            break;
+          case 'custom':
+            result = await sendCustomMessage(contact.phone, broadcast.customMessage || '');
+            messageContent = broadcast.customMessage || '';
+            break;
+          case 'ai_agent':
+            result = await sendAIAgentMessage(contact.phone, broadcast.agentId || '', `Contact name: ${contact.name}`);
+            messageContent = '[AI Generated Message]';
+            break;
+          default:
+            result = { success: false, error: 'Invalid message type' };
+        }
+        
+        await logBroadcastMessage({
+          campaignName: broadcast.campaignName,
+          contactName: contact.name,
+          contactPhone: contact.phone,
+          messageType: broadcast.messageType,
+          templateName: broadcast.templateName,
+          message: messageContent,
+          status: result.success ? 'sent' : 'failed',
+          messageId: result.messageId,
+          error: result.error,
+          timestamp: new Date().toISOString(),
+        });
+        
+        if (result.success) {
+          successful++;
+        } else {
+          failed++;
+        }
+        
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+      
+      // Update broadcast status
+      await mongodb.updateOne('scheduled_broadcasts', { id: broadcast.id }, {
+        ...broadcast,
+        status: 'sent',
+        sentCount: successful,
+        failedCount: failed,
+      });
+      
+      console.log(`[Scheduler] Broadcast ${broadcast.id} complete: ${successful} sent, ${failed} failed`);
+    }
+  } catch (error) {
+    console.error('[Scheduler] Error processing scheduled broadcasts:', error);
+  }
+}
+
+// Start the scheduler
+let schedulerInterval: NodeJS.Timeout | null = null;
+
+export function startScheduler(): void {
+  if (schedulerInterval) {
+    return;
+  }
+  console.log('[Scheduler] Starting broadcast scheduler (checking every 30 seconds)');
+  schedulerInterval = setInterval(processScheduledBroadcasts, 30000);
+  // Run immediately on start
+  processScheduledBroadcasts();
+}
+
+export function stopScheduler(): void {
+  if (schedulerInterval) {
+    clearInterval(schedulerInterval);
+    schedulerInterval = null;
+    console.log('[Scheduler] Broadcast scheduler stopped');
   }
 }
