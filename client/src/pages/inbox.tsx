@@ -621,8 +621,8 @@ export default function Inbox() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-4 animate-in fade-in duration-500">
-        <div className="flex items-center justify-between">
+      <div className="h-full flex flex-col gap-4 animate-in fade-in duration-500">
+        <div className="flex items-center justify-between flex-shrink-0">
           <div>
             <h2 className="text-2xl font-bold tracking-tight">Inbox</h2>
             <p className="text-sm text-muted-foreground">
@@ -643,7 +643,7 @@ export default function Inbox() {
           </div>
         </div>
 
-        <div className="flex items-center gap-4 p-4 bg-muted/50 rounded-lg">
+        <div className="flex items-center gap-4 p-3 bg-muted/50 rounded-lg flex-shrink-0">
           <Checkbox 
             checked={selectedContacts.length === filteredChats.length && filteredChats.length > 0}
             onCheckedChange={handleSelectAll}
@@ -654,8 +654,8 @@ export default function Inbox() {
           )}
         </div>
 
-      <div className="h-[calc(100vh-16rem)] flex bg-card border border-border rounded-lg overflow-hidden shadow-sm">
-        <div className="w-80 border-r border-border flex flex-col bg-background">
+      <div className="flex-1 min-h-0 flex bg-card border border-border rounded-lg overflow-hidden shadow-sm">
+        <div className="w-80 border-r border-border flex flex-col bg-background min-h-0">
           <div className="p-4 border-b border-border">
             <div className="relative">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -698,44 +698,45 @@ export default function Inbox() {
                 {filteredChats.map((chat) => (
                   <div 
                     key={chat.id} 
-                    className={`p-4 flex items-start gap-3 hover:bg-muted/50 cursor-pointer transition-colors ${chat.id === selectedChatId ? 'bg-muted/50' : ''}`}
+                    className={`p-3 flex items-start gap-2 hover:bg-muted/50 cursor-pointer transition-colors ${chat.id === selectedChatId ? 'bg-muted/50' : ''}`}
                     onClick={() => handleSelectChat(chat.id)}
                   >
                     <Checkbox 
                       checked={selectedContacts.includes(chat.contactId)}
                       onCheckedChange={() => {}}
                       onClick={(e) => handleSelectContact(chat.contactId, e)}
+                      className="mt-1"
                     />
-                    <Avatar>
-                      <AvatarFallback className="bg-primary/10 text-primary">
+                    <Avatar className="h-9 w-9">
+                      <AvatarFallback className="bg-primary/10 text-primary text-sm">
                         {getInitials(chat.contact)}
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between mb-1">
-                        <div className="flex items-center gap-2">
-                          <span className={`font-medium truncate ${chat.unreadCount > 0 ? 'font-bold' : ''}`}>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-1.5">
+                          <span className={`text-sm font-medium truncate ${chat.unreadCount > 0 ? 'font-bold' : ''}`}>
                             {getContactName(chat.contact)}
                           </span>
                           {isWithin24Hours(chat) && (
-                            <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200 px-1">
+                            <Badge variant="outline" className="text-[10px] bg-green-50 text-green-700 border-green-200 px-1 py-0">
                               <Clock className="h-2.5 w-2.5" />
                             </Badge>
                           )}
+                          {chat.unreadCount > 0 && (
+                            <span className="h-4 w-4 rounded-full bg-primary text-primary-foreground text-[9px] flex items-center justify-center font-medium">
+                              {chat.unreadCount}
+                            </span>
+                          )}
                         </div>
-                        <span className="text-xs text-muted-foreground whitespace-nowrap">
+                        <span className="text-[11px] text-muted-foreground whitespace-nowrap">
                           {chat.lastMessageTime ? formatTime(chat.lastMessageTime) : ""}
                         </span>
                       </div>
-                      <p className="text-sm text-muted-foreground truncate">
+                      <p className="text-xs text-muted-foreground truncate mt-0.5">
                         {chat.lastMessage || "No messages yet"}
                       </p>
                     </div>
-                    {chat.unreadCount > 0 && (
-                      <div className="h-5 w-5 rounded-full bg-primary text-primary-foreground text-[10px] flex items-center justify-center font-medium">
-                        {chat.unreadCount}
-                      </div>
-                    )}
                   </div>
                 ))}
               </div>

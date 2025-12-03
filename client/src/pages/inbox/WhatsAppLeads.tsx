@@ -570,13 +570,13 @@ export default function WhatsAppLeads() {
 
   return (
     <DashboardLayout>
-      <div className="flex flex-col h-[calc(100vh-4rem)]">
-        <div className="flex items-center justify-between p-4 border-b border-border">
+      <div className="h-full flex flex-col gap-4">
+        <div className="flex items-center justify-between flex-shrink-0">
           <div>
-            <h1 className="text-2xl font-bold flex items-center gap-2">
+            <h2 className="text-2xl font-bold flex items-center gap-2">
               <Users className="h-6 w-6 text-primary" />
               WhatsApp Leads
-            </h1>
+            </h2>
             <p className="text-sm text-muted-foreground">
               New contacts who messaged you (not in your contact list). Assign AI agents based on their first message.
             </p>
@@ -595,8 +595,8 @@ export default function WhatsAppLeads() {
           </div>
         </div>
         
-        <div className="flex flex-1 overflow-hidden">
-          <div className="w-[400px] border-r border-border flex flex-col">
+        <div className="flex flex-1 min-h-0 bg-card border border-border rounded-lg overflow-hidden shadow-sm">
+          <div className="w-96 border-r border-border flex flex-col bg-background min-h-0">
             <div className="p-3 space-y-3">
               <div className="flex items-center gap-2">
                 <Checkbox 
@@ -643,57 +643,52 @@ export default function WhatsAppLeads() {
                   <p className="text-xs">New contacts will appear here</p>
                 </div>
               ) : (
-                filteredChats.map((chat) => (
+                <div className="divide-y divide-border">
+                {filteredChats.map((chat) => (
                   <div 
                     key={chat.id}
-                    className={`flex items-start gap-3 p-3 cursor-pointer hover:bg-muted/50 transition-colors border-b border-border/50 ${
-                      selectedChatId === chat.id ? "bg-muted" : ""
+                    className={`flex items-start gap-2 p-3 cursor-pointer hover:bg-muted/50 transition-colors ${
+                      selectedChatId === chat.id ? "bg-muted/50" : ""
                     }`}
                   >
                     <Checkbox 
                       checked={selectedContacts.includes(chat.id)}
                       onCheckedChange={(checked) => handleSelectContact(chat.id, checked as boolean)}
                       onClick={(e) => e.stopPropagation()}
+                      className="mt-1"
                     />
                     <div 
-                      className="flex-1 min-w-0"
+                      className="flex-1 min-w-0 flex items-start gap-2"
                       onClick={() => handleSelectChat(chat.id)}
                     >
-                      <div className="flex items-center gap-2">
-                        <Avatar className="h-10 w-10">
-                          <AvatarFallback className="bg-primary/10 text-primary text-sm">
-                            {getInitials(chat.contact)}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between">
-                            <span className="font-medium truncate">{getContactName(chat.contact)}</span>
+                      <Avatar className="h-9 w-9">
+                        <AvatarFallback className="bg-primary/10 text-primary text-sm">
+                          {getInitials(chat.contact)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-sm font-medium truncate">{getContactName(chat.contact)}</span>
                             {chat.unreadCount > 0 && (
-                              <Badge variant="destructive" className="h-5 px-1.5 text-xs">
+                              <span className="h-4 w-4 rounded-full bg-primary text-primary-foreground text-[9px] flex items-center justify-center font-medium">
                                 {chat.unreadCount}
-                              </Badge>
+                              </span>
                             )}
                           </div>
-                          <div className="text-xs text-muted-foreground truncate">
-                            <span className="text-primary font-medium">First Message: </span>
-                            {chat.lastInboundMessage || "No message"}
-                          </div>
                         </div>
-                      </div>
-                      <div className="mt-1 flex items-center gap-2">
-                        <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
-                          <UserPlus className="h-3 w-3 mr-1" />
+                        <p className="text-xs text-muted-foreground truncate mt-0.5">
+                          {chat.lastInboundMessage || "No message"}
+                        </p>
+                        <Badge variant="outline" className="text-[10px] bg-blue-50 text-blue-700 border-blue-200 mt-1 py-0">
+                          <UserPlus className="h-2.5 w-2.5 mr-0.5" />
                           New Lead
                         </Badge>
-                        {chat.lastMessageTime && (
-                          <span className="text-xs text-muted-foreground">
-                            {formatTime(chat.lastMessageTime)}
-                          </span>
-                        )}
                       </div>
                     </div>
                   </div>
-                ))
+                ))}
+                </div>
               )}
             </ScrollArea>
           </div>
