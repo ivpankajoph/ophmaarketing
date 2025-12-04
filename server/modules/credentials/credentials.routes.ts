@@ -5,51 +5,6 @@ import { decrypt } from '../encryption/encryption.service';
 
 const router = Router();
 
-function maskSecret(value: string | undefined): string {
-  if (!value) return '';
-  if (value.length <= 8) return '****';
-  return value.substring(0, 4) + '****' + value.substring(value.length - 4);
-}
-
-function getEnvCredentials() {
-  return {
-    whatsappToken: process.env.WHATSAPP_TOKEN_NEW || process.env.WHATSAPP_TOKEN || '',
-    phoneNumberId: process.env.PHONE_NUMBER_ID || '',
-    businessAccountId: process.env.WHATSAPP_BUSINESS_ACCOUNT_ID || '',
-    webhookVerifyToken: process.env.WEBHOOK_VERIFY_TOKEN || '',
-    appId: process.env.FACEBOOK_APP_ID || '',
-    appSecret: process.env.FACEBOOK_APP_SECRET || '',
-    openaiApiKey: process.env.OPENAI_API_KEY || '',
-    facebookAccessToken: process.env.FACEBOOK_ACCESS_TOKEN || '',
-    facebookPageId: process.env.FACEBOOK_PAGE_ID || '',
-  };
-}
-
-function getMaskedEnvCredentials() {
-  const env = getEnvCredentials();
-  return {
-    whatsappToken: maskSecret(env.whatsappToken),
-    phoneNumberId: maskSecret(env.phoneNumberId),
-    businessAccountId: maskSecret(env.businessAccountId),
-    webhookVerifyToken: maskSecret(env.webhookVerifyToken),
-    appId: maskSecret(env.appId),
-    appSecret: maskSecret(env.appSecret),
-    openaiApiKey: maskSecret(env.openaiApiKey),
-    facebookAccessToken: maskSecret(env.facebookAccessToken),
-    facebookPageId: maskSecret(env.facebookPageId),
-  };
-}
-
-function getEnvCredentialStatus() {
-  const env = getEnvCredentials();
-  return {
-    hasWhatsApp: !!(env.whatsappToken && env.phoneNumberId),
-    hasOpenAI: !!env.openaiApiKey,
-    hasFacebook: !!env.facebookAccessToken,
-    isVerified: true,
-  };
-}
-
 router.get('/', requireAuth, async (req: Request, res: Response) => {
   try {
     const userId = getUserId(req);
@@ -60,19 +15,6 @@ router.get('/', requireAuth, async (req: Request, res: Response) => {
     const stored = await credentialsService.getCredentialsByUserId(userId);
     
     if (!stored) {
-      const envCreds = getEnvCredentials();
-      const hasEnvCreds = !!(envCreds.whatsappToken || envCreds.openaiApiKey || envCreds.facebookAccessToken);
-      
-      if (hasEnvCreds) {
-        return res.json({ 
-          hasCredentials: true,
-          source: 'environment',
-          credentials: getMaskedEnvCredentials(),
-          status: getEnvCredentialStatus(),
-          isVerified: true,
-        });
-      }
-      
       return res.json({ 
         hasCredentials: false,
         credentials: null,
@@ -85,7 +27,6 @@ router.get('/', requireAuth, async (req: Request, res: Response) => {
 
     res.json({
       hasCredentials: true,
-      source: 'database',
       credentials: masked,
       status,
       isVerified: stored.isVerified,

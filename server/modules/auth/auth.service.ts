@@ -1,5 +1,6 @@
 import crypto from 'crypto';
-import { User } from '../storage/mongodb.adapter';
+import { User, UserCredentials } from '../storage/mongodb.adapter';
+import { encrypt } from '../encryption/encryption.service';
 
 export interface AuthUser {
   id: string;
@@ -107,7 +108,60 @@ export async function ensureDefaultAdmin(): Promise<void> {
       await createUser('admin@whatsapp.com', 'admin123', 'Admin', 'admin@whatsapp.com');
       console.log('[Auth] Default admin user created (admin@whatsapp.com / admin123)');
     }
+    
+    const admin = await User.findOne({ username: 'admin@whatsapp.com' });
+    if (admin) {
+      await seedAdminCredentials(admin.id);
+    }
   } catch (error) {
     console.error('[Auth] Error ensuring default admin:', error);
+  }
+}
+
+async function seedAdminCredentials(adminUserId: string): Promise<void> {
+  try {
+    const existingCreds = await UserCredentials.findOne({ userId: adminUserId });
+    if (existingCreds) {
+      console.log('[Auth] Admin credentials already exist in database');
+      return;
+    }
+
+    const whatsappToken = process.env.WHATSAPP_TOKEN_NEW || process.env.WHATSAPP_TOKEN || '';
+    const phoneNumberId = process.env.PHONE_NUMBER_ID || '';
+    const businessAccountId = process.env.WHATSAPP_BUSINESS_ACCOUNT_ID || '';
+    const webhookVerifyToken = process.env.WEBHOOK_VERIFY_TOKEN || '';
+    const openaiApiKey = process.env.OPENAI_API_KEY || '';
+    const facebookAccessToken = process.env.FB_ACCESS_TOKEN || process.env.FACEBOOK_ACCESS_TOKEN || '';
+    const facebookPageId = process.env.FACEBOOK_PAGE_ID || '';
+    const appId = process.env.FACEBOOK_APP_ID || '';
+    const appSecret = process.env.FACEBOOK_APP_SECRET || '';
+
+    const hasAnyCreds = whatsappToken || openaiApiKey || facebookAccessToken;
+    if (!hasAnyCreds) {
+      console.log('[Auth] No environment credentials to seed');
+      return;
+    }
+
+    const now = new Date().toISOString();
+    await UserCredentials.create({
+      id: crypto.randomUUID(),
+      userId: adminUserId,
+      whatsappToken: whatsappToken ? encrypt(whatsappToken) : '',
+      phoneNumberId: phoneNumberId ? encrypt(phoneNumberId) : '',
+      businessAccountId: businessAccountId ? encrypt(businessAccountId) : '',
+      webhookVerifyToken: webhookVerifyToken ? encrypt(webhookVerifyToken) : '',
+      openaiApiKey: openaiApiKey ? encrypt(openaiApiKey) : '',
+      facebookAccessToken: facebookAccessToken ? encrypt(facebookAccessToken) : '',
+      facebookPageId: facebookPageId ? encrypt(facebookPageId) : '',
+      appId: appId ? encrypt(appId) : '',
+      appSecret: appSecret ? encrypt(appSecret) : '',
+      isVerified: true,
+      createdAt: now,
+      updatedAt: now,
+    });
+
+    console.log('[Auth] Seeded admin credentials from environment variables');
+  } catch (error) {
+    console.error('[Auth] Error seeding admin credentials:', error);
   }
 }

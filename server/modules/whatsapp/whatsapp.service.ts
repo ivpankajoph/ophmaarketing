@@ -40,21 +40,6 @@ export async function getUserWhatsAppCredentials(userId: string): Promise<WhatsA
   }
 }
 
-export function getSystemWhatsAppCredentials(): WhatsAppCredentials | null {
-  const token = process.env.WHATSAPP_TOKEN_NEW || process.env.WHATSAPP_TOKEN;
-  const phoneNumberId = process.env.PHONE_NUMBER_ID;
-  
-  if (!token || !phoneNumberId) {
-    return null;
-  }
-  
-  return {
-    token,
-    phoneNumberId,
-    businessAccountId: process.env.WHATSAPP_BUSINESS_ACCOUNT_ID,
-  };
-}
-
 export async function getWhatsAppCredentialsForUser(userId?: string): Promise<WhatsAppCredentials | null> {
   if (userId) {
     const userCreds = await getUserWhatsAppCredentials(userId);
@@ -63,7 +48,7 @@ export async function getWhatsAppCredentialsForUser(userId?: string): Promise<Wh
     }
   }
   
-  return getSystemWhatsAppCredentials();
+  return null;
 }
 
 export async function getWhatsAppCredentialsStrict(userId: string): Promise<WhatsAppCredentials | null> {
@@ -72,7 +57,7 @@ export async function getWhatsAppCredentialsStrict(userId: string): Promise<What
     return userCreds;
   }
   
-  return getSystemWhatsAppCredentials();
+  return null;
 }
 
 export async function sendTextMessage(
