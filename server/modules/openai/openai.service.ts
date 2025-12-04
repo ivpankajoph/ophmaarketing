@@ -1,4 +1,6 @@
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+import { credentialsService } from '../credentials/credentials.service';
+
+const SYSTEM_OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const OPENAI_MODEL = process.env.OPENAI_MODEL || 'gpt-4o';
 
 interface ChatMessage {
@@ -15,18 +17,35 @@ interface Agent {
   temperature?: number;
 }
 
+async function getOpenAIApiKey(userId?: string): Promise<string | null> {
+  if (userId) {
+    try {
+      const creds = await credentialsService.getDecryptedCredentials(userId);
+      if (creds?.openaiApiKey) {
+        return creds.openaiApiKey;
+      }
+    } catch (error) {
+      console.error('[OpenAI Service] Error getting user API key:', error);
+    }
+  }
+  
+  return SYSTEM_OPENAI_API_KEY || null;
+}
+
 export async function sendChatCompletion(
   messages: ChatMessage[],
-  agent?: Agent
+  agent?: Agent,
+  userId?: string
 ): Promise<string> {
-  if (!OPENAI_API_KEY) {
-    throw new Error('OPENAI_API_KEY is not configured');
+  const apiKey = await getOpenAIApiKey(userId);
+  
+  if (!apiKey) {
+    throw new Error('OpenAI API key is not configured. Please add your API key in Settings > API Credentials.');
   }
 
   const model = agent?.model || OPENAI_MODEL;
   const temperature = agent?.temperature ?? 0.7;
 
-  // Support both systemPrompt and instructions fields for backward compatibility
   const systemPromptContent = agent?.systemPrompt || agent?.instructions || '';
   const systemMessages: ChatMessage[] = systemPromptContent
     ? [{ role: 'system', content: systemPromptContent }]
@@ -39,7 +58,7 @@ export async function sendChatCompletion(
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${OPENAI_API_KEY}`,
+        'Authorization': `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
         model,
@@ -65,12 +84,34 @@ export async function sendChatCompletion(
 export async function generateAgentResponse(
   userMessage: string,
   agent: Agent,
-  conversationHistory: ChatMessage[] = []
+  conversationHistory: ChatMessage[] = [],
+  userId?: string
 ): Promise<string> {
   const messages: ChatMessage[] = [
     ...conversationHistory,
     { role: 'user', content: userMessage },
   ];
 
-  return sendChatCompletion(messages, agent);
+  return sendChatCompletion(messages, agent, userId);
+}
+
+export async function testOpenAIConnection(userId?: string): Promise<boolean> {
+  const apiKey = await getOpenAIApiKey(userId);
+  
+  if (!apiKey) {
+    return false;
+  }
+  
+  try {
+    const response = await fetch('https://api.openai.com/v1/models', {
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+      },
+    });
+    
+    return response.ok;
+  } catch (error) {
+    console.error('[OpenAI Service] Connection test failed:', error);
+    return false;
+  }
 }
