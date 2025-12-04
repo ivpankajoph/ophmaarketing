@@ -10,6 +10,7 @@ import * as contactAgentService from '../contactAgent/contactAgent.service';
 import * as prefilledTextService from '../prefilledText/prefilledText.service';
 import { credentialsService } from '../credentials/credentials.service';
 import * as whatsappService from './whatsapp.service';
+import { isContactBlocked, isPhoneBlocked, listAllBlockedContacts } from '../contacts/contacts.routes';
 
 const WHATSAPP_TOKEN = process.env.WHATSAPP_TOKEN_NEW || process.env.WHATSAPP_TOKEN;
 const PHONE_NUMBER_ID = process.env.PHONE_NUMBER_ID;
@@ -80,25 +81,30 @@ export async function handleWebhook(req: Request, res: Response) {
     const messageType = message.type;
     
     // Check if contact is blocked - works with or without resolved userId
-    const { isContactBlocked, isPhoneBlocked, listAllBlockedContacts } = await import('../contacts/contacts.routes');
+    console.log(`[Webhook] Checking if phone ${from} is blocked...`);
     
     // Debug: list all blocked contacts
-    await listAllBlockedContacts();
+    const allBlocked = await listAllBlockedContacts();
+    console.log(`[Webhook] Total blocked contacts in DB: ${allBlocked.length}`);
     
     if (resolvedUserId) {
+      console.log(`[Webhook] Checking block for user ${resolvedUserId}, phone ${from}`);
       const isBlocked = await isContactBlocked(resolvedUserId, from);
       if (isBlocked) {
-        console.log(`[Webhook] Message from blocked contact ${from} for user ${resolvedUserId}, ignoring`);
+        console.log(`[Webhook] BLOCKED! Message from blocked contact ${from} for user ${resolvedUserId}, ignoring`);
         return res.sendStatus(200);
       }
     } else {
+      console.log(`[Webhook] No resolved userId, checking if phone ${from} is blocked by any user`);
       // Check if phone is blocked by any user
       const blockResult = await isPhoneBlocked(from);
       if (blockResult.blocked) {
-        console.log(`[Webhook] Message from blocked contact ${from} (blocked by user ${blockResult.userId}), ignoring`);
+        console.log(`[Webhook] BLOCKED! Message from blocked contact ${from} (blocked by user ${blockResult.userId}), ignoring`);
         return res.sendStatus(200);
       }
     }
+    
+    console.log(`[Webhook] Phone ${from} is NOT blocked, proceeding with message`)
     
     // Extract message content based on type
     let messageText = '';
