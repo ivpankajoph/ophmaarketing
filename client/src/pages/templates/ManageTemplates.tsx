@@ -22,6 +22,11 @@ interface Template {
   content: string;
   variables: string[];
   status: "pending" | "approved" | "rejected";
+  language?: string;
+  metaTemplateId?: string;
+  metaStatus?: string;
+  rejectionReason?: string;
+  lastSyncedAt?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -327,6 +332,7 @@ export default function ManageTemplates() {
                   <TableRow>
                     <TableHead>Name</TableHead>
                     <TableHead>Category</TableHead>
+                    <TableHead>Language</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Variables</TableHead>
                     <TableHead>Last Updated</TableHead>
@@ -342,9 +348,10 @@ export default function ManageTemplates() {
                           {template.category}
                         </Badge>
                       </TableCell>
+                      <TableCell>{template.language || 'en'}</TableCell>
                       <TableCell>
-                        <Badge variant={getStatusColor(template.status)} className="capitalize">
-                          {template.status}
+                        <Badge variant={getStatusColor(template.metaStatus?.toLowerCase() || template.status)} className="capitalize">
+                          {template.metaStatus?.toLowerCase() || template.status}
                         </Badge>
                       </TableCell>
                       <TableCell>

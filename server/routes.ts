@@ -791,8 +791,8 @@ export async function registerRoutes(
         if (credentials?.whatsappToken) {
           token = credentials.whatsappToken;
         }
-        if (credentials?.wabaId) {
-          wabaId = credentials.wabaId;
+        if (credentials?.businessAccountId) {
+          wabaId = credentials.businessAccountId;
         }
       }
       
@@ -931,8 +931,8 @@ export async function registerRoutes(
         if (credentials?.whatsappToken) {
           token = credentials.whatsappToken;
         }
-        if (credentials?.wabaId) {
-          wabaId = credentials.wabaId;
+        if (credentials?.businessAccountId) {
+          wabaId = credentials.businessAccountId;
         }
       }
       
