@@ -779,17 +779,37 @@ export async function registerRoutes(
   // Sync templates from Meta Business Suite
   app.post("/api/templates/sync-meta", async (req, res) => {
     try {
-      // WABA_ID is the WhatsApp Business Account ID, not the Phone Number ID
-      const wabaId = process.env.WABA_ID;
-      // Use either WHATSAPP_TOKEN_NEW or WHATSAPP_TOKEN or FB_ACCESS_TOKEN
-      const token = process.env.WHATSAPP_TOKEN_NEW || process.env.WHATSAPP_TOKEN || process.env.FB_ACCESS_TOKEN;
+      const { credentialsService } = await import('./modules/credentials/credentials.service');
+      
+      // Get user credentials from session
+      const userId = (req as any).session?.user?.id;
+      let token: string | undefined;
+      let wabaId: string | undefined;
+      
+      if (userId) {
+        const credentials = await credentialsService.getDecryptedCredentials(userId);
+        if (credentials?.whatsappToken) {
+          token = credentials.whatsappToken;
+        }
+        if (credentials?.wabaId) {
+          wabaId = credentials.wabaId;
+        }
+      }
+      
+      // Fallback to environment variables
+      if (!token) {
+        token = process.env.WHATSAPP_TOKEN_NEW || process.env.WHATSAPP_TOKEN || process.env.FB_ACCESS_TOKEN;
+      }
+      if (!wabaId) {
+        wabaId = process.env.WABA_ID;
+      }
       
       if (!token) {
-        return res.status(400).json({ message: "WhatsApp/Facebook access token not configured. Please add WHATSAPP_TOKEN or FB_ACCESS_TOKEN." });
+        return res.status(400).json({ message: "WhatsApp access token not configured. Please configure your API credentials in Settings." });
       }
 
       if (!wabaId) {
-        return res.status(400).json({ message: "WhatsApp Business Account ID (WABA_ID) not configured. Please add WABA_ID environment variable." });
+        return res.status(400).json({ message: "WhatsApp Business Account ID (WABA_ID) not configured. Please configure it in Settings." });
       }
 
       console.log(`[TemplateSync] Fetching templates from WABA ID: ${wabaId}`);
@@ -829,39 +849,49 @@ export async function registerRoutes(
         const existingTemplates = await storage.getTemplates();
         const exists = existingTemplates.find(t => t.name === metaTemplate.name);
         
-        if (!exists) {
-          // Extract content from components
-          let content = "";
-          let variables: string[] = [];
-          
-          if (metaTemplate.components) {
-            const bodyComponent = metaTemplate.components.find((c: any) => c.type === "BODY");
-            if (bodyComponent) {
-              content = bodyComponent.text || "";
-              // Extract variables like {{1}}, {{2}}, etc.
-              const matches = content.match(/\{\{(\d+)\}\}/g);
-              if (matches) {
-                variables = matches.map((m: string, i: number) => `var${i + 1}`);
-              }
+        // Extract content from components
+        let content = "";
+        let variables: string[] = [];
+        
+        if (metaTemplate.components) {
+          const bodyComponent = metaTemplate.components.find((c: any) => c.type === "BODY");
+          if (bodyComponent) {
+            content = bodyComponent.text || "";
+            const matches = content.match(/\{\{(\d+)\}\}/g);
+            if (matches) {
+              variables = matches.map((m: string, i: number) => `var${i + 1}`);
             }
           }
+        }
 
+        const status = metaTemplate.status === "APPROVED" ? "approved" : 
+                      metaTemplate.status === "REJECTED" ? "rejected" : "pending";
+        const now = new Date().toISOString();
+
+        if (!exists) {
           const newTemplate = await storage.createTemplate({
             name: metaTemplate.name,
             category: (metaTemplate.category || "utility").toLowerCase() as any,
             content: content,
             variables: variables,
           });
-          // Update status based on Meta status
-          const status = metaTemplate.status === "APPROVED" ? "approved" : 
-                        metaTemplate.status === "REJECTED" ? "rejected" : "pending";
-          await storage.updateTemplate(newTemplate.id, { status });
+          await storage.updateTemplate(newTemplate.id, { 
+            status,
+            language: metaTemplate.language || 'en',
+            metaTemplateId: metaTemplate.id,
+            metaStatus: metaTemplate.status,
+            lastSyncedAt: now,
+          } as any);
           synced++;
         } else {
-          // Update status if changed
-          const status = metaTemplate.status === "APPROVED" ? "approved" : 
-                        metaTemplate.status === "REJECTED" ? "rejected" : "pending";
-          await storage.updateTemplate(exists.id, { status });
+          await storage.updateTemplate(exists.id, { 
+            status,
+            content: content || exists.content,
+            language: metaTemplate.language || 'en',
+            metaTemplateId: metaTemplate.id,
+            metaStatus: metaTemplate.status,
+            lastSyncedAt: now,
+          } as any);
           updated++;
         }
       }
@@ -890,15 +920,35 @@ export async function registerRoutes(
         return res.status(404).json({ message: "Template not found" });
       }
 
-      const wabaId = process.env.WABA_ID;
-      const token = process.env.WHATSAPP_TOKEN_NEW || process.env.WHATSAPP_TOKEN || process.env.FB_ACCESS_TOKEN;
+      const { credentialsService } = await import('./modules/credentials/credentials.service');
+      
+      const userId = (req as any).session?.user?.id;
+      let token: string | undefined;
+      let wabaId: string | undefined;
+      
+      if (userId) {
+        const credentials = await credentialsService.getDecryptedCredentials(userId);
+        if (credentials?.whatsappToken) {
+          token = credentials.whatsappToken;
+        }
+        if (credentials?.wabaId) {
+          wabaId = credentials.wabaId;
+        }
+      }
       
       if (!token) {
-        return res.status(400).json({ message: "WhatsApp/Facebook access token not configured. Please add WHATSAPP_TOKEN to your secrets." });
+        token = process.env.WHATSAPP_TOKEN_NEW || process.env.WHATSAPP_TOKEN || process.env.FB_ACCESS_TOKEN;
+      }
+      if (!wabaId) {
+        wabaId = process.env.WABA_ID;
+      }
+      
+      if (!token) {
+        return res.status(400).json({ message: "WhatsApp access token not configured. Please configure your API credentials in Settings." });
       }
 
       if (!wabaId) {
-        return res.status(400).json({ message: "WABA_ID not configured. Please add WABA_ID environment variable." });
+        return res.status(400).json({ message: "WABA_ID not configured. Please configure it in Settings." });
       }
 
       // Convert template name to Meta format

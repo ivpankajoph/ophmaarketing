@@ -230,6 +230,11 @@ const TemplateSchema = new Schema({
   content: { type: String, required: true },
   variables: { type: [String], default: [] },
   status: { type: String, default: 'pending' },
+  language: { type: String, default: 'en' },
+  metaTemplateId: { type: String },
+  metaStatus: { type: String },
+  rejectionReason: { type: String },
+  lastSyncedAt: { type: String },
   createdAt: { type: String, required: true },
   updatedAt: { type: String, required: true },
 }, { collection: 'templates' });
