@@ -28,6 +28,12 @@ The system incorporates a modular backend structure, allowing for independent de
 - **Meta Business Suite**: For syncing and approving message templates.
 
 ## Recent Changes (December 4, 2025)
+- **Template Sync with Meta/Facebook**: Template management now uses per-user credentials from database.
+  - **Meta Graph API Integration**: `/api/templates/sync-meta` endpoint fetches templates from Meta using user's businessAccountId (WABA ID) and whatsappToken.
+  - **Template Schema Extended**: Added language, metaTemplateId, metaStatus, rejectionReason, lastSyncedAt fields to templates.
+  - **TemplateStatus Page**: Now fetches real data from API instead of static mock data. Shows approval/pending/rejected counts from actual Meta status.
+  - **ManageTemplates Page**: Added language column, displays metaStatus instead of local status, Submit button only shows for un-submitted templates.
+  - **Duplicate Submission Prevention**: Backend guards prevent re-submitting already approved/rejected/submitted templates to Meta.
 - **Contact Blocking System**: Full contact blocking functionality with multi-tenant isolation.
   - **Blocked Contacts Schema**: MongoDB `blocked_contacts` collection with userId, phone, name, reason, blockedAt, isActive fields. Unique index on (userId, phone) for tenant isolation.
   - **Block/Delete UI**: Inbox dropdown menu with "Block Contact" and "Delete Contact" options. Confirmation dialogs prevent accidental actions.
