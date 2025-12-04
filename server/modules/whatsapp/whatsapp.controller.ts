@@ -80,7 +80,11 @@ export async function handleWebhook(req: Request, res: Response) {
     const messageType = message.type;
     
     // Check if contact is blocked - works with or without resolved userId
-    const { isContactBlocked, isPhoneBlocked } = await import('../contacts/contacts.routes');
+    const { isContactBlocked, isPhoneBlocked, listAllBlockedContacts } = await import('../contacts/contacts.routes');
+    
+    // Debug: list all blocked contacts
+    await listAllBlockedContacts();
+    
     if (resolvedUserId) {
       const isBlocked = await isContactBlocked(resolvedUserId, from);
       if (isBlocked) {

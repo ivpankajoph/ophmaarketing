@@ -161,24 +161,35 @@ router.patch('/chats/contact/:contactId/read', requireAuth, async (req: Request,
 
 export async function isContactBlocked(userId: string, phone: string): Promise<boolean> {
   const normalizedPhone = phone.replace(/\D/g, '');
+  console.log(`[BlockCheck] Checking if ${normalizedPhone} is blocked for user ${userId}`);
   const blocked = await BlockedContact.findOne({ 
     userId, 
     phone: normalizedPhone, 
     isActive: true 
   });
+  console.log(`[BlockCheck] Result for ${normalizedPhone}: ${blocked ? 'BLOCKED' : 'not blocked'}`);
   return !!blocked;
 }
 
 export async function isPhoneBlocked(phone: string): Promise<{ blocked: boolean; userId?: string }> {
   const normalizedPhone = phone.replace(/\D/g, '');
+  console.log(`[BlockCheck] Checking if ${normalizedPhone} is blocked by any user`);
   const blocked = await BlockedContact.findOne({ 
     phone: normalizedPhone, 
     isActive: true 
   });
   if (blocked) {
+    console.log(`[BlockCheck] Found: ${normalizedPhone} is blocked by user ${blocked.userId}`);
     return { blocked: true, userId: blocked.userId };
   }
+  console.log(`[BlockCheck] ${normalizedPhone} is not blocked by anyone`);
   return { blocked: false };
+}
+
+export async function listAllBlockedContacts(): Promise<any[]> {
+  const all = await BlockedContact.find({ isActive: true }).lean();
+  console.log(`[BlockCheck] All blocked contacts:`, JSON.stringify(all, null, 2));
+  return all;
 }
 
 export default router;
