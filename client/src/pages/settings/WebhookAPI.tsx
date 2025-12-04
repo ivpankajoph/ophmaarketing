@@ -10,6 +10,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle2, Copy, RefreshCw, Activity, Link as LinkIcon, Loader2, Eye, EyeOff, X, Shield, Key, Bot } from "lucide-react";
 import { toast } from "sonner";
+import { fetchWithAuth } from "@/lib/fetchWithAuth";
 
 interface CredentialsStatus {
   hasWhatsApp: boolean;
@@ -46,7 +47,7 @@ export default function WebhookAPI() {
   const { data: credentialsData, isLoading } = useQuery<CredentialsResponse>({
     queryKey: ["/api/credentials"],
     queryFn: async () => {
-      const res = await fetch("/api/credentials");
+      const res = await fetchWithAuth("/api/credentials");
       if (!res.ok) throw new Error("Failed to fetch credentials");
       return res.json();
     },
@@ -54,7 +55,7 @@ export default function WebhookAPI() {
 
   const saveMutation = useMutation({
     mutationFn: async (credentials: Record<string, string>) => {
-      const res = await fetch("/api/credentials", {
+      const res = await fetchWithAuth("/api/credentials", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(credentials),
@@ -82,7 +83,7 @@ export default function WebhookAPI() {
 
   const testWhatsAppMutation = useMutation({
     mutationFn: async () => {
-      const res = await fetch("/api/credentials/test/whatsapp", {
+      const res = await fetchWithAuth("/api/credentials/test/whatsapp", {
         method: "POST",
       });
       const data = await res.json();
@@ -100,7 +101,7 @@ export default function WebhookAPI() {
 
   const testOpenAIMutation = useMutation({
     mutationFn: async () => {
-      const res = await fetch("/api/credentials/test/openai", {
+      const res = await fetchWithAuth("/api/credentials/test/openai", {
         method: "POST",
       });
       const data = await res.json();
@@ -117,7 +118,7 @@ export default function WebhookAPI() {
 
   const testFacebookMutation = useMutation({
     mutationFn: async () => {
-      const res = await fetch("/api/credentials/test/facebook", {
+      const res = await fetchWithAuth("/api/credentials/test/facebook", {
         method: "POST",
       });
       const data = await res.json();
