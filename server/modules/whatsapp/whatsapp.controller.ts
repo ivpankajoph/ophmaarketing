@@ -482,8 +482,22 @@ export async function sendMessage(req: Request, res: Response) {
       return res.status(400).json({ error: 'Recipient and message are required' });
     }
 
-    const result = await sendWhatsAppMessage(to, message);
-    res.json({ success: true, result });
+    const userId = (req.session as any)?.userId;
+    
+    const credentials = await whatsappService.getWhatsAppCredentialsStrict(userId);
+    if (!credentials) {
+      return res.status(403).json({ 
+        error: 'WhatsApp credentials not configured. Please set up your API keys in Settings > API Credentials.' 
+      });
+    }
+    
+    const result = await whatsappService.sendTextMessage(to, message, userId);
+    
+    if (!result.success) {
+      return res.status(400).json({ error: result.error || 'Failed to send message' });
+    }
+    
+    res.json({ success: true, messageId: result.messageId });
   } catch (error: any) {
     console.error('Error sending message:', error);
     res.status(500).json({ error: error.message || 'Failed to send message' });
@@ -498,14 +512,19 @@ export async function getMediaUrl(req: Request, res: Response) {
       return res.status(400).json({ error: 'Media ID is required' });
     }
     
-    if (!WHATSAPP_TOKEN) {
-      return res.status(500).json({ error: 'WhatsApp credentials not configured' });
+    const userId = (req.session as any)?.userId;
+    const credentials = await whatsappService.getWhatsAppCredentialsStrict(userId);
+    
+    if (!credentials) {
+      return res.status(403).json({ 
+        error: 'WhatsApp credentials not configured. Please set up your API keys in Settings > API Credentials.' 
+      });
     }
 
     const mediaInfoUrl = `https://graph.facebook.com/v18.0/${mediaId}`;
     const mediaInfoResponse = await fetch(mediaInfoUrl, {
       headers: {
-        'Authorization': `Bearer ${WHATSAPP_TOKEN}`,
+        'Authorization': `Bearer ${credentials.token}`,
       },
     });
 
@@ -523,7 +542,7 @@ export async function getMediaUrl(req: Request, res: Response) {
 
     const mediaResponse = await fetch(downloadUrl, {
       headers: {
-        'Authorization': `Bearer ${WHATSAPP_TOKEN}`,
+        'Authorization': `Bearer ${credentials.token}`,
       },
     });
 
@@ -645,24 +664,27 @@ export async function sendTemplateMessageEndpoint(req: Request, res: Response) {
       return res.status(400).json({ error: 'Recipient (to) and templateName are required' });
     }
 
-    const languageCodesToTry = languageCode ? [languageCode] : ['en', 'en_US', 'en_GB'];
-    let result = null;
-    let lastError = null;
-
-    for (const langCode of languageCodesToTry) {
-      try {
-        console.log(`[WhatsApp] Trying template "${templateName}" with language code: ${langCode}`);
-        result = await sendTemplateMessage(to, templateName, langCode, components || [], namedParams);
-        console.log(`[WhatsApp] Success with language code: ${langCode}`);
-        break;
-      } catch (err: any) {
-        lastError = err;
-        console.log(`[WhatsApp] Failed with language code ${langCode}: ${err.message}`);
-      }
+    const userId = (req.session as any)?.userId;
+    
+    const credentials = await whatsappService.getWhatsAppCredentialsStrict(userId);
+    if (!credentials) {
+      return res.status(403).json({ 
+        error: 'WhatsApp credentials not configured. Please set up your API keys in Settings > API Credentials.' 
+      });
     }
+    
+    const resolvedLangCode = languageCode || 'en';
+    
+    const sendResult = await whatsappService.sendTemplateMessage(
+      to, 
+      templateName, 
+      resolvedLangCode, 
+      components || [], 
+      userId
+    );
 
-    if (!result) {
-      throw lastError || new Error('Failed to send template with all language codes');
+    if (!sendResult.success) {
+      throw new Error(sendResult.error || 'Failed to send template');
     }
     
     try {
@@ -695,7 +717,7 @@ export async function sendTemplateMessageEndpoint(req: Request, res: Response) {
       console.error('Error saving outbound message:', err);
     }
 
-    res.json({ success: true, result });
+    res.json({ success: true, messageId: sendResult.messageId });
   } catch (error: any) {
     console.error('Error sending template:', error);
     res.status(500).json({ error: error.message || 'Failed to send template' });
