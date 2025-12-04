@@ -79,6 +79,15 @@ export async function handleWebhook(req: Request, res: Response) {
     const from = message.from;
     const messageType = message.type;
     
+    if (resolvedUserId) {
+      const { isContactBlocked } = await import('../contacts/contacts.routes');
+      const isBlocked = await isContactBlocked(resolvedUserId, from);
+      if (isBlocked) {
+        console.log(`[Webhook] Message from blocked contact ${from} for user ${resolvedUserId}, ignoring`);
+        return res.sendStatus(200);
+      }
+    }
+    
     // Extract message content based on type
     let messageText = '';
     let buttonPayload = '';

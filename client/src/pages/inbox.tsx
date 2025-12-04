@@ -29,8 +29,11 @@ import {
   Reply,
   X,
   MailOpen,
-  CheckSquare
+  CheckSquare,
+  Ban,
+  Trash2
 } from "lucide-react";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 
@@ -106,6 +109,9 @@ export default function Inbox() {
   const [selectedAgent, setSelectedAgent] = useState("");
   const [customMessage, setCustomMessage] = useState("");
   const [replyingTo, setReplyingTo] = useState<Message | null>(null);
+  const [blockDialogOpen, setBlockDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [blockReason, setBlockReason] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const queryClient = useQueryClient();
 
@@ -351,6 +357,47 @@ export default function Inbox() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/chats"] });
       toast.success("Marked as unread");
+    },
+  });
+
+  const blockContactMutation = useMutation({
+    mutationFn: async ({ phone, name, reason }: { phone: string; name: string; reason: string }) => {
+      const res = await fetch("/api/contacts/block", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone, name, reason }),
+      });
+      if (!res.ok) throw new Error("Failed to block contact");
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/chats"] });
+      setBlockDialogOpen(false);
+      setBlockReason("");
+      setSelectedChatId(null);
+      toast.success("Contact blocked successfully");
+    },
+    onError: () => {
+      toast.error("Failed to block contact");
+    },
+  });
+
+  const deleteContactMutation = useMutation({
+    mutationFn: async (contactId: string) => {
+      const res = await fetch(`/api/contacts/${contactId}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) throw new Error("Failed to delete contact");
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/chats"] });
+      setDeleteDialogOpen(false);
+      setSelectedChatId(null);
+      toast.success("Contact deleted successfully");
+    },
+    onError: () => {
+      toast.error("Failed to delete contact");
     },
   });
 
@@ -779,6 +826,14 @@ export default function Inbox() {
                         <MailOpen className="mr-2 h-4 w-4" />
                         Mark as Unread
                       </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => setBlockDialogOpen(true)} className="text-orange-600">
+                        <Ban className="mr-2 h-4 w-4" />
+                        Block Contact
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => setDeleteDialogOpen(true)} className="text-red-600">
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        Delete Contact
+                      </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
@@ -1001,6 +1056,70 @@ export default function Inbox() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={blockDialogOpen} onOpenChange={setBlockDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Block Contact</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to block {selectedChat ? getContactName(selectedChat.contact) : "this contact"}? 
+              You will no longer receive messages from them.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="py-4">
+            <Label htmlFor="blockReason">Reason (optional)</Label>
+            <Textarea 
+              id="blockReason"
+              placeholder="Enter reason for blocking..."
+              value={blockReason}
+              onChange={(e) => setBlockReason(e.target.value)}
+              className="mt-2"
+            />
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              className="bg-orange-600 hover:bg-orange-700"
+              onClick={() => {
+                if (selectedChat) {
+                  blockContactMutation.mutate({
+                    phone: selectedChat.contact.phone,
+                    name: getContactName(selectedChat.contact),
+                    reason: blockReason,
+                  });
+                }
+              }}
+            >
+              Block Contact
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Contact</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete {selectedChat ? getContactName(selectedChat.contact) : "this contact"}? 
+              This will permanently remove all chat history with this contact.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              className="bg-red-600 hover:bg-red-700"
+              onClick={() => {
+                if (selectedChat) {
+                  deleteContactMutation.mutate(selectedChat.contactId);
+                }
+              }}
+            >
+              Delete Contact
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </DashboardLayout>
   );
 }

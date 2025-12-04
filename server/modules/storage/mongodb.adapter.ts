@@ -320,6 +320,18 @@ const ScheduledBroadcastSchema = new Schema({
   failedCount: { type: Number, default: 0 },
 }, { collection: 'scheduled_broadcasts' });
 
+const BlockedContactSchema = new Schema({
+  id: { type: String, required: true, unique: true },
+  userId: { type: String, required: true, index: true },
+  phone: { type: String, required: true, index: true },
+  name: { type: String, default: '' },
+  reason: { type: String, default: '' },
+  blockedAt: { type: String, required: true },
+  isActive: { type: Boolean, default: true },
+}, { collection: 'blocked_contacts' });
+
+BlockedContactSchema.index({ userId: 1, phone: 1 }, { unique: true });
+
 const UserCredentialsSchema = new Schema({
   id: { type: String, required: true, unique: true },
   userId: { type: String, required: true, unique: true, index: true },
@@ -360,6 +372,7 @@ export const WhatsappSettings = mongoose.models.WhatsappSettings || mongoose.mod
 export const Billing = mongoose.models.Billing || mongoose.model('Billing', BillingSchema);
 export const PrefilledTextMapping = mongoose.models.PrefilledTextMapping || mongoose.model('PrefilledTextMapping', PrefilledTextMappingSchema);
 export const ScheduledBroadcast = mongoose.models.ScheduledBroadcast || mongoose.model('ScheduledBroadcast', ScheduledBroadcastSchema);
+export const BlockedContact = mongoose.models.BlockedContact || mongoose.model('BlockedContact', BlockedContactSchema);
 export const UserCredentials = mongoose.models.UserCredentials || mongoose.model('UserCredentials', UserCredentialsSchema);
 
 const modelMap: Record<string, Model<any>> = {
@@ -385,6 +398,7 @@ const modelMap: Record<string, Model<any>> = {
   billing: Billing,
   prefilled_text_mappings: PrefilledTextMapping,
   scheduled_broadcasts: ScheduledBroadcast,
+  blocked_contacts: BlockedContact,
   user_credentials: UserCredentials,
 };
 
