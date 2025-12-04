@@ -18,7 +18,35 @@ interface AuthContextType {
   checkAuth: () => Promise<void>;
 }
 
+const AUTH_STORAGE_KEY = "whatsapp_auth_user";
+
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+function getStoredUser(): User | null {
+  try {
+    const stored = localStorage.getItem(AUTH_STORAGE_KEY);
+    return stored ? JSON.parse(stored) : null;
+  } catch {
+    return null;
+  }
+}
+
+function setStoredUser(user: User | null) {
+  if (user) {
+    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(user));
+  } else {
+    localStorage.removeItem(AUTH_STORAGE_KEY);
+  }
+}
+
+export function getAuthHeaders(): Record<string, string> {
+  const user = getStoredUser();
+  if (!user) return {};
+  return {
+    "x-user-id": user.id,
+    "x-user": JSON.stringify(user),
+  };
+}
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -27,14 +55,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const checkAuth = async () => {
     try {
-      const res = await fetch("/api/auth/check");
+      const storedUser = getStoredUser();
+      if (!storedUser) {
+        setIsAuthenticated(false);
+        setUser(null);
+        setIsLoading(false);
+        return;
+      }
+
+      const res = await fetch("/api/auth/check", {
+        headers: getAuthHeaders(),
+      });
       const data = await res.json();
+      
       if (data.authenticated && data.user) {
         setIsAuthenticated(true);
         setUser(data.user);
+        setStoredUser(data.user);
       } else {
         setIsAuthenticated(false);
         setUser(null);
+        setStoredUser(null);
       }
     } catch (error) {
       console.error("Auth check failed:", error);
@@ -62,6 +103,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (res.ok && data.success) {
         setIsAuthenticated(true);
         setUser(data.user);
+        setStoredUser(data.user);
         return true;
       }
       
@@ -90,6 +132,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (res.ok && data.success) {
         setIsAuthenticated(true);
         setUser(data.user);
+        setStoredUser(data.user);
         return { success: true };
       }
       
@@ -102,12 +145,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = async () => {
     try {
-      await fetch("/api/auth/logout", { method: "POST" });
+      await fetch("/api/auth/logout", { 
+        method: "POST",
+        headers: getAuthHeaders(),
+      });
     } catch (error) {
       console.error("Logout error:", error);
     } finally {
       setIsAuthenticated(false);
       setUser(null);
+      setStoredUser(null);
     }
   };
 

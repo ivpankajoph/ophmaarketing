@@ -89,11 +89,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       href: "/inbox/window",
       badge: windowUnreadCount > 0 ? windowUnreadCount : undefined,
     },
-    {
-      icon: UserPlus,
-      label: "WhatsApp Leads",
-      href: "/inbox/leads",
-    },
+
     {
       icon: MessageSquare,
       label: "Inbox",
@@ -172,7 +168,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         { label: "Agent Perf.", href: "/reports/agents" },
         { label: "Spending", href: "/reports/spending" },
         { label: "Credits", href: "/reports/credits" },
-        { label: "Blocked Contacts", href: "/reports/blocked" },
       ]
     },
     {
