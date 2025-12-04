@@ -621,7 +621,7 @@ export default function Inbox() {
 
   return (
     <DashboardLayout>
-      <div className="h-full flex flex-col gap-4 animate-in fade-in duration-500">
+      <div className="h-full p-1 flex flex-col gap-4 animate-in fade-in duration-500">
         <div className="flex items-center justify-between flex-shrink-0">
           <div>
             <h2 className="text-2xl font-bold tracking-tight">Inbox</h2>
@@ -654,7 +654,7 @@ export default function Inbox() {
           )}
         </div>
 
-      <div className="flex-1 min-h-0 flex bg-card border border-border rounded-lg overflow-hidden shadow-sm">
+      <div className="flex-1 min-h-screen p-2 flex bg-card border border-border rounded-lg overflow-hidden shadow-sm">
         <div className="w-80 border-r border-border flex flex-col bg-background min-h-0">
           <div className="p-4 border-b border-border">
             <div className="relative">

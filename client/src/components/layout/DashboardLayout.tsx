@@ -265,7 +265,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   };
 
   const NavContent = () => (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-screen">
       <div className="p-6 flex items-center gap-3">
         <div className="h-10 w-10 rounded-lg bg-primary flex items-center justify-center">
           <MessageSquare className="h-6 w-6 text-primary-foreground" />
