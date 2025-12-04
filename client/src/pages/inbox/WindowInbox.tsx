@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import DashboardLayout from "@/components/layout/DashboardLayout";
+import { fetchWithAuth } from "@/lib/fetchWithAuth";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -531,7 +532,7 @@ export default function WindowInbox() {
       replyToContent?: string;
     }) => {
       // Send via WhatsApp API
-      const waRes = await fetch("/api/webhook/whatsapp/send", {
+      const waRes = await fetchWithAuth("/api/webhook/whatsapp/send", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -546,7 +547,7 @@ export default function WindowInbox() {
       }
 
       // Also save to local storage for inbox display
-      const res = await fetch("/api/messages", {
+      const res = await fetchWithAuth("/api/messages", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -600,7 +601,7 @@ export default function WindowInbox() {
         const templateObj = templates.find((t) => t.id === selectedTemplate);
 
         try {
-          const res = await fetch("/api/inbox/send", {
+          const res = await fetchWithAuth("/api/inbox/send", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -659,7 +660,7 @@ export default function WindowInbox() {
   // Mark messages as read when selecting a chat
   const markAsReadMutation = useMutation({
     mutationFn: async (contactId: string) => {
-      const res = await fetch(`/api/chats/${contactId}/mark-read`, {
+      const res = await fetchWithAuth(`/api/chats/${contactId}/mark-read`, {
         method: "POST",
       });
       if (!res.ok) throw new Error("Failed to mark as read");
@@ -673,7 +674,7 @@ export default function WindowInbox() {
 
   const markAsUnreadMutation = useMutation({
     mutationFn: async (contactId: string) => {
-      const res = await fetch(`/api/chats/${contactId}/mark-unread`, {
+      const res = await fetchWithAuth(`/api/chats/${contactId}/mark-unread`, {
         method: "POST",
       });
       if (!res.ok) throw new Error("Failed to mark as unread");
@@ -691,7 +692,7 @@ export default function WindowInbox() {
 
   const blockContactMutation = useMutation({
     mutationFn: async ({ phone, name }: { phone: string; name: string }) => {
-      const res = await fetch("/api/contacts/block", {
+      const res = await fetchWithAuth("/api/contacts/block", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ phone, name, reason: "Blocked from 24-hour window" }),

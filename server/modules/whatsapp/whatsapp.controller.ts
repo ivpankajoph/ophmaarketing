@@ -11,6 +11,7 @@ import * as prefilledTextService from '../prefilledText/prefilledText.service';
 import { credentialsService } from '../credentials/credentials.service';
 import * as whatsappService from './whatsapp.service';
 import { isContactBlocked, isPhoneBlocked, listAllBlockedContacts } from '../contacts/contacts.routes';
+import { getUserId } from '../auth/auth.routes';
 
 const WHATSAPP_TOKEN = process.env.WHATSAPP_TOKEN_NEW || process.env.WHATSAPP_TOKEN;
 const PHONE_NUMBER_ID = process.env.PHONE_NUMBER_ID;
@@ -509,7 +510,7 @@ export async function sendMessage(req: Request, res: Response) {
       return res.status(400).json({ error: 'Recipient and message are required' });
     }
 
-    const userId = (req.session as any)?.userId;
+    const userId = getUserId(req);
     
     const credentials = await whatsappService.getWhatsAppCredentialsStrict(userId);
     if (!credentials) {
@@ -539,7 +540,7 @@ export async function getMediaUrl(req: Request, res: Response) {
       return res.status(400).json({ error: 'Media ID is required' });
     }
     
-    const userId = (req.session as any)?.userId;
+    const userId = getUserId(req);
     const credentials = await whatsappService.getWhatsAppCredentialsStrict(userId);
     
     if (!credentials) {
@@ -691,7 +692,7 @@ export async function sendTemplateMessageEndpoint(req: Request, res: Response) {
       return res.status(400).json({ error: 'Recipient (to) and templateName are required' });
     }
 
-    const userId = (req.session as any)?.userId;
+    const userId = getUserId(req);
     
     const credentials = await whatsappService.getWhatsAppCredentialsStrict(userId);
     if (!credentials) {

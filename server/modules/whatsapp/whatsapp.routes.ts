@@ -1,19 +1,12 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import * as controller from './whatsapp.controller';
+import { requireAuth } from '../auth/auth.routes';
 
 const router = Router();
 
-const requireAuth = (req: Request, res: Response, next: NextFunction) => {
-  const userId = (req.session as any)?.userId;
-  if (!userId) {
-    return res.status(401).json({ error: 'Authentication required' });
-  }
-  next();
-};
-
 router.get('/', controller.verifyWebhook);
 router.post('/', controller.handleWebhook);
-router.post('/send', controller.sendMessage);
+router.post('/send', requireAuth, controller.sendMessage);
 router.post('/send-template', requireAuth, controller.sendTemplateMessageEndpoint);
 router.get('/conversations', controller.getConversations);
 router.get('/conversations/:phone', controller.getConversation);
