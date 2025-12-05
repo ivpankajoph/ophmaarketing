@@ -1,6 +1,7 @@
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import DashboardLayout from "@/components/layout/DashboardLayout";
+import { getAuthHeaders } from "@/contexts/AuthContext";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -96,6 +97,37 @@ interface ImportedContact {
 
 function normalizePhone(phone: string): string {
   return phone.replace(/\D/g, '');
+}
+
+async function downloadMediaWithAuth(mediaUrl: string, filename: string, openInNewTab: boolean = false) {
+  try {
+    const response = await fetch(`/api/webhook/whatsapp/media/${mediaUrl}`, {
+      headers: getAuthHeaders()
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to download media');
+    }
+    
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    
+    if (openInNewTab) {
+      window.open(url, '_blank');
+    } else {
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+    
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  } catch (error) {
+    console.error('Media download error:', error);
+    toast.error('Failed to download file. Please try again.');
+  }
 }
 
 export default function Inbox() {
@@ -576,7 +608,7 @@ export default function Inbox() {
               src={`/api/webhook/whatsapp/media/${mediaUrl}`} 
               alt="Shared image" 
               className="max-w-[280px] max-h-[300px] rounded-lg object-cover cursor-pointer hover:opacity-90 transition-opacity"
-              onClick={() => window.open(`/api/webhook/whatsapp/media/${mediaUrl}`, '_blank')}
+              onClick={() => downloadMediaWithAuth(mediaUrl, 'image.jpg', true)}
               onError={(e) => {
                 (e.target as HTMLImageElement).style.display = 'none';
                 (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
@@ -648,15 +680,22 @@ export default function Inbox() {
       if (mediaUrl) {
         const filename = content.match(/\[Document: ([^\]]+)\]/)?.[1] || 'document';
         return (
-          <a 
-            href={`/api/webhook/whatsapp/media/${mediaUrl}`} 
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 p-2 bg-muted rounded-lg hover:bg-muted/80 transition-colors"
-          >
-            <span className="text-lg">📄</span>
-            <span className="text-sm underline">{filename}</span>
-          </a>
+          <div className="flex items-center gap-2">
+            <button 
+              onClick={() => downloadMediaWithAuth(mediaUrl, filename, true)}
+              className="flex items-center gap-2 p-2 bg-muted rounded-lg hover:bg-muted/80 transition-colors cursor-pointer"
+            >
+              <span className="text-lg">📄</span>
+              <span className="text-sm underline">{filename}</span>
+            </button>
+            <button
+              onClick={() => downloadMediaWithAuth(mediaUrl, filename, false)}
+              className="p-2 bg-muted rounded-lg hover:bg-muted/80 transition-colors"
+              title="Download"
+            >
+              <Download className="h-4 w-4" />
+            </button>
+          </div>
         );
       }
       return <span className="flex items-center gap-1 text-muted-foreground italic">📄 {content}</span>;
