@@ -161,7 +161,11 @@ export default function UserManagement() {
       setIsCreateOpen(false);
       setIsCredentialsOpen(true);
       resetForm();
-      toast.success("User created successfully");
+      if (data.emailSent) {
+        toast.success("User created successfully. Credentials have been emailed.");
+      } else {
+        toast.success("User created successfully. Email could not be sent - share credentials manually.");
+      }
     },
     onError: (error: Error) => {
       toast.error(error.message);
@@ -225,7 +229,11 @@ export default function UserManagement() {
     onSuccess: (data) => {
       setNewCredentials(data);
       setIsCredentialsOpen(true);
-      toast.success("Password reset successfully");
+      if (data.emailSent) {
+        toast.success("Password reset successfully. New credentials have been emailed.");
+      } else {
+        toast.success("Password reset successfully. Email could not be sent - share credentials manually.");
+      }
     },
     onError: () => {
       toast.error("Failed to reset password");

@@ -9,6 +9,7 @@ import {
 } from './user.model';
 import { hashPassword } from '../auth/auth.service';
 import { requireAuth, getUser } from '../auth/auth.routes';
+import { sendCredentialsEmail, sendPasswordResetEmail } from '../email/email.service';
 
 function generateId(): string {
   return crypto.randomUUID();
@@ -104,6 +105,8 @@ router.post('/', requireAuth, requireAdmin, async (req: Request, res: Response) 
 
     await user.save();
 
+    const emailSent = await sendCredentialsEmail(email, name, username, plainPassword);
+
     res.status(201).json({
       user: {
         id: user.id,
@@ -117,7 +120,8 @@ router.post('/', requireAuth, requireAdmin, async (req: Request, res: Response) 
       credentials: {
         username,
         password: plainPassword
-      }
+      },
+      emailSent
     });
   } catch (error) {
     console.error('Error creating user:', error);
@@ -175,9 +179,12 @@ router.post('/:id/reset-password', requireAuth, requireAdmin, async (req: Reques
     user.password = hashPassword(plainPassword);
     await user.save();
 
+    const emailSent = await sendPasswordResetEmail(user.email, user.name, user.username, plainPassword);
+
     res.json({
       username: user.username,
-      password: plainPassword
+      password: plainPassword,
+      emailSent
     });
   } catch (error) {
     console.error('Error resetting password:', error);
