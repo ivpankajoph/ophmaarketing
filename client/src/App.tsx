@@ -61,6 +61,7 @@ import Credits from "@/pages/reports/Credits";
 import UserEngagement from "@/pages/reports/UserEngagement";
 import BroadcastReports from "@/pages/reports/BroadcastReports";
 import BlockedContacts from "@/pages/reports/BlockedContacts";
+import UserManagement from "@/pages/UserManagement";
 
 function ProtectedRoute({ component: Component }: { component: React.ComponentType }) {
   const { isAuthenticated } = useAuth();
@@ -141,6 +142,9 @@ function Router() {
       <Route path="/settings/profile">{() => <ProtectedRoute component={ProfileDetails} />}</Route>
       <Route path="/settings/api">{() => <ProtectedRoute component={WebhookAPI} />}</Route>
       <Route path="/settings/billing">{() => <ProtectedRoute component={Billing} />}</Route>
+      
+      {/* User Management */}
+      <Route path="/user-management">{() => <ProtectedRoute component={UserManagement} />}</Route>
       
       <Route component={NotFound} />
     </Switch>

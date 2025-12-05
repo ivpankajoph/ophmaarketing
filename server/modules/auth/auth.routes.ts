@@ -48,6 +48,7 @@ router.post('/login', async (req: Request, res: Response) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        pageAccess: user.pageAccess,
       }
     });
   } catch (error) {
@@ -112,6 +113,7 @@ router.get('/me', async (req: Request, res: Response) => {
       name: user.name,
       email: user.email,
       role: user.role,
+      pageAccess: user.pageAccess,
     }
   });
 });
@@ -131,6 +133,7 @@ router.get('/check', async (req: Request, res: Response) => {
       name: user.name,
       email: user.email,
       role: user.role,
+      pageAccess: user.pageAccess,
     } : null
   });
 });

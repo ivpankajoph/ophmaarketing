@@ -1,5 +1,6 @@
 import crypto from 'crypto';
 import { User, UserCredentials } from '../storage/mongodb.adapter';
+import { SystemUser } from '../users/user.model';
 
 export interface AuthUser {
   id: string;
@@ -7,6 +8,7 @@ export interface AuthUser {
   name: string;
   email?: string;
   role: string;
+  pageAccess?: string[];
 }
 
 export function hashPassword(password: string): string {
@@ -35,7 +37,21 @@ export async function findUserByUsername(username: string): Promise<any | null> 
 export async function findUserById(id: string): Promise<any | null> {
   try {
     const user = await User.findOne({ id });
-    return user;
+    if (user) return user;
+    
+    const systemUser = await SystemUser.findOne({ id, isActive: true });
+    if (systemUser) {
+      return {
+        id: systemUser.id,
+        username: systemUser.username,
+        name: systemUser.name,
+        email: systemUser.email,
+        role: systemUser.role,
+        pageAccess: systemUser.pageAccess,
+      };
+    }
+    
+    return null;
   } catch (error) {
     console.error('[Auth] Error finding user by id:', error);
     return null;
@@ -78,21 +94,38 @@ export async function createUser(username: string, password: string, name: strin
 export async function validateLogin(username: string, password: string): Promise<AuthUser | null> {
   try {
     const user = await findUserByUsername(username);
-    if (!user) {
-      return null;
+    if (user) {
+      if (!verifyPassword(password, user.password)) {
+        return null;
+      }
+      return {
+        id: user.id,
+        username: user.username,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      };
     }
 
-    if (!verifyPassword(password, user.password)) {
-      return null;
+    const systemUser = await SystemUser.findOne({ 
+      $or: [{ username }, { email: username }],
+      isActive: true 
+    });
+    if (systemUser) {
+      if (!verifyPassword(password, systemUser.password)) {
+        return null;
+      }
+      return {
+        id: systemUser.id,
+        username: systemUser.username,
+        name: systemUser.name,
+        email: systemUser.email,
+        role: systemUser.role,
+        pageAccess: systemUser.pageAccess,
+      };
     }
 
-    return {
-      id: user.id,
-      username: user.username,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-    };
+    return null;
   } catch (error) {
     console.error('[Auth] Error validating login:', error);
     return null;

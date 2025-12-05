@@ -21,6 +21,7 @@ The system incorporates a modular backend structure, allowing for independent de
     - Multi-tenant SaaS architecture with secure credential isolation per user, including AES-256-GCM encryption for API keys.
     - Contact blocking system with webhook filtering.
     - Automated AI agent assignment based on pre-filled text mappings and conversation history persistence.
+    - **User Management with RBAC**: Role-based access control system with four roles (Super Admin, Sub Admin, Manager, User). Admins can create users with auto-generated credentials, assign roles, and control page-level access. System users authenticate through the same login with PBKDF2 password hashing. Protected API endpoints use requireAuth and requireAdmin middleware.
 - **System Design**: The system is designed to connect to the official WhatsApp Business API, supporting webhooks for incoming messages and API calls for sending messages. An auto-reply system orchestrates the process of syncing leads, creating AI agents, mapping agents to forms, and sending personalized WhatsApp messages to leads.
 
 ## External Dependencies

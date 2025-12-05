@@ -21,7 +21,8 @@ import {
   ChevronRight,
   Facebook,
   Clock,
-  UserPlus
+  UserPlus,
+  UserCog
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -82,11 +83,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       icon: LayoutDashboard,
       label: "Dashboard",
       href: "/",
+      pageId: "dashboard",
     },
     {
       icon: Clock,
       label: "24-Hour Window",
       href: "/inbox/window",
+      pageId: "window-inbox",
       badge: windowUnreadCount > 0 ? windowUnreadCount : undefined,
     },
 
@@ -94,11 +97,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       icon: MessageSquare,
       label: "Inbox",
       href: "/inbox",
+      pageId: "inbox",
     },
     {
       icon: Megaphone,
       label: "Campaigns",
-      href: "/campaigns", // Kept for active state checking
+      href: "/campaigns",
+      pageId: "broadcast",
       subItems: [
         { label: "Broadcasts", href: "/campaigns/broadcast" },
         { label: "Selected Contacts", href: "/campaigns/selected-contacts" },
@@ -111,6 +116,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       icon: GitBranch,
       label: "Automation",
       href: "/automation",
+      pageId: "auto-reply",
       subItems: [
         { label: "Builder", href: "/automation" },
         { label: "Auto Leads", href: "/automation/leads" },
@@ -124,11 +130,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       icon: LayoutGrid,
       label: "Connect Apps",
       href: "/apps/connect",
+      pageId: "flow-builder",
     },
     {
       icon: FileText,
       label: "Templates",
       href: "/templates",
+      pageId: "templates",
       subItems: [
         { label: "Add Template", href: "/templates/add" },
         { label: "Template Status", href: "/templates/status" },
@@ -139,6 +147,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       icon: Bot,
       label: "AI Agent",
       href: "/ai",
+      pageId: "ai-agents",
       subItems: [
         { label: "All Agents", href: "/ai/agents" },
         { label: "New Agent", href: "/ai/new" },
@@ -151,6 +160,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       icon: Facebook,
       label: "Facebook",
       href: "/facebook",
+      pageId: "facebook-leads",
       subItems: [
         { label: "Lead Forms", href: "/facebook/forms" },
         { label: "Leads", href: "/facebook/leads" },
@@ -160,6 +170,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       icon: BarChart3,
       label: "Reports",
       href: "/reports",
+      pageId: "reports-campaign",
       subItems: [
         { label: "Delivery Report", href: "/reports/delivery" },
         { label: "Broadcast Report", href: "/reports/broadcast" },
@@ -176,11 +187,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       icon: Users,
       label: "Contacts",
       href: "/contacts",
+      pageId: "contacts",
     },
     {
       icon: Settings,
       label: "Settings",
       href: "/settings",
+      pageId: "settings",
       subItems: [
         { label: "Team Members", href: "/settings/team" },
         { label: "Permissions", href: "/settings/permissions" },
@@ -190,7 +203,24 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         { label: "Billing & Credits", href: "/settings/billing" },
       ]
     },
+    {
+      icon: UserCog,
+      label: "User Management",
+      href: "/user-management",
+      pageId: "user-management",
+      adminOnly: true,
+    },
   ];
+
+  const isAdmin = user?.role === 'super_admin' || user?.role === 'sub_admin';
+  const userPageAccess = user?.pageAccess || [];
+  
+  const filteredNavStructure = navStructure.filter(item => {
+    if (item.adminOnly && !isAdmin) return false;
+    if (!item.pageId) return true;
+    if (isAdmin) return true;
+    return userPageAccess.includes(item.pageId);
+  });
 
   const NavItem = ({ item }: { item: any }) => {
     const isActive = location === item.href || (item.subItems && item.subItems.some((sub: any) => location === sub.href));
@@ -275,7 +305,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </div>
 
       <div className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-        {navStructure.map((item, idx) => (
+        {filteredNavStructure.map((item, idx) => (
           <NavItem key={idx} item={item} />
         ))}
       </div>

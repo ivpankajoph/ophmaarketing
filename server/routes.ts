@@ -22,6 +22,7 @@ import authRoutes from "./modules/auth/auth.routes";
 import credentialsRoutes from "./modules/credentials/credentials.routes";
 import contactsRoutes from "./modules/contacts/contacts.routes";
 import reportsRoutes from "./modules/reports/reports.routes";
+import usersRoutes from "./modules/users/users.routes";
 import * as broadcastService from "./modules/broadcast/broadcast.service";
 import * as agentService from "./modules/aiAgents/agent.service";
 import * as openaiService from "./modules/openai/openai.service";
@@ -1405,6 +1406,7 @@ export async function registerRoutes(
   app.use("/api/ai-analytics", aiAnalyticsRoutes);
   app.use("/api/prefilled-text", prefilledTextRoutes);
   app.use("/api/reports", reportsRoutes);
+  app.use("/api/users", usersRoutes);
 
   app.get("/api/chats/whatsapp-leads", async (req, res) => {
     try {
