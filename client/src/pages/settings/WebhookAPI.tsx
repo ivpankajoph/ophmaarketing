@@ -15,6 +15,7 @@ import { fetchWithAuth } from "@/lib/fetchWithAuth";
 interface CredentialsStatus {
   hasWhatsApp: boolean;
   hasOpenAI: boolean;
+  hasGemini: boolean;
   hasFacebook: boolean;
   isVerified: boolean;
 }
@@ -30,6 +31,7 @@ interface CredentialsResponse {
 export default function WebhookAPI() {
   const [showWhatsAppToken, setShowWhatsAppToken] = useState(false);
   const [showOpenAIKey, setShowOpenAIKey] = useState(false);
+  const [showGeminiKey, setShowGeminiKey] = useState(false);
   const [showFacebookToken, setShowFacebookToken] = useState(false);
   
   const [whatsappToken, setWhatsappToken] = useState("");
@@ -39,6 +41,7 @@ export default function WebhookAPI() {
   const [appId, setAppId] = useState("");
   const [appSecret, setAppSecret] = useState("");
   const [openaiApiKey, setOpenaiApiKey] = useState("");
+  const [geminiApiKey, setGeminiApiKey] = useState("");
   const [facebookAccessToken, setFacebookAccessToken] = useState("");
   const [facebookPageId, setFacebookPageId] = useState("");
   
@@ -73,6 +76,7 @@ export default function WebhookAPI() {
       setAppId("");
       setAppSecret("");
       setOpenaiApiKey("");
+      setGeminiApiKey("");
       setFacebookAccessToken("");
       setFacebookPageId("");
     },
@@ -157,6 +161,14 @@ export default function WebhookAPI() {
     saveMutation.mutate({ openaiApiKey });
   };
 
+  const handleSaveGemini = () => {
+    if (!geminiApiKey) {
+      toast.error("Please enter your Gemini API key");
+      return;
+    }
+    saveMutation.mutate({ geminiApiKey });
+  };
+
   const handleSaveFacebook = () => {
     const credentials: Record<string, string> = {};
     if (facebookAccessToken) credentials.facebookAccessToken = facebookAccessToken;
@@ -178,7 +190,7 @@ export default function WebhookAPI() {
     ? `${window.location.origin}/api/webhook/whatsapp` 
     : '';
 
-  const status = credentialsData?.status || { hasWhatsApp: false, hasOpenAI: false, hasFacebook: false, isVerified: false };
+  const status = credentialsData?.status || { hasWhatsApp: false, hasOpenAI: false, hasGemini: false, hasFacebook: false, isVerified: false };
   const maskedCreds = credentialsData?.credentials || {};
 
   return (
@@ -225,6 +237,10 @@ export default function WebhookAPI() {
             <TabsTrigger value="openai" className="gap-2">
               <Bot className="h-4 w-4" />
               OpenAI
+            </TabsTrigger>
+            <TabsTrigger value="gemini" className="gap-2">
+              <Bot className="h-4 w-4" />
+              Gemini
             </TabsTrigger>
             <TabsTrigger value="facebook" className="gap-2">
               <Key className="h-4 w-4" />
@@ -412,6 +428,70 @@ export default function WebhookAPI() {
                 </Button>
                 <Button 
                   onClick={handleSaveOpenAI}
+                  disabled={saveMutation.isPending}
+                >
+                  {saveMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  Save & Encrypt
+                </Button>
+              </CardFooter>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="gemini" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <div className="flex items-center gap-2">
+                  <div className="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center text-white">
+                    <Bot className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <CardTitle>Google Gemini API</CardTitle>
+                    <CardDescription>Connect your Google AI account for Gemini-powered agents</CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {status.hasGemini && maskedCreds.geminiApiKey && (
+                  <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg mb-4">
+                    <p className="text-sm text-blue-700">
+                      <CheckCircle2 className="h-4 w-4 inline mr-1" />
+                      API Key saved: {maskedCreds.geminiApiKey}
+                    </p>
+                  </div>
+                )}
+                
+                <div className="grid gap-2">
+                  <Label>Gemini API Key</Label>
+                  <div className="flex gap-2">
+                    <div className="relative flex-1">
+                      <Input 
+                        type={showGeminiKey ? "text" : "password"}
+                        placeholder={status.hasGemini ? "Enter new key to update..." : "AIza..."}
+                        value={geminiApiKey}
+                        onChange={(e) => setGeminiApiKey(e.target.value)}
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="absolute right-0 top-0 h-full"
+                        onClick={() => setShowGeminiKey(!showGeminiKey)}
+                      >
+                        {showGeminiKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </Button>
+                    </div>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Get your API key from{" "}
+                    <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" className="text-primary underline">
+                      Google AI Studio
+                    </a>
+                  </p>
+                </div>
+              </CardContent>
+              <CardFooter className="flex justify-end bg-muted/50 border-t p-6">
+                <Button 
+                  onClick={handleSaveGemini}
                   disabled={saveMutation.isPending}
                 >
                   {saveMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

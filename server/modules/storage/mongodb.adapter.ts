@@ -347,6 +347,7 @@ const UserCredentialsSchema = new Schema({
   appId: { type: String },
   appSecret: { type: String },
   openaiApiKey: { type: String },
+  geminiApiKey: { type: String },
   facebookAccessToken: { type: String },
   facebookPageId: { type: String },
   isVerified: { type: Boolean, default: false },

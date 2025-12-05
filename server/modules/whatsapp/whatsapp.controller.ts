@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { getMappingByFormId } from '../mapping/mapping.service';
 import { getAgentById, getAllAgents } from '../aiAgents/agent.service';
-import { generateAgentResponse } from '../openai/openai.service';
+import { generateAgentResponse } from '../ai/ai.service';
 import { getAllLeads } from '../facebook/fb.service';
 import { storage } from '../../storage';
 import * as aiAnalytics from '../aiAnalytics/aiAnalytics.service';

@@ -18,7 +18,7 @@ router.get('/', requireAuth, async (req: Request, res: Response) => {
       return res.json({ 
         hasCredentials: false,
         credentials: null,
-        status: { hasWhatsApp: false, hasOpenAI: false, hasFacebook: false, isVerified: false }
+        status: { hasWhatsApp: false, hasOpenAI: false, hasGemini: false, hasFacebook: false, isVerified: false }
       });
     }
 
@@ -53,6 +53,7 @@ router.post('/', requireAuth, async (req: Request, res: Response) => {
       appId,
       appSecret,
       openaiApiKey,
+      geminiApiKey,
       facebookAccessToken,
       facebookPageId,
     } = req.body;
@@ -65,6 +66,7 @@ router.post('/', requireAuth, async (req: Request, res: Response) => {
       appId,
       appSecret,
       openaiApiKey,
+      geminiApiKey,
       facebookAccessToken,
       facebookPageId,
     });

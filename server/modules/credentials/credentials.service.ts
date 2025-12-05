@@ -9,6 +9,7 @@ export interface CredentialInput {
   appId?: string;
   appSecret?: string;
   openaiApiKey?: string;
+  geminiApiKey?: string;
   facebookAccessToken?: string;
   facebookPageId?: string;
 }
@@ -23,6 +24,7 @@ export interface StoredCredentials {
   appId?: string;
   appSecret?: string;
   openaiApiKey?: string;
+  geminiApiKey?: string;
   facebookAccessToken?: string;
   facebookPageId?: string;
   isVerified: boolean;
@@ -39,6 +41,7 @@ export interface DecryptedCredentials {
   appId: string;
   appSecret: string;
   openaiApiKey: string;
+  geminiApiKey: string;
   facebookAccessToken: string;
   facebookPageId: string;
 }
@@ -67,6 +70,7 @@ export async function getDecryptedCredentials(userId: string): Promise<Decrypted
       appId: stored.appId || '',
       appSecret: stored.appSecret || '',
       openaiApiKey: stored.openaiApiKey || '',
+      geminiApiKey: stored.geminiApiKey || '',
       facebookAccessToken: stored.facebookAccessToken || '',
       facebookPageId: stored.facebookPageId || '',
     };
@@ -95,6 +99,7 @@ export async function getMaskedCredentialsForUser(userId: string): Promise<Recor
       appId: mask(stored.appId),
       appSecret: mask(stored.appSecret),
       openaiApiKey: mask(stored.openaiApiKey),
+      geminiApiKey: mask(stored.geminiApiKey),
       facebookAccessToken: mask(stored.facebookAccessToken),
       facebookPageId: mask(stored.facebookPageId),
     };
@@ -117,6 +122,7 @@ export async function saveCredentials(userId: string, input: CredentialInput): P
     if (input.appId) data.appId = input.appId;
     if (input.appSecret) data.appSecret = input.appSecret;
     if (input.openaiApiKey) data.openaiApiKey = input.openaiApiKey;
+    if (input.geminiApiKey) data.geminiApiKey = input.geminiApiKey;
     if (input.facebookAccessToken) data.facebookAccessToken = input.facebookAccessToken;
     if (input.facebookPageId) data.facebookPageId = input.facebookPageId;
     
@@ -208,23 +214,25 @@ export async function hasCredentials(userId: string): Promise<boolean> {
 export async function getCredentialStatus(userId: string): Promise<{
   hasWhatsApp: boolean;
   hasOpenAI: boolean;
+  hasGemini: boolean;
   hasFacebook: boolean;
   isVerified: boolean;
 }> {
   try {
     const creds = await getCredentialsByUserId(userId);
     if (!creds) {
-      return { hasWhatsApp: false, hasOpenAI: false, hasFacebook: false, isVerified: false };
+      return { hasWhatsApp: false, hasOpenAI: false, hasGemini: false, hasFacebook: false, isVerified: false };
     }
     
     return {
       hasWhatsApp: !!(creds.whatsappToken && creds.phoneNumberId),
       hasOpenAI: !!creds.openaiApiKey,
+      hasGemini: !!creds.geminiApiKey,
       hasFacebook: !!creds.facebookAccessToken,
       isVerified: creds.isVerified,
     };
   } catch (error) {
-    return { hasWhatsApp: false, hasOpenAI: false, hasFacebook: false, isVerified: false };
+    return { hasWhatsApp: false, hasOpenAI: false, hasGemini: false, hasFacebook: false, isVerified: false };
   }
 }
 

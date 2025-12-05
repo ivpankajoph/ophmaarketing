@@ -23,11 +23,34 @@ The system incorporates a modular backend structure, allowing for independent de
 ## External Dependencies
 - **MongoDB Atlas**: Cloud-hosted NoSQL database for data persistence.
 - **OpenAI API**: For AI agent functionalities, specifically GPT-4o.
+- **Google Gemini API**: For AI agent functionalities using Gemini models.
 - **Facebook Graph API**: For syncing Facebook Lead Forms and managing leads.
 - **WhatsApp Business API**: For sending and receiving WhatsApp messages.
 - **Meta Business Suite**: For syncing and approving message templates.
 
-## Recent Changes (December 4, 2025)
+## Recent Changes (December 5, 2025)
+- **Gemini AI Support**: Added Google Gemini as an alternative AI provider for AI agents.
+  - **Gemini Models**: gemini-2.0-flash-exp (Gemini 2.0 Experimental), gemini-1.5-flash (Gemini 1.5 Flash), gemini-1.5-pro (Gemini 1.5 Pro), gemini-exp-1206 (Gemini Experimental).
+  - **Unified AI Service**: New `server/modules/ai/ai.service.ts` routes requests to OpenAI or Gemini based on model selection.
+  - **Gemini Service**: New `server/modules/gemini/gemini.service.ts` handles Gemini API calls using @google/genai SDK.
+  - **Agent Creation UI**: Updated NewAgent page to display both OpenAI and Gemini model options in a categorized dropdown.
+  - **Settings**: Added Gemini API key configuration tab in Settings > API Credentials.
+- **Real-Time Reports System**: All report pages now fetch real data from MongoDB with day-wise and month-wise breakdowns.
+  - **Reports Service**: New `server/modules/reports/reports.service.ts` provides aggregated metrics from MongoDB collections.
+  - **AI Agent Performance**: Shows actual agent usage stats including chats handled, messages generated, and response times.
+  - **Customer Replies**: Displays incoming messages with basic sentiment analysis (positive/negative/neutral).
+  - **User Engagement**: Shows engagement scores based on read rates and reply rates per user.
+  - **Spending Report**: Calculates estimated costs based on message categories (marketing/utility/service).
+  - **API Endpoints**: GET `/api/reports/ai-agents`, `/api/reports/customer-replies`, `/api/reports/user-engagement`, `/api/reports/spending`.
+- **Key Files**: 
+  - `server/modules/gemini/gemini.service.ts` - Gemini API integration
+  - `server/modules/ai/ai.service.ts` - Unified AI routing service
+  - `server/modules/reports/reports.service.ts` - Reports aggregation service
+  - `server/modules/reports/reports.routes.ts` - Reports API endpoints
+  - `client/src/pages/ai/NewAgent.tsx` - Agent creation with Gemini models
+  - `client/src/pages/settings/WebhookAPI.tsx` - Gemini API key configuration
+
+## Previous Changes (December 4, 2025)
 - **Template Sync with Meta/Facebook**: Template management now uses per-user credentials from database.
   - **Meta Graph API Integration**: `/api/templates/sync-meta` endpoint fetches templates from Meta using user's businessAccountId (WABA ID) and whatsappToken.
   - **Template Schema Extended**: Added language, metaTemplateId, metaStatus, rejectionReason, lastSyncedAt fields to templates.

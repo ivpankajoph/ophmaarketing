@@ -178,14 +178,42 @@ export default function NewAgent() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="gpt-4o">Bot 1 (Most Intelligent)</SelectItem>
-                    <SelectItem value="gpt-4o-mini">Bot 2 (Smart & Fast)</SelectItem>
-                    <SelectItem value="gpt-4-turbo">Bot 3 (Premium)</SelectItem>
-                    <SelectItem value="gpt-3.5-turbo">Bot 4 (Economy)</SelectItem>
+                    <SelectItem value="gpt-4o" className="flex items-center">
+                      <span className="font-medium">OpenAI GPT-4o</span>
+                      <span className="ml-2 text-xs text-muted-foreground">(Most Intelligent)</span>
+                    </SelectItem>
+                    <SelectItem value="gpt-4o-mini">
+                      <span className="font-medium">OpenAI GPT-4o Mini</span>
+                      <span className="ml-2 text-xs text-muted-foreground">(Smart & Fast)</span>
+                    </SelectItem>
+                    <SelectItem value="gpt-4-turbo">
+                      <span className="font-medium">OpenAI GPT-4 Turbo</span>
+                      <span className="ml-2 text-xs text-muted-foreground">(Premium)</span>
+                    </SelectItem>
+                    <SelectItem value="gpt-3.5-turbo">
+                      <span className="font-medium">OpenAI GPT-3.5</span>
+                      <span className="ml-2 text-xs text-muted-foreground">(Economy)</span>
+                    </SelectItem>
+                    <SelectItem value="gemini-2.5-flash">
+                      <span className="font-medium">Gemini 2.5 Flash</span>
+                      <span className="ml-2 text-xs text-muted-foreground">(Fast & Efficient)</span>
+                    </SelectItem>
+                    <SelectItem value="gemini-2.5-pro">
+                      <span className="font-medium">Gemini 2.5 Pro</span>
+                      <span className="ml-2 text-xs text-muted-foreground">(Advanced Reasoning)</span>
+                    </SelectItem>
+                    <SelectItem value="gemini-1.5-flash">
+                      <span className="font-medium">Gemini 1.5 Flash</span>
+                      <span className="ml-2 text-xs text-muted-foreground">(Budget Friendly)</span>
+                    </SelectItem>
+                    <SelectItem value="gemini-1.5-pro">
+                      <span className="font-medium">Gemini 1.5 Pro</span>
+                      <span className="ml-2 text-xs text-muted-foreground">(Multimodal)</span>
+                    </SelectItem>
                   </SelectContent>
                 </Select>
                 <p className="text-xs text-muted-foreground">
-                  Bot 1: Latest & Most Capable | Bot 4: Fast & Affordable
+                  OpenAI models require OpenAI API key | Gemini models require Gemini API key
                 </p>
               </div>
               <div className="grid gap-2">

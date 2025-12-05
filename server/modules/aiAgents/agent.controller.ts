@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import * as agentService from './agent.service';
-import { generateAgentResponse } from '../openai/openai.service';
+import { generateAgentResponse } from '../ai/ai.service';
 
 export async function listAgents(req: Request, res: Response) {
   try {
