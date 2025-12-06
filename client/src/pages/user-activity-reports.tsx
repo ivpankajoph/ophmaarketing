@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import DashboardLayout from "@/components/layout/DashboardLayout";
+import { getAuthHeaders } from "@/contexts/AuthContext";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -51,7 +52,9 @@ export default function UserActivityReportsPage() {
     queryKey: ["/api/lead-management/reports/activity-stats", dateRange],
     queryFn: async () => {
       const startDate = subDays(new Date(), parseInt(dateRange));
-      const res = await fetch(`/api/lead-management/reports/activity-stats?startDate=${startDate.toISOString()}`);
+      const res = await fetch(`/api/lead-management/reports/activity-stats?startDate=${startDate.toISOString()}`, {
+        headers: getAuthHeaders(),
+      });
       if (!res.ok) throw new Error("Failed to fetch activity stats");
       return res.json();
     },
@@ -68,7 +71,9 @@ export default function UserActivityReportsPage() {
       if (filterUserId !== "all") params.append("userId", filterUserId);
       if (filterAction !== "all") params.append("action", filterAction);
       
-      const res = await fetch(`/api/lead-management/reports/activity-logs?${params}`);
+      const res = await fetch(`/api/lead-management/reports/activity-logs?${params}`, {
+        headers: getAuthHeaders(),
+      });
       if (!res.ok) throw new Error("Failed to fetch activity logs");
       return res.json();
     },
@@ -77,7 +82,9 @@ export default function UserActivityReportsPage() {
   const { data: users } = useQuery<{id: string; name: string; role: string}[]>({
     queryKey: ["/api/users"],
     queryFn: async () => {
-      const res = await fetch("/api/users");
+      const res = await fetch("/api/users", {
+        headers: getAuthHeaders(),
+      });
       if (!res.ok) return [];
       return res.json();
     },

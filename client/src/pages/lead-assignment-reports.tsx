@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import DashboardLayout from "@/components/layout/DashboardLayout";
+import { getAuthHeaders } from "@/contexts/AuthContext";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -61,7 +62,9 @@ export default function LeadAssignmentReportsPage() {
     queryKey: ["/api/lead-management/reports/summary", dateRange],
     queryFn: async () => {
       const startDate = subDays(new Date(), parseInt(dateRange));
-      const res = await fetch(`/api/lead-management/reports/summary?startDate=${startDate.toISOString()}`);
+      const res = await fetch(`/api/lead-management/reports/summary?startDate=${startDate.toISOString()}`, {
+        headers: getAuthHeaders(),
+      });
       if (!res.ok) throw new Error("Failed to fetch summary");
       return res.json();
     },
@@ -78,7 +81,9 @@ export default function LeadAssignmentReportsPage() {
       if (filterPriority !== "all") params.append("priority", filterPriority);
       if (filterStatus !== "all") params.append("status", filterStatus);
       
-      const res = await fetch(`/api/lead-management/reports/assignments?${params}`);
+      const res = await fetch(`/api/lead-management/reports/assignments?${params}`, {
+        headers: getAuthHeaders(),
+      });
       if (!res.ok) throw new Error("Failed to fetch assignments");
       return res.json();
     },
@@ -87,7 +92,9 @@ export default function LeadAssignmentReportsPage() {
   const { data: users } = useQuery<{id: string; name: string; role: string}[]>({
     queryKey: ["/api/users"],
     queryFn: async () => {
-      const res = await fetch("/api/users");
+      const res = await fetch("/api/users", {
+        headers: getAuthHeaders(),
+      });
       if (!res.ok) return [];
       return res.json();
     },
