@@ -76,7 +76,32 @@ export async function sendGeminiCompletion(
       },
     });
 
-    return response.text || 'No response generated';
+    const responseText = response.text || '';
+    
+    // Detect and filter refusal responses from Gemini
+    const refusalPatterns = [
+      'I am sorry, I cannot fulfill this request',
+      'I cannot generate personalized messages',
+      'I am not able to generate',
+      'I\'m sorry, I cannot',
+      'I cannot assist with',
+      'I\'m not able to help with',
+    ];
+    
+    const isRefusal = refusalPatterns.some(pattern => 
+      responseText.toLowerCase().includes(pattern.toLowerCase())
+    );
+    
+    if (isRefusal || !responseText.trim()) {
+      console.log('[Gemini] Detected refusal or empty response, using fallback');
+      // Return a neutral follow-up message based on the agent's purpose
+      if (systemPromptContent.toLowerCase().includes('award') || systemPromptContent.toLowerCase().includes('life changer')) {
+        return "Please reply if you are interested in the award, and I will share the benefits again.";
+      }
+      return "Thank you for your message! How can I assist you today?";
+    }
+    
+    return responseText;
   } catch (error) {
     console.error('Gemini API error:', error);
     throw error;
