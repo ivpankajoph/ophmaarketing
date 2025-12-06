@@ -12,6 +12,7 @@ import { credentialsService } from '../credentials/credentials.service';
 import * as whatsappService from './whatsapp.service';
 import { isContactBlocked, isPhoneBlocked, listAllBlockedContacts } from '../contacts/contacts.routes';
 import { getUserId } from '../auth/auth.routes';
+import { contactAnalyticsService } from '../contactAnalytics/contactAnalytics.service';
 
 const WHATSAPP_TOKEN = process.env.WHATSAPP_TOKEN_NEW || process.env.WHATSAPP_TOKEN;
 const PHONE_NUMBER_ID = process.env.PHONE_NUMBER_ID;
@@ -210,31 +211,22 @@ export async function handleWebhook(req: Request, res: Response) {
     // Use messageText or buttonPayload for AI processing
     const contentForAI = messageText || buttonPayload;
 
-    // Check if this is a button response - send fixed thank you message
+    // Check if this is a button response - log it but continue with AI processing
     const isButtonResponse = messageType === 'button' || messageType === 'interactive';
     
     if (isButtonResponse) {
-      const thankYouMessage = "Thanks for your feedback, we will keep in touch with you soon.";
-      
-      await whatsappService.sendTextMessage(from, thankYouMessage, resolvedUserId);
-      await saveOutboundMessage(from, thankYouMessage);
-      
-      await contactAgentService.disableAutoReply(from);
-      
-      console.log(`Button response auto-reply sent to ${from}: ${thankYouMessage} (auto-reply disabled)`);
-      return res.sendStatus(200);
+      console.log(`[Webhook] Button response from ${from}: "${contentForAI}" - continuing with AI processing`);
     }
-
-    // FIRST: Check if auto-reply is disabled for this contact (e.g., after "Thanks" message)
-    // This check must happen BEFORE checking for assigned agents
+    
+    // Check if auto-reply is disabled for this contact (set manually by user in inbox)
+    // Note: Button clicks no longer disable auto-reply, only manual inbox actions do
     const autoReplyDisabled = await contactAgentService.isAutoReplyDisabled(from);
-    
     if (autoReplyDisabled) {
-      console.log(`[Webhook] Auto-reply disabled for ${from} - no automatic AI response until agent manually selected in inbox`);
+      console.log(`[Webhook] Auto-reply manually disabled for ${from} - skipping AI response`);
       return res.sendStatus(200);
     }
     
-    // For regular text messages, check if this contact has a manually assigned agent
+    // For all messages, check if this contact has a manually assigned agent
     const contactAgentAssignment = await contactAgentService.getAgentForContact(from);
     let agentToUse = null;
     let useStoredHistory = false;
@@ -315,6 +307,15 @@ export async function handleWebhook(req: Request, res: Response) {
     await whatsappService.sendTextMessage(from, aiResponse, resolvedUserId);
     
     await saveOutboundMessage(from, aiResponse);
+
+    // Track AI agent interaction for analytics (only if we have valid agent ID)
+    if (agentToUse.id && agentToUse.name) {
+      try {
+        await contactAnalyticsService.trackAgentInteraction(from, agentToUse.id, agentToUse.name);
+      } catch (trackError) {
+        console.error('[Webhook] Error tracking agent interaction:', trackError);
+      }
+    }
 
     console.log(`AI auto-reply sent to ${from}: ${aiResponse.substring(0, 100)}...`);
 

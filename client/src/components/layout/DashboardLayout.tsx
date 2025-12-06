@@ -177,6 +177,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         { label: "Campaign Perf.", href: "/reports/campaigns" },
         { label: "Replies", href: "/reports/replies" },
         { label: "Agent Perf.", href: "/reports/agents" },
+        { label: "Contact Analytics", href: "/reports/contacts" },
         { label: "Blocked Contacts", href: "/reports/blocked" },
         { label: "Spending", href: "/reports/spending" },
         { label: "User Engagement", href: "/reports/engagement" },

@@ -61,6 +61,7 @@ import Credits from "@/pages/reports/Credits";
 import UserEngagement from "@/pages/reports/UserEngagement";
 import BroadcastReports from "@/pages/reports/BroadcastReports";
 import BlockedContacts from "@/pages/reports/BlockedContacts";
+import ContactReports from "@/pages/reports/ContactReports";
 import UserManagement from "@/pages/UserManagement";
 
 function ProtectedRoute({ component: Component }: { component: React.ComponentType }) {
@@ -133,6 +134,7 @@ function Router() {
       <Route path="/reports/user-engagement">{() => <ProtectedRoute component={UserEngagement} />}</Route>
       <Route path="/reports/broadcast">{() => <ProtectedRoute component={BroadcastReports} />}</Route>
       <Route path="/reports/blocked">{() => <ProtectedRoute component={BlockedContacts} />}</Route>
+      <Route path="/reports/contacts">{() => <ProtectedRoute component={ContactReports} />}</Route>
 
       <Route path="/contacts">{() => <ProtectedRoute component={Contacts} />}</Route>
       <Route path="/settings">{() => <ProtectedRoute component={Settings} />}</Route>
