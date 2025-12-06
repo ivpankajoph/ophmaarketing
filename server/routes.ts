@@ -403,6 +403,36 @@ export async function registerRoutes(
     }
   });
 
+  app.get("/api/debug/user/:email", async (req, res) => {
+    try {
+      const { SystemUser } = await import('./modules/users/user.model');
+      const { User } = await import('./modules/storage/mongodb.adapter');
+      const email = req.params.email;
+      
+      const systemUser = await SystemUser.findOne({ email });
+      const regularUser = await User.findOne({ $or: [{ email }, { username: email }] });
+      
+      res.json({
+        systemUser: systemUser ? {
+          id: systemUser.id,
+          email: systemUser.email,
+          name: systemUser.name,
+          role: systemUser.role,
+          isActive: systemUser.isActive
+        } : null,
+        regularUser: regularUser ? {
+          id: regularUser.id,
+          email: regularUser.email,
+          name: regularUser.name,
+          role: regularUser.role
+        } : null
+      });
+    } catch (error) {
+      console.error('Debug error:', error);
+      res.status(500).json({ error: String(error) });
+    }
+  });
+
   app.get("/api/chats", async (req, res) => {
     try {
       const userId = req.headers['x-user-id'] as string;
@@ -410,6 +440,7 @@ export async function registerRoutes(
       const userName = req.headers['x-user-name'] as string;
       
       console.log(`[Inbox Filter] User: ${userName}, Role: ${userRole}, ID: ${userId}`);
+      console.log(`[Inbox Filter] All headers:`, JSON.stringify(req.headers));
       
       let chats = await storage.getChats();
       

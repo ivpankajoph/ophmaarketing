@@ -42,13 +42,19 @@ function setStoredUser(user: User | null) {
 
 export function getAuthHeaders(): Record<string, string> {
   const user = getStoredUser();
-  if (!user) return {};
-  return {
-    "x-user-id": user.id,
+  console.log('[Auth Headers] Stored user:', user);
+  if (!user) {
+    console.log('[Auth Headers] No user in localStorage, returning empty headers');
+    return {};
+  }
+  const headers = {
+    "x-user-id": user.id || '',
     "x-user-role": user.role || 'user',
     "x-user-name": user.name || '',
     "x-user": JSON.stringify(user),
   };
+  console.log('[Auth Headers] Sending headers:', headers);
+  return headers;
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
