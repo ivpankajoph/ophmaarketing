@@ -1,7 +1,7 @@
 import { GoogleGenAI } from "@google/genai";
 import { credentialsService } from '../credentials/credentials.service';
 
-const SYSTEM_GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+const SYSTEM_GEMINI_API_KEY = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
 
 interface ChatMessage {
   role: 'system' | 'user' | 'assistant';
