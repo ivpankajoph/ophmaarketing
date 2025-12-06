@@ -267,6 +267,68 @@ router.get('/team-hierarchies', async (req: Request, res: Response) => {
   }
 });
 
+router.get('/reports/summary', async (req: Request, res: Response) => {
+  try {
+    const user = getUser(req);
+    if (!isAdmin(user) && user.role !== 'manager') {
+      return res.status(403).json({ error: 'Not authorized to view reports' });
+    }
+
+    const { startDate } = req.query;
+    
+    const report = await leadManagementService.getLeadAssignmentReport({
+      fromDate: startDate as string,
+    });
+
+    const byUserReport = await leadManagementService.getLeadAssignmentReport({
+      fromDate: startDate as string,
+      groupBy: 'user',
+    });
+
+    const byStatusReport = await leadManagementService.getLeadAssignmentReport({
+      fromDate: startDate as string,
+      groupBy: 'status',
+    });
+
+    const summary = report.summary;
+    const byUser = byUserReport.data.map((u: any) => ({
+      userId: u._id,
+      userName: u.userName,
+      userRole: 'user',
+      totalAssigned: u.totalAssigned || 0,
+      active: u.assigned || 0,
+      completed: u.completed || 0,
+      inProgress: u.inProgress || 0,
+      avgResponseTime: 0,
+    }));
+
+    const byPriority = [
+      { priority: 'urgent', count: 0 },
+      { priority: 'high', count: 0 },
+      { priority: 'medium', count: 0 },
+      { priority: 'low', count: 0 },
+    ];
+
+    const byStatus = byStatusReport.data.map((s: any) => ({
+      status: s._id,
+      count: s.count || 0,
+    }));
+
+    res.json({
+      totalAssignments: summary.total || 0,
+      activeAssignments: (summary.assigned || 0) + (summary.inProgress || 0),
+      completedAssignments: summary.completed || 0,
+      averageResponseTime: 0,
+      byUser,
+      byPriority,
+      byStatus,
+    });
+  } catch (error) {
+    console.error('Error getting summary report:', error);
+    res.status(500).json({ error: 'Failed to get summary report' });
+  }
+});
+
 router.get('/reports/assignments', async (req: Request, res: Response) => {
   try {
     const user = getUser(req);
@@ -274,16 +336,20 @@ router.get('/reports/assignments', async (req: Request, res: Response) => {
       return res.status(403).json({ error: 'Not authorized to view reports' });
     }
 
-    const { userId, fromDate, toDate, groupBy } = req.query;
+    const { userId, startDate, priority, status } = req.query;
 
-    const report = await leadManagementService.getLeadAssignmentReport({
+    const assignments = await leadManagementService.getAllLeadAssignments({
       userId: userId as string,
-      fromDate: fromDate as string,
-      toDate: toDate as string,
-      groupBy: groupBy as 'user' | 'day' | 'status',
+      fromDate: startDate as string,
+      status: status as string,
     });
 
-    res.json(report);
+    let filtered = assignments;
+    if (priority && priority !== 'all') {
+      filtered = filtered.filter((a: any) => a.priority === priority);
+    }
+
+    res.json(filtered);
   } catch (error) {
     console.error('Error getting assignment report:', error);
     res.status(500).json({ error: 'Failed to get assignment report' });
@@ -309,6 +375,109 @@ router.get('/reports/activity', async (req: Request, res: Response) => {
   } catch (error) {
     console.error('Error getting activity report:', error);
     res.status(500).json({ error: 'Failed to get activity report' });
+  }
+});
+
+router.get('/reports/activity-stats', async (req: Request, res: Response) => {
+  try {
+    const user = getUser(req);
+    if (!isAdmin(user) && user.role !== 'manager') {
+      return res.status(403).json({ error: 'Not authorized to view reports' });
+    }
+
+    const { startDate } = req.query;
+
+    const report = await leadManagementService.getUserActivityReport({
+      fromDate: startDate as string,
+    });
+
+    const byAction = [
+      { action: 'assign', count: 0 },
+      { action: 'bulk_assign', count: 0 },
+      { action: 'unassign', count: 0 },
+      { action: 'update', count: 0 },
+    ];
+
+    const byEntityType = [
+      { entityType: 'lead_assignment', count: 0 },
+    ];
+
+    report.recentActivity?.forEach((log: any) => {
+      const actionIndex = byAction.findIndex(a => a.action === log.actionType);
+      if (actionIndex >= 0) byAction[actionIndex].count++;
+      
+      const entityIndex = byEntityType.findIndex(e => e.entityType === 'lead_assignment');
+      if (entityIndex >= 0) byEntityType[entityIndex].count++;
+    });
+
+    const byUser = report.userSummary?.map((u: any) => ({
+      userId: u._id,
+      userName: u.userName,
+      userRole: 'user',
+      totalActions: u.totalLeadsAssigned + u.totalLeadsCompleted + u.totalMessagesSent,
+      lastActivityAt: new Date().toISOString(),
+      actionBreakdown: [
+        { action: 'assign', count: u.totalLeadsAssigned || 0 },
+        { action: 'complete', count: u.totalLeadsCompleted || 0 },
+        { action: 'message', count: u.totalMessagesSent || 0 },
+      ],
+    })) || [];
+
+    const uniqueUsers = new Set(report.recentActivity?.map((a: any) => a.userId) || []);
+
+    res.json({
+      totalActivities: report.recentActivity?.length || 0,
+      uniqueUsers: uniqueUsers.size,
+      byAction,
+      byEntityType,
+      byUser,
+    });
+  } catch (error) {
+    console.error('Error getting activity stats:', error);
+    res.status(500).json({ error: 'Failed to get activity stats' });
+  }
+});
+
+router.get('/reports/activity-logs', async (req: Request, res: Response) => {
+  try {
+    const user = getUser(req);
+    if (!isAdmin(user) && user.role !== 'manager') {
+      return res.status(403).json({ error: 'Not authorized to view reports' });
+    }
+
+    const { userId, action, startDate, limit } = req.query;
+
+    const report = await leadManagementService.getUserActivityReport({
+      userId: userId as string,
+      fromDate: startDate as string,
+    });
+
+    let logs = report.recentActivity || [];
+    
+    if (action && action !== 'all') {
+      logs = logs.filter((l: any) => l.actionType === action);
+    }
+    
+    if (limit) {
+      logs = logs.slice(0, parseInt(limit as string));
+    }
+
+    const formattedLogs = logs.map((log: any) => ({
+      _id: log.id || log._id,
+      userId: log.userId,
+      userName: log.userName || 'Unknown',
+      userRole: log.userRole || 'user',
+      action: log.actionType,
+      entityType: 'lead_assignment',
+      entityId: log.leadAssignmentId,
+      details: log.metadata || {},
+      createdAt: log.timestamp,
+    }));
+
+    res.json(formattedLogs);
+  } catch (error) {
+    console.error('Error getting activity logs:', error);
+    res.status(500).json({ error: 'Failed to get activity logs' });
   }
 });
 

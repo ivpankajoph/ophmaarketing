@@ -63,6 +63,8 @@ import BroadcastReports from "@/pages/reports/BroadcastReports";
 import BlockedContacts from "@/pages/reports/BlockedContacts";
 import ContactReports from "@/pages/reports/ContactReports";
 import UserManagement from "@/pages/UserManagement";
+import LeadAssignmentReports from "@/pages/lead-assignment-reports";
+import UserActivityReports from "@/pages/user-activity-reports";
 
 function ProtectedRoute({ component: Component }: { component: React.ComponentType }) {
   const { isAuthenticated } = useAuth();
@@ -135,6 +137,8 @@ function Router() {
       <Route path="/reports/broadcast">{() => <ProtectedRoute component={BroadcastReports} />}</Route>
       <Route path="/reports/blocked">{() => <ProtectedRoute component={BlockedContacts} />}</Route>
       <Route path="/reports/contacts">{() => <ProtectedRoute component={ContactReports} />}</Route>
+      <Route path="/reports/lead-assignments">{() => <ProtectedRoute component={LeadAssignmentReports} />}</Route>
+      <Route path="/reports/user-activity">{() => <ProtectedRoute component={UserActivityReports} />}</Route>
 
       <Route path="/contacts">{() => <ProtectedRoute component={Contacts} />}</Route>
       <Route path="/settings">{() => <ProtectedRoute component={Settings} />}</Route>
