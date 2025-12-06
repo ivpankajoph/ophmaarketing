@@ -240,20 +240,31 @@ export async function handleWebhook(req: Request, res: Response) {
     let agentToUse = null;
     let useStoredHistory = false;
     
-    // Only use manually assigned agent - no fallback to lead-form or random agents
+    // First try manually assigned agent
     if (contactAgentAssignment) {
       console.log(`[Webhook] Found assigned agent for ${from}: ${contactAgentAssignment.agentName} (${contactAgentAssignment.agentId})`);
       agentToUse = await getAgentById(contactAgentAssignment.agentId);
-      useStoredHistory = true;
-    } else {
-      // Check for pre-filled text mapping FIRST (for WhatsApp leads)
+      
+      if (agentToUse && agentToUse.isActive) {
+        useStoredHistory = true;
+        console.log(`[Webhook] Using assigned agent: ${agentToUse.name}`);
+      } else {
+        // Agent was deleted or is inactive - clear the stale assignment
+        console.log(`[Webhook] Assigned agent not found or inactive for ${from}, clearing assignment and falling back`);
+        await contactAgentService.removeAgentFromContact(from);
+        agentToUse = null;
+      }
+    }
+    
+    // If no valid assigned agent, try pre-filled text mapping
+    if (!agentToUse) {
       const prefilledMapping = await prefilledTextService.findMatchingAgentForMessage(contentForAI);
       if (prefilledMapping) {
         console.log(`[Webhook] Found pre-filled text mapping for "${contentForAI}" -> Agent: ${prefilledMapping.agentName}`);
         agentToUse = await getAgentById(prefilledMapping.agentId);
         
         // Auto-assign this agent to the contact for future messages
-        if (agentToUse) {
+        if (agentToUse && agentToUse.isActive) {
           await contactAgentService.assignAgentToContact(
             '', // contactId - will be set later
             from,
@@ -262,24 +273,32 @@ export async function handleWebhook(req: Request, res: Response) {
           );
           useStoredHistory = true;
           console.log(`[Webhook] Auto-assigned agent ${prefilledMapping.agentName} to WhatsApp lead ${from}`);
+        } else {
+          agentToUse = null;
         }
       }
-      
-      // Fall back to lead-form mapping if no pre-filled text match
-      if (!agentToUse) {
-        const lead = await findLeadByPhone(from);
-        if (lead) {
-          const mapping = await getMappingByFormId(lead.formId);
-          if (mapping && mapping.isActive) {
-            agentToUse = await getAgentById(mapping.agentId);
+    }
+    
+    // Fall back to lead-form mapping if no pre-filled text match
+    if (!agentToUse) {
+      const lead = await findLeadByPhone(from);
+      if (lead) {
+        const mapping = await getMappingByFormId(lead.formId);
+        if (mapping && mapping.isActive) {
+          const mappedAgent = await getAgentById(mapping.agentId);
+          if (mappedAgent && mappedAgent.isActive) {
+            agentToUse = mappedAgent;
           }
         }
       }
+    }
 
-      // Fall back to any active agent only if nothing else matched
-      if (!agentToUse) {
-        const agents = await getAllAgents();
-        agentToUse = agents.find((a: any) => a.isActive);
+    // Fall back to any active agent only if nothing else matched
+    if (!agentToUse) {
+      const agents = await getAllAgents();
+      agentToUse = agents.find((a: any) => a.isActive);
+      if (agentToUse) {
+        console.log(`[Webhook] Using fallback active agent: ${agentToUse.name}`);
       }
     }
 
