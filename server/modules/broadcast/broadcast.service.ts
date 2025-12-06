@@ -1,6 +1,7 @@
 import * as mongodb from '../storage/mongodb.adapter';
 import * as templateService from '../leadAutoReply/templateMessages.service';
 import * as openaiService from '../openai/openai.service';
+import * as aiService from '../ai/ai.service';
 import * as agentService from '../aiAgents/agent.service';
 
 export interface BroadcastList {
@@ -247,14 +248,14 @@ export async function sendAIAgentMessage(phone: string, agentId: string, context
     return { success: false, error: 'Agent not found' };
   }
 
-  console.log(`[AIAgent] Generating message with agent "${agent.name}" for ${phone}`);
+  console.log(`[AIAgent] Generating message with agent "${agent.name}" (model: ${agent.model || 'default'}) for ${phone}`);
   
   const prompt = context || 'Generate a friendly welcome message for a new contact. Keep it under 160 characters.';
-  const aiMessage = await openaiService.generateAgentResponse(prompt, agent);
+  const aiMessage = await aiService.generateAgentResponse(prompt, agent, []);
   
   if (!aiMessage) {
     console.error('[AIAgent] Failed to generate AI message');
-    return { success: false, error: 'Failed to generate AI message. Check if OPENAI_API_KEY is configured.' };
+    return { success: false, error: 'Failed to generate AI message. Check if API key is configured for the agent model.' };
   }
 
   console.log(`[AIAgent] AI generated: "${aiMessage.substring(0, 100)}..."`);

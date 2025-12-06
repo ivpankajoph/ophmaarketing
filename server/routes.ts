@@ -28,6 +28,7 @@ import leadManagementRoutes from "./modules/leadManagement/leadManagement.routes
 import * as broadcastService from "./modules/broadcast/broadcast.service";
 import * as agentService from "./modules/aiAgents/agent.service";
 import * as openaiService from "./modules/openai/openai.service";
+import * as aiService from "./modules/ai/ai.service";
 import * as templateService from "./modules/leadAutoReply/templateMessages.service";
 import * as mongodb from "./modules/storage/mongodb.adapter";
 import * as contactAgentService from "./modules/contactAgent/contactAgent.service";
@@ -578,16 +579,16 @@ export async function registerRoutes(
             }
           }
           
-          console.log(`[InboxSend] Using ${conversationHistory.length} messages for context`);
+          console.log(`[InboxSend] Using ${conversationHistory.length} messages for context, agent model: ${agent.model || 'default'}`);
           
-          const aiMessage = await openaiService.generateAgentResponse(
+          const aiMessage = await aiService.generateAgentResponse(
             `Generate a friendly personalized message for ${name || 'this customer'}. Keep it conversational and under 200 characters.`,
             agent,
             conversationHistory
           );
           
           if (!aiMessage) {
-            return res.status(500).json({ error: "Failed to generate AI response. Check if OPENAI_API_KEY is configured." });
+            return res.status(500).json({ error: "Failed to generate AI response. Check if API key is configured for the agent model." });
           }
           
           console.log(`[InboxSend] AI generated: "${aiMessage.substring(0, 100)}..."`);
@@ -658,16 +659,16 @@ export async function registerRoutes(
         return res.status(404).json({ error: "AI Agent not found" });
       }
       
-      console.log(`[InboxSendAI] Generating contextual AI response with agent: ${agent.name}`);
+      console.log(`[InboxSendAI] Generating contextual AI response with agent: ${agent.name} (model: ${agent.model || 'default'})`);
       
       const context = userMessage 
         ? `Customer ${name || ''} said: "${userMessage}". Please respond appropriately.`
         : `Generate a friendly greeting for ${name || 'this customer'}.`;
       
-      const aiMessage = await openaiService.generateAgentResponse(context, agent);
+      const aiMessage = await aiService.generateAgentResponse(context, agent, []);
       
       if (!aiMessage) {
-        return res.status(500).json({ error: "Failed to generate AI response" });
+        return res.status(500).json({ error: "Failed to generate AI response. Check if API key is configured for the agent model." });
       }
       
       const result = await broadcastService.sendCustomMessage(phone, aiMessage);
