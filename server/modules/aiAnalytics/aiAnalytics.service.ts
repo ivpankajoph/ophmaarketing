@@ -60,10 +60,17 @@ export async function getQualificationById(id: string): Promise<AIChatQualificat
 }
 
 export async function getQualificationByPhone(phone: string): Promise<AIChatQualification | undefined> {
+  if (!phone) return undefined;
+  
   const qualifications = await getQualifications();
-  const normalizedPhone = phone.replace(/\D/g, '');
-  return qualifications.find(q => q.phone.replace(/\D/g, '').includes(normalizedPhone) || 
-    normalizedPhone.includes(q.phone.replace(/\D/g, '')));
+  const normalizedPhone = (phone || '').replace(/\D/g, '');
+  
+  if (!normalizedPhone) return undefined;
+  
+  return qualifications.find(q => {
+    const qPhone = (q.phone || '').replace(/\D/g, '');
+    return qPhone.includes(normalizedPhone) || normalizedPhone.includes(qPhone);
+  });
 }
 
 export async function getQualificationsByCategory(category: 'interested' | 'not_interested' | 'pending'): Promise<AIChatQualification[]> {
@@ -101,7 +108,11 @@ export async function getQualificationStats(): Promise<QualificationStats> {
 }
 
 export function analyzeMessage(message: string): { category: 'interested' | 'not_interested' | 'pending'; score: number; keywords: string[] } {
-  const lowerMessage = message.toLowerCase();
+  if (!message) {
+    return { category: 'pending', score: 50, keywords: [] };
+  }
+  
+  const lowerMessage = (message || '').toLowerCase();
   const foundInterestKeywords: string[] = [];
   const foundNotInterestedKeywords: string[] = [];
   
@@ -148,8 +159,13 @@ export async function createOrUpdateQualification(
     contactId?: string;
   }
 ): Promise<AIChatQualification> {
-  const existing = await getQualificationByPhone(phone);
-  const analysis = analyzeMessage(message);
+  if (!phone) {
+    throw new Error('Phone is required for AI qualification tracking');
+  }
+  
+  const normalizedPhone = (phone || '').replace(/\D/g, '');
+  const existing = await getQualificationByPhone(normalizedPhone);
+  const analysis = analyzeMessage(message || '');
   const now = new Date().toISOString();
   
   if (existing) {
@@ -189,8 +205,8 @@ export async function createOrUpdateQualification(
     const newQualification: AIChatQualification = {
       id: generateId(),
       contactId: options?.contactId || generateId(),
-      phone,
-      name,
+      phone: normalizedPhone,
+      name: name || `+${normalizedPhone}`,
       source,
       campaignId: options?.campaignId,
       campaignName: options?.campaignName,

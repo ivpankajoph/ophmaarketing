@@ -297,7 +297,7 @@ const BillingSchema = new Schema({
 
 const PrefilledTextMappingSchema = new Schema({
   id: { type: String, required: true, unique: true },
-  text: { type: String, required: true },
+  prefilledText: { type: String, required: true },
   agentId: { type: String, required: true },
   agentName: { type: String },
   isActive: { type: Boolean, default: true },

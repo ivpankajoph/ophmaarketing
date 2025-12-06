@@ -51,7 +51,11 @@ export async function getWhatsAppCredentialsForUser(userId?: string): Promise<Wh
   return null;
 }
 
-export async function getWhatsAppCredentialsStrict(userId: string): Promise<WhatsAppCredentials | null> {
+export async function getWhatsAppCredentialsStrict(userId?: string): Promise<WhatsAppCredentials | null> {
+  if (!userId) {
+    return null;
+  }
+  
   const userCreds = await getUserWhatsAppCredentials(userId);
   if (userCreds) {
     return userCreds;

@@ -120,7 +120,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       subItems: [
         { label: "Builder", href: "/automation" },
         { label: "Auto Leads", href: "/automation/leads" },
-        { label: "Keyword Reply", href: "/automation/keywords" },
+        // { label: "Keyword Reply", href: "/automation/keywords" },
         { label: "Follow-up", href: "/automation/follow-up" },
         { label: "Drip Campaign", href: "/automation/drip" },
         { label: "New Lead Alert", href: "/automation/new-leads" },

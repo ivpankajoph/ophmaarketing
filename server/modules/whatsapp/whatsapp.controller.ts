@@ -611,7 +611,7 @@ export async function sendMessage(req: Request, res: Response) {
       return res.status(400).json({ error: 'Recipient and message are required' });
     }
 
-    const userId = getUserId(req);
+    const userId = getUserId(req) || undefined;
     
     const credentials = await whatsappService.getWhatsAppCredentialsStrict(userId);
     if (!credentials) {
@@ -641,7 +641,7 @@ export async function getMediaUrl(req: Request, res: Response) {
       return res.status(400).json({ error: 'Media ID is required' });
     }
     
-    const userId = getUserId(req);
+    const userId = getUserId(req) || undefined;
     const credentials = await whatsappService.getWhatsAppCredentialsStrict(userId);
     
     if (!credentials) {
@@ -793,7 +793,7 @@ export async function sendTemplateMessageEndpoint(req: Request, res: Response) {
       return res.status(400).json({ error: 'Recipient (to) and templateName are required' });
     }
 
-    const userId = getUserId(req);
+    const userId = getUserId(req) || undefined;
     
     const credentials = await whatsappService.getWhatsAppCredentialsStrict(userId);
     if (!credentials) {
