@@ -290,6 +290,11 @@ router.get('/reports/summary', async (req: Request, res: Response) => {
       groupBy: 'status',
     });
 
+    const byPriorityReport = await leadManagementService.getLeadAssignmentReport({
+      fromDate: startDate as string,
+      groupBy: 'priority',
+    });
+
     const summary = report.summary;
     const byUser = byUserReport.data.map((u: any) => ({
       userId: u._id,
@@ -302,11 +307,12 @@ router.get('/reports/summary', async (req: Request, res: Response) => {
       avgResponseTime: 0,
     }));
 
+    const priorityCounts = new Map(byPriorityReport.data.map((p: any) => [p._id, p.count || 0]));
     const byPriority = [
-      { priority: 'urgent', count: 0 },
-      { priority: 'high', count: 0 },
-      { priority: 'medium', count: 0 },
-      { priority: 'low', count: 0 },
+      { priority: 'urgent', count: priorityCounts.get('urgent') || 0 },
+      { priority: 'high', count: priorityCounts.get('high') || 0 },
+      { priority: 'medium', count: priorityCounts.get('medium') || 0 },
+      { priority: 'low', count: priorityCounts.get('low') || 0 },
     ];
 
     const byStatus = byStatusReport.data.map((s: any) => ({

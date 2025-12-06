@@ -140,12 +140,18 @@ export default function LeadAssignmentReportsPage() {
 
   const getStatusBadge = (status: string) => {
     const colors: Record<string, string> = {
-      active: "bg-blue-100 text-blue-700 border-blue-200",
+      assigned: "bg-blue-100 text-blue-700 border-blue-200",
       in_progress: "bg-yellow-100 text-yellow-700 border-yellow-200",
       completed: "bg-green-100 text-green-700 border-green-200",
       transferred: "bg-purple-100 text-purple-700 border-purple-200",
     };
-    return <Badge variant="outline" className={colors[status] || ""}>{status.replace("_", " ")}</Badge>;
+    const labels: Record<string, string> = {
+      assigned: "Active",
+      in_progress: "In Progress",
+      completed: "Completed",
+      transferred: "Transferred",
+    };
+    return <Badge variant="outline" className={colors[status] || ""}>{labels[status] || status.replace("_", " ")}</Badge>;
   };
 
   const formatResponseTime = (minutes: number) => {
@@ -360,7 +366,7 @@ export default function LeadAssignmentReportsPage() {
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-4">
-                        {["active", "in_progress", "completed", "transferred"].map((status) => {
+                        {["assigned", "in_progress", "completed", "transferred"].map((status) => {
                           const item = summary.byStatus.find(s => s.status === status);
                           const count = item?.count || 0;
                           const percentage = summary.totalAssignments > 0 
@@ -423,7 +429,7 @@ export default function LeadAssignmentReportsPage() {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="all">All Status</SelectItem>
-                          <SelectItem value="active">Active</SelectItem>
+                          <SelectItem value="assigned">Active</SelectItem>
                           <SelectItem value="in_progress">In Progress</SelectItem>
                           <SelectItem value="completed">Completed</SelectItem>
                           <SelectItem value="transferred">Transferred</SelectItem>

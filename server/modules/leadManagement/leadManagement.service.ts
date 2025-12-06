@@ -436,7 +436,7 @@ export async function getLeadAssignmentReport(filters?: {
   userId?: string;
   fromDate?: string;
   toDate?: string;
-  groupBy?: 'user' | 'day' | 'status';
+  groupBy?: 'user' | 'day' | 'status' | 'priority';
 }): Promise<any> {
   const matchStage: any = {};
   
@@ -478,6 +478,14 @@ export async function getLeadAssignmentReport(filters?: {
       groupStage = {
         $group: {
           _id: '$status',
+          count: { $sum: 1 },
+        }
+      };
+      break;
+    case 'priority':
+      groupStage = {
+        $group: {
+          _id: '$priority',
           count: { $sum: 1 },
         }
       };
