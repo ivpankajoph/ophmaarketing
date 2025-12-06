@@ -48,6 +48,19 @@ export async function getWhatsAppCredentialsForUser(userId?: string): Promise<Wh
     }
   }
   
+  // Fall back to system credentials from environment variables
+  const systemToken = process.env.WHATSAPP_TOKEN_NEW || process.env.WHATSAPP_TOKEN;
+  const systemPhoneNumberId = process.env.PHONE_NUMBER_ID;
+  
+  if (systemToken && systemPhoneNumberId) {
+    console.log('[WhatsApp Service] Using system credentials from environment');
+    return {
+      token: systemToken,
+      phoneNumberId: systemPhoneNumberId,
+      businessAccountId: process.env.BUSINESS_ACCOUNT_ID,
+    };
+  }
+  
   return null;
 }
 
