@@ -31,3 +31,10 @@ The system incorporates a modular backend structure, allowing for independent de
 - **Facebook Graph API**: For syncing Facebook Lead Forms, managing leads, and fetching template status.
 - **WhatsApp Business API**: For sending and receiving WhatsApp messages.
 - **Meta Business Suite**: For syncing and approving message templates.
+
+## Recent Changes (December 2025)
+- **Gemini AI Migration**: AI agents now primarily use Google Gemini (gemini-2.5-flash) with GOOGLE_API_KEY environment variable.
+- **AI Analytics Bug Fixes**: Added null safety guards to prevent crashes when phone numbers are undefined or malformed.
+- **Prefilled Text Mapping Fix**: Aligned MongoDB schema field from `text` to `prefilledText` to match service layer.
+- **WhatsApp Type Safety**: Fixed type errors in controller/service for userId handling with proper null checks.
+- **Contact Analytics**: System tracks 112+ contacts with interest level classification (interested/neutral/not interested).
