@@ -151,7 +151,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       subItems: [
         { label: "All Agents", href: "/ai/agents" },
         { label: "New Agent", href: "/ai/new" },
-        { label: "Agent Mapping", href: "/ai/map" },
+        // { label: "Agent Mapping", href: "/ai/map" },
         { label: "Pre-filled Text", href: "/ai/prefilled" },
         { label: "AI Reports", href: "/ai/reports" },
       ]

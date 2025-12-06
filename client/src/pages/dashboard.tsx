@@ -169,7 +169,9 @@ export default function Dashboard() {
             <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
             <p className="text-muted-foreground">Complete overview of your messaging performance {getPeriodLabel()}.</p>
           </div>
+   
           <div className="flex items-center gap-2">
+          
             <Select value={period} onValueChange={setPeriod}>
               <SelectTrigger className="w-[140px]">
                 <SelectValue placeholder="Select period" />
@@ -183,7 +185,7 @@ export default function Dashboard() {
             </Select>
           </div>
         </div>
-
+         <h1>ACTIVITY REPORT</h1>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <StatsCard 
             title="Total Messages" 
@@ -210,8 +212,9 @@ export default function Dashboard() {
             trend={{ value: stats?.changes.deliveredChange || 0, label: "from previous period" }}
           />
         </div>
-
+        <h1>AI REPORT</h1>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+
           <Card className="border-blue-200 bg-gradient-to-br from-blue-50 to-white dark:from-blue-950/20 dark:to-background">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">AI Responses</CardTitle>
@@ -281,7 +284,7 @@ export default function Dashboard() {
             </CardContent>
           </Card>
         </div>
-
+        <h1>PERFORMANCE REPORT</h1>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">

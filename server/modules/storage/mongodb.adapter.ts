@@ -387,6 +387,86 @@ const ContactAnalyticsSchema = new Schema({
   updatedAt: { type: String, required: true },
 }, { collection: 'contact_analytics' });
 
+const LeadAssignmentSchema = new Schema({
+  id: { type: String, required: true, unique: true },
+  contactId: { type: String, required: true, index: true },
+  chatId: { type: String, index: true },
+  phone: { type: String, required: true, index: true },
+  contactName: { type: String, default: '' },
+  assignedToUserId: { type: String, required: true, index: true },
+  assignedToUserName: { type: String, default: '' },
+  assignedByUserId: { type: String, required: true },
+  assignedByUserName: { type: String, default: '' },
+  status: { type: String, enum: ['assigned', 'in_progress', 'completed', 'reassigned', 'unassigned'], default: 'assigned' },
+  priority: { type: String, enum: ['low', 'medium', 'high', 'urgent'], default: 'medium' },
+  notes: { type: String, default: '' },
+  previousAssignments: [{
+    userId: String,
+    userName: String,
+    assignedAt: String,
+    unassignedAt: String,
+    reason: String
+  }],
+  slaDeadline: { type: String },
+  firstResponseAt: { type: String },
+  resolvedAt: { type: String },
+  createdAt: { type: String, required: true },
+  updatedAt: { type: String, required: true },
+}, { collection: 'lead_assignments' });
+
+LeadAssignmentSchema.index({ assignedToUserId: 1, status: 1 });
+LeadAssignmentSchema.index({ contactId: 1, assignedToUserId: 1 });
+
+const TeamHierarchySchema = new Schema({
+  id: { type: String, required: true, unique: true },
+  managerId: { type: String, required: true, unique: true, index: true },
+  managerName: { type: String, default: '' },
+  teamMembers: [{
+    userId: String,
+    userName: String,
+    addedAt: String
+  }],
+  createdAt: { type: String, required: true },
+  updatedAt: { type: String, required: true },
+}, { collection: 'team_hierarchy' });
+
+const ActivityLogSchema = new Schema({
+  id: { type: String, required: true, unique: true },
+  userId: { type: String, required: true, index: true },
+  userName: { type: String, default: '' },
+  userRole: { type: String, default: '' },
+  actionType: { type: String, enum: ['message_sent', 'message_received', 'lead_assigned', 'lead_reassigned', 'lead_completed', 'lead_viewed', 'login', 'logout'], required: true },
+  contactId: { type: String, index: true },
+  contactPhone: { type: String },
+  contactName: { type: String },
+  leadAssignmentId: { type: String },
+  metadata: { type: Schema.Types.Mixed, default: {} },
+  timestamp: { type: String, required: true },
+}, { collection: 'activity_logs' });
+
+ActivityLogSchema.index({ userId: 1, timestamp: -1 });
+ActivityLogSchema.index({ actionType: 1, timestamp: -1 });
+
+const UserActivityStatsSchema = new Schema({
+  id: { type: String, required: true, unique: true },
+  userId: { type: String, required: true, index: true },
+  userName: { type: String, default: '' },
+  date: { type: String, required: true, index: true },
+  messagesSent: { type: Number, default: 0 },
+  messagesReceived: { type: Number, default: 0 },
+  leadsAssigned: { type: Number, default: 0 },
+  leadsCompleted: { type: Number, default: 0 },
+  leadsInProgress: { type: Number, default: 0 },
+  avgResponseTimeMinutes: { type: Number, default: 0 },
+  totalResponseTimeMinutes: { type: Number, default: 0 },
+  responseCount: { type: Number, default: 0 },
+  activeHours: { type: [Number], default: [] },
+  createdAt: { type: String, required: true },
+  updatedAt: { type: String, required: true },
+}, { collection: 'user_activity_stats' });
+
+UserActivityStatsSchema.index({ userId: 1, date: -1 });
+
 export const Agent = mongoose.models.Agent || mongoose.model('Agent', AgentSchema);
 export const Form = mongoose.models.Form || mongoose.model('Form', FormSchema);
 export const Lead = mongoose.models.Lead || mongoose.model('Lead', LeadSchema);
@@ -412,6 +492,10 @@ export const ScheduledBroadcast = mongoose.models.ScheduledBroadcast || mongoose
 export const BlockedContact = mongoose.models.BlockedContact || mongoose.model('BlockedContact', BlockedContactSchema);
 export const UserCredentials = mongoose.models.UserCredentials || mongoose.model('UserCredentials', UserCredentialsSchema);
 export const ContactAnalytics = mongoose.models.ContactAnalytics || mongoose.model('ContactAnalytics', ContactAnalyticsSchema);
+export const LeadAssignment = mongoose.models.LeadAssignment || mongoose.model('LeadAssignment', LeadAssignmentSchema);
+export const TeamHierarchy = mongoose.models.TeamHierarchy || mongoose.model('TeamHierarchy', TeamHierarchySchema);
+export const ActivityLog = mongoose.models.ActivityLog || mongoose.model('ActivityLog', ActivityLogSchema);
+export const UserActivityStats = mongoose.models.UserActivityStats || mongoose.model('UserActivityStats', UserActivityStatsSchema);
 
 const modelMap: Record<string, Model<any>> = {
   agents: Agent,
@@ -439,6 +523,10 @@ const modelMap: Record<string, Model<any>> = {
   blocked_contacts: BlockedContact,
   user_credentials: UserCredentials,
   contact_analytics: ContactAnalytics,
+  lead_assignments: LeadAssignment,
+  team_hierarchy: TeamHierarchy,
+  activity_logs: ActivityLog,
+  user_activity_stats: UserActivityStats,
 };
 
 export async function readCollection<T>(collectionName: string): Promise<T[]> {
