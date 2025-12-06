@@ -425,7 +425,7 @@ export async function registerRoutes(
       }
       
       const assignments = await leadManagementService.getAllLeadAssignments({ 
-        status: 'assigned' 
+        status: ['assigned', 'in_progress']
       });
       const assignmentMap = new Map(assignments.map((a: any) => [a.contactId, a]));
       
@@ -438,6 +438,43 @@ export async function registerRoutes(
     } catch (error) {
       console.error('Error getting chats:', error);
       res.status(500).json({ message: "Failed to get chats" });
+    }
+  });
+
+  app.get("/api/chats/window", async (req, res) => {
+    try {
+      const userId = req.headers['x-user-id'] as string;
+      const userRole = (req.headers['x-user-role'] as string) || 'super_admin';
+      const userName = req.headers['x-user-name'] as string;
+      
+      let chats = await storage.getChats();
+      
+      if (userId && userRole !== 'super_admin' && userRole !== 'sub_admin') {
+        const permittedContactIds = await leadManagementService.getFilteredChatsForUser({
+          userId,
+          role: userRole as any,
+          name: userName,
+        });
+        
+        if (permittedContactIds.length > 0) {
+          chats = chats.filter(chat => permittedContactIds.includes(chat.contact.id));
+        } else if (userRole === 'user') {
+          chats = [];
+        }
+      }
+      
+      const now = new Date();
+      const windowChats = chats.filter(chat => {
+        if (chat.lastInboundMessageTime) {
+          const lastInbound = new Date(chat.lastInboundMessageTime);
+          const hoursDiff = (now.getTime() - lastInbound.getTime()) / (1000 * 60 * 60);
+          return hoursDiff <= 24;
+        }
+        return false;
+      });
+      res.json(windowChats);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to get window chats" });
     }
   });
 
@@ -653,43 +690,6 @@ export async function registerRoutes(
     } catch (error: any) {
       console.error("[InboxSendAI] Error:", error);
       res.status(500).json({ error: error.message || "Failed to send AI response" });
-    }
-  });
-
-  app.get("/api/chats/window", async (req, res) => {
-    try {
-      const userId = req.headers['x-user-id'] as string;
-      const userRole = (req.headers['x-user-role'] as string) || 'super_admin';
-      const userName = req.headers['x-user-name'] as string;
-      
-      let chats = await storage.getChats();
-      
-      if (userId && userRole !== 'super_admin' && userRole !== 'sub_admin') {
-        const permittedContactIds = await leadManagementService.getFilteredChatsForUser({
-          userId,
-          role: userRole as any,
-          name: userName,
-        });
-        
-        if (permittedContactIds.length > 0) {
-          chats = chats.filter(chat => permittedContactIds.includes(chat.contact.id));
-        } else if (userRole === 'user') {
-          chats = [];
-        }
-      }
-      
-      const now = new Date();
-      const windowChats = chats.filter(chat => {
-        if (chat.lastInboundMessageTime) {
-          const lastInbound = new Date(chat.lastInboundMessageTime);
-          const hoursDiff = (now.getTime() - lastInbound.getTime()) / (1000 * 60 * 60);
-          return hoursDiff <= 24;
-        }
-        return false;
-      });
-      res.json(windowChats);
-    } catch (error) {
-      res.status(500).json({ message: "Failed to get window chats" });
     }
   });
 

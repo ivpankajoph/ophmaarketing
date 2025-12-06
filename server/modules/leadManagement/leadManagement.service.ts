@@ -249,14 +249,20 @@ export async function getLeadAssignmentsByUser(userId: string, status?: string):
 }
 
 export async function getAllLeadAssignments(filters?: { 
-  status?: string; 
+  status?: string | string[]; 
   userId?: string;
   fromDate?: string;
   toDate?: string;
 }): Promise<any[]> {
   const query: any = {};
   
-  if (filters?.status) query.status = filters.status;
+  if (filters?.status) {
+    if (Array.isArray(filters.status)) {
+      query.status = { $in: filters.status };
+    } else {
+      query.status = filters.status;
+    }
+  }
   if (filters?.userId) query.assignedToUserId = filters.userId;
   if (filters?.fromDate || filters?.toDate) {
     query.createdAt = {};
