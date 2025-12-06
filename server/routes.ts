@@ -614,10 +614,15 @@ export async function registerRoutes(
           
           console.log(`[InboxSend] Using ${conversationHistory.length} messages for context, agent model: ${agent.model || 'default'}`);
           
+          // Get the last inbound message to respond to, or use a greeting prompt
+          const lastInboundMessage = conversationHistory.filter(m => m.role === 'user').pop();
+          const promptMessage = lastInboundMessage?.content || 
+            `Greet ${name || 'the customer'} warmly and introduce yourself as per your instructions.`;
+          
           const aiMessage = await aiService.generateAgentResponse(
-            `Generate a friendly personalized message for ${name || 'this customer'}. Keep it conversational and under 200 characters.`,
+            promptMessage,
             agent,
-            conversationHistory
+            conversationHistory.slice(0, -1) // Exclude the last message since we're using it as the prompt
           );
           
           if (!aiMessage) {
@@ -694,11 +699,10 @@ export async function registerRoutes(
       
       console.log(`[InboxSendAI] Generating contextual AI response with agent: ${agent.name} (model: ${agent.model || 'default'})`);
       
-      const context = userMessage 
-        ? `Customer ${name || ''} said: "${userMessage}". Please respond appropriately.`
-        : `Generate a friendly greeting for ${name || 'this customer'}.`;
+      // Use the user message directly as the prompt, or a simple greeting request
+      const promptMessage = userMessage || 'Hello';
       
-      const aiMessage = await aiService.generateAgentResponse(context, agent, []);
+      const aiMessage = await aiService.generateAgentResponse(promptMessage, agent, []);
       
       if (!aiMessage) {
         return res.status(500).json({ error: "Failed to generate AI response. Check if API key is configured for the agent model." });

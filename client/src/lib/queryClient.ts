@@ -5,23 +5,15 @@ const AUTH_STORAGE_KEY = "whatsapp_auth_user";
 function getAuthHeaders(): Record<string, string> {
   try {
     const stored = localStorage.getItem(AUTH_STORAGE_KEY);
-    console.log('[QueryClient] Raw localStorage:', stored);
-    if (!stored) {
-      console.log('[QueryClient] No user in localStorage');
-      return {};
-    }
+    if (!stored) return {};
     const user = JSON.parse(stored);
-    console.log('[QueryClient] Parsed user:', user);
-    const headers = {
+    return {
       "x-user-id": user.id || '',
       "x-user-role": user.role || 'user',
       "x-user-name": user.name || '',
       "x-user": JSON.stringify(user),
     };
-    console.log('[QueryClient] Sending headers:', headers);
-    return headers;
-  } catch (e) {
-    console.error('[QueryClient] Error parsing user:', e);
+  } catch {
     return {};
   }
 }
