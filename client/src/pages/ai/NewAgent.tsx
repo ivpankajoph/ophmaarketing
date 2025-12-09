@@ -179,35 +179,35 @@ export default function NewAgent() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="gpt-4o" className="flex items-center">
-                      <span className="font-medium">OpenAI GPT-4o</span>
+                      <span className="font-medium">Boomer GPT-4o</span>
                       <span className="ml-2 text-xs text-muted-foreground">(Most Intelligent)</span>
                     </SelectItem>
                     <SelectItem value="gpt-4o-mini">
-                      <span className="font-medium">OpenAI GPT-4o Mini</span>
+                      <span className="font-medium">Boomer GPT-4o Mini</span>
                       <span className="ml-2 text-xs text-muted-foreground">(Smart & Fast)</span>
                     </SelectItem>
                     <SelectItem value="gpt-4-turbo">
-                      <span className="font-medium">OpenAI GPT-4 Turbo</span>
+                      <span className="font-medium">Boomer GPT-4 Turbo</span>
                       <span className="ml-2 text-xs text-muted-foreground">(Premium)</span>
                     </SelectItem>
                     <SelectItem value="gpt-3.5-turbo">
-                      <span className="font-medium">OpenAI GPT-3.5</span>
+                      <span className="font-medium">Boomer GPT-3.5</span>
                       <span className="ml-2 text-xs text-muted-foreground">(Economy)</span>
                     </SelectItem>
                     <SelectItem value="gemini-2.5-flash">
-                      <span className="font-medium">Gemini 2.5 Flash</span>
+                      <span className="font-medium">Kaaya 2.5 Flash</span>
                       <span className="ml-2 text-xs text-muted-foreground">(Fast & Efficient)</span>
                     </SelectItem>
                     <SelectItem value="gemini-2.5-pro">
-                      <span className="font-medium">Gemini 2.5 Pro</span>
+                      <span className="font-medium">Kaaya 2.5 Pro</span>
                       <span className="ml-2 text-xs text-muted-foreground">(Advanced Reasoning)</span>
                     </SelectItem>
                     <SelectItem value="gemini-1.5-flash">
-                      <span className="font-medium">Gemini 1.5 Flash</span>
+                      <span className="font-medium">Kaaya 1.5 Flash</span>
                       <span className="ml-2 text-xs text-muted-foreground">(Budget Friendly)</span>
                     </SelectItem>
                     <SelectItem value="gemini-1.5-pro">
-                      <span className="font-medium">Gemini 1.5 Pro</span>
+                      <span className="font-medium">Kaaya 1.5 Pro</span>
                       <span className="ml-2 text-xs text-muted-foreground">(Multimodal)</span>
                     </SelectItem>
                   </SelectContent>

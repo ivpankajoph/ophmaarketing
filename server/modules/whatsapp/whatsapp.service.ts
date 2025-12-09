@@ -1,4 +1,5 @@
 import { credentialsService } from '../credentials/credentials.service';
+import * as integrationService from '../integrations/integration.service';
 
 export interface WhatsAppCredentials {
   token: string;
@@ -23,6 +24,16 @@ export interface TemplateComponent {
 
 export async function getUserWhatsAppCredentials(userId: string): Promise<WhatsAppCredentials | null> {
   try {
+    const integrationCreds = await integrationService.getDecryptedCredentials(userId, 'whatsapp');
+    if (integrationCreds?.accessToken && integrationCreds?.phoneNumberId) {
+      console.log('[WhatsApp Service] Using credentials from Connected Apps');
+      return {
+        token: integrationCreds.accessToken,
+        phoneNumberId: integrationCreds.phoneNumberId,
+        businessAccountId: integrationCreds.businessAccountId,
+      };
+    }
+    
     const creds = await credentialsService.getDecryptedCredentials(userId);
     
     if (creds?.whatsappToken && creds?.phoneNumberId) {

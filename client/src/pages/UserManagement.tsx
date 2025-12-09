@@ -306,9 +306,18 @@ export default function UserManagement() {
             <p className="text-muted-foreground">
               Create and manage users, assign roles and page access permissions
             </p>
+
+            <a href="/reports/lead-assignments">
+              <Button className="mt-4 cursor-pointer bg-white text-black border border-black">
+                See All Reports
+              </Button>
+            </a>
+
           </div>
           <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+            
             <DialogTrigger asChild>
+              
               <Button onClick={() => { resetForm(); setIsCreateOpen(true); }}>
                 <UserPlus className="mr-2 h-4 w-4" />
                 Create User

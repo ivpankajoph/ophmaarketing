@@ -5,7 +5,8 @@ import {
   UserActivityStats,
   Contact,
   Chat,
-  Message
+  Message,
+  User
 } from '../storage/mongodb.adapter';
 import { SystemUser } from '../users/user.model';
 
@@ -274,12 +275,33 @@ export async function getAllLeadAssignments(filters?: {
 }
 
 export async function getAssignableUsers(): Promise<any[]> {
-  const users = await SystemUser.find({ 
+  const systemUsers = await SystemUser.find({ 
     isActive: true,
     role: { $in: ['sub_admin', 'manager', 'user'] }
   }).select('-password').lean();
   
-  return users;
+  const registeredUsers = await User.find({
+    role: { $exists: true, $in: ['sub_admin', 'manager', 'user'] }
+  }).select('-password').lean();
+  
+  const seenIds = new Set<string>();
+  const uniqueUsers: any[] = [];
+  
+  for (const user of systemUsers) {
+    if (user.id && !seenIds.has(user.id)) {
+      seenIds.add(user.id);
+      uniqueUsers.push(user);
+    }
+  }
+  
+  for (const user of registeredUsers) {
+    if (user.id && !seenIds.has(user.id) && user.role) {
+      seenIds.add(user.id);
+      uniqueUsers.push(user);
+    }
+  }
+  
+  return uniqueUsers;
 }
 
 export async function getPermittedUserIds(context: UserRoleContext): Promise<string[] | null> {

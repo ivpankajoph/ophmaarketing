@@ -63,12 +63,70 @@ export default function AgentsPage() {
 
   const getModelDisplayName = (model: string): string => {
     const modelNames: { [key: string]: string } = {
-      "gpt-4o": "Bot 1",
-      "gpt-4o-mini": "Bot 2",
-      "gpt-4-turbo": "Bot 3",
-      "gpt-3.5-turbo": "Bot 4",
+      "gpt-4o": "GPT-4o",
+      "gpt-4o-mini": "GPT-4o Mini",
+      "gpt-4-turbo": "GPT-4 Turbo",
+      "gpt-3.5-turbo": "GPT-3.5",
+      "gemini-2.5-flash": "Gemini 2.5 Flash",
+      "gemini-2.5-pro": "Gemini 2.5 Pro",
+      "gemini-2.0-flash": "Gemini 2.0 Flash",
+      "gemini-1.5-flash": "Gemini 1.5 Flash",
+      "gemini-1.5-pro": "Gemini 1.5 Pro",
     };
     return modelNames[model] || model;
+  };
+
+  const getProviderFromModel = (model: string): 'openai' | 'gemini' => {
+    return model.startsWith('gemini-') ? 'gemini' : 'openai';
+  };
+
+  const getDefaultModelForProvider = (provider: 'openai' | 'gemini'): string => {
+    return provider === 'gemini' ? 'gemini-2.5-flash' : 'gpt-4o';
+  };
+
+  const switchAgentProvider = async (agent: Agent, newProvider: 'openai' | 'gemini') => {
+    const newModel = getDefaultModelForProvider(newProvider);
+    try {
+      const response = await fetch(`/api/agents/${agent.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ model: newModel }),
+      });
+
+      if (response.ok) {
+        const updated = await response.json();
+        setAgents((prev) => prev.map((a) => (a.id === agent.id ? updated : a)));
+        toast({ 
+          title: "Provider Switched", 
+          description: `${agent.name} now uses ${newProvider === 'openai' ? 'OpenAI' : 'Gemini'}.` 
+        });
+      }
+    } catch (error) {
+      toast({ title: "Error", description: "Failed to switch provider.", variant: "destructive" });
+    }
+  };
+
+  const switchAllAgentsToProvider = async (provider: 'openai' | 'gemini') => {
+    const newModel = getDefaultModelForProvider(provider);
+    try {
+      const updatePromises = agents.map(agent => 
+        fetch(`/api/agents/${agent.id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ model: newModel }),
+        })
+      );
+      
+      await Promise.all(updatePromises);
+      await fetchAgents();
+      
+      toast({ 
+        title: "All Agents Updated", 
+        description: `All agents now use ${provider === 'openai' ? 'OpenAI' : 'Gemini'}.` 
+      });
+    } catch (error) {
+      toast({ title: "Error", description: "Failed to update agents.", variant: "destructive" });
+    }
   };
 
   const fetchAgents = async () => {
@@ -218,13 +276,37 @@ export default function AgentsPage() {
             <h2 className="text-3xl font-bold tracking-tight">AI Agents</h2>
             <p className="text-muted-foreground">Create and manage AI agents for automated responses</p>
           </div>
-          <Dialog open={dialogOpen} onOpenChange={(open) => { setDialogOpen(open); if (!open) resetForm(); }}>
-            <DialogTrigger asChild>
-              <Button>
-                <Plus className="h-4 w-4 mr-2" />
-                New Agent
-              </Button>
-            </DialogTrigger>
+          <div className="flex items-center gap-2">
+            {agents.length > 0 && (
+              <div className="flex items-center gap-1 mr-2" title="Quick switch uses default models (GPT-4o / Gemini 2.5 Flash). Use Edit for specific models.">
+                <span className="text-sm text-muted-foreground mr-1">Switch All:</span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => switchAllAgentsToProvider('openai')}
+                  className="text-xs"
+                  title="Switch all agents to OpenAI GPT-4o"
+                >
+                  Boomer
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => switchAllAgentsToProvider('gemini')}
+                  className="text-xs"
+                  title="Switch all agents to Gemini 2.5 Flash"
+                >
+                  Kaaya
+                </Button>
+              </div>
+            )}
+            <Dialog open={dialogOpen} onOpenChange={(open) => { setDialogOpen(open); if (!open) resetForm(); }}>
+              <DialogTrigger asChild>
+                <Button>
+                  <Plus className="h-4 w-4 mr-2" />
+                  New Agent
+                </Button>
+              </DialogTrigger>
             <DialogContent className="max-w-2xl">
               <DialogHeader>
                 <DialogTitle>{editingAgent ? "Edit Agent" : "Create New Agent"}</DialogTitle>
@@ -252,12 +334,19 @@ export default function AgentsPage() {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="gpt-4o">Bot 1 (Most Intelligent)</SelectItem>
-                        <SelectItem value="gpt-4o-mini">Bot 2 (Smart & Fast)</SelectItem>
-                        <SelectItem value="gpt-4-turbo">Bot 3 (Premium)</SelectItem>
-                        <SelectItem value="gpt-3.5-turbo">Bot 4 (Economy)</SelectItem>
+                        <SelectItem value="gpt-4o">Boomer GPT-4o (Most Intelligent)</SelectItem>
+                        <SelectItem value="gpt-4o-mini">Boomer GPT-4o Mini (Smart & Fast)</SelectItem>
+                        <SelectItem value="gpt-4-turbo">Boomer GPT-4 Turbo (Premium)</SelectItem>
+                        <SelectItem value="gpt-3.5-turbo">Boomer GPT-3.5 (Economy)</SelectItem>
+                        <SelectItem value="gemini-2.5-flash">Kaaya 2.5 Flash (Fast & Efficient)</SelectItem>
+                        <SelectItem value="gemini-2.5-pro">Kaaya 2.5 Pro (Advanced)</SelectItem>
+                        <SelectItem value="gemini-1.5-flash">Kaaya 1.5 Flash (Budget)</SelectItem>
+                        <SelectItem value="gemini-1.5-pro">Kaaya 1.5 Pro (Multimodal)</SelectItem>
                       </SelectContent>
                     </Select>
+                    <p className="text-xs text-muted-foreground">
+                      OpenAI models use your OpenAI API key | Gemini models use your Google API key
+                    </p>
                   </div>
                 </div>
                 <div className="grid gap-2">
@@ -301,6 +390,7 @@ export default function AgentsPage() {
               </DialogFooter>
             </DialogContent>
           </Dialog>
+          </div>
         </div>
 
         <Card>
@@ -328,8 +418,8 @@ export default function AgentsPage() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Name</TableHead>
+                    <TableHead>Provider</TableHead>
                     <TableHead>Model</TableHead>
-                    <TableHead>Description</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
@@ -343,9 +433,30 @@ export default function AgentsPage() {
                           {agent.name}
                         </div>
                       </TableCell>
-                      <TableCell>{getModelDisplayName(agent.model)}</TableCell>
-                      <TableCell className="max-w-[200px] truncate">
-                        {agent.description || "-"}
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant={getProviderFromModel(agent.model) === 'openai' ? "default" : "outline"}
+                            size="sm"
+                            className="h-7 px-2 text-xs"
+                            onClick={() => switchAgentProvider(agent, 'openai')}
+                            title="Switch to OpenAI GPT-4o"
+                          >
+                            Boomer
+                          </Button>
+                          <Button
+                            variant={getProviderFromModel(agent.model) === 'gemini' ? "default" : "outline"}
+                            size="sm"
+                            className="h-7 px-2 text-xs"
+                            onClick={() => switchAgentProvider(agent, 'gemini')}
+                            title="Switch to Gemini 2.5 Flash"
+                          >
+                            Kaaya
+                          </Button>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline">{getModelDisplayName(agent.model)}</Badge>
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">

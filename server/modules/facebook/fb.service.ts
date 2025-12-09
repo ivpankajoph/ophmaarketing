@@ -1,5 +1,6 @@
 import { readCollection, writeCollection, findById, findByField } from '../storage';
 import * as leadAutoReply from '../leadAutoReply/leadAutoReply.service';
+import * as integrationService from '../integrations/integration.service';
 
 // Facebook tokens - we can use either a Page Access Token directly
 // or derive it from a User Access Token + Page ID
@@ -8,55 +9,85 @@ const FB_PAGE_ID = process.env.FB_PAGE_ID;
 
 // Cache for the actual Page Access Token
 let cachedPageAccessToken: string | null = null;
+let cachedPageId: string | null = null;
+
+// Function to get Facebook credentials from Connected Apps or environment
+async function getFacebookCredentials(userId: string = 'system'): Promise<{ token: string; pageId: string } | null> {
+  const integrationCreds = await integrationService.getDecryptedCredentials(userId, 'facebook');
+  if (integrationCreds?.accessToken && integrationCreds?.pageId) {
+    console.log('[FB] Using credentials from Connected Apps');
+    return {
+      token: integrationCreds.accessToken,
+      pageId: integrationCreds.pageId
+    };
+  }
+  
+  if (FB_USER_OR_PAGE_TOKEN && FB_PAGE_ID) {
+    return {
+      token: FB_USER_OR_PAGE_TOKEN,
+      pageId: FB_PAGE_ID
+    };
+  }
+  
+  return null;
+}
 
 // Function to get the actual Page Access Token
 // If user provides a User Access Token, we fetch the Page Access Token from /me/accounts
-async function getPageAccessToken(): Promise<string> {
-  if (cachedPageAccessToken) {
+async function getPageAccessToken(userId: string = 'system'): Promise<string> {
+  const creds = await getFacebookCredentials(userId);
+  
+  if (!creds) {
+    throw new Error('Facebook credentials not configured. Please connect Facebook in Settings > Connected Apps.');
+  }
+  
+  if (cachedPageAccessToken && cachedPageId === creds.pageId) {
     return cachedPageAccessToken;
   }
   
-  if (!FB_USER_OR_PAGE_TOKEN) {
-    throw new Error('Facebook credentials not configured. Please set FB_PAGE_ACCESS_TOKEN.');
-  }
+  const { token, pageId } = creds;
   
   // First, check if this is already a Page Access Token by trying to get page info
   try {
-    const meResponse = await fetch(`https://graph.facebook.com/v18.0/me?access_token=${FB_USER_OR_PAGE_TOKEN}`);
+    const meResponse = await fetch(`https://graph.facebook.com/v18.0/me?access_token=${token}`);
     const meData = await meResponse.json();
     
     // If this returns a page (has category field), it's a Page Access Token
     if (meData.category || meData.category_list) {
       console.log('[FB] Token is already a Page Access Token');
-      cachedPageAccessToken = FB_USER_OR_PAGE_TOKEN;
+      cachedPageAccessToken = token;
+      cachedPageId = pageId;
       return cachedPageAccessToken;
     }
     
     // If it's a user token, try to get the page token from /me/accounts
     console.log('[FB] Token is a User Access Token, fetching Page Access Token...');
-    const accountsResponse = await fetch(`https://graph.facebook.com/v18.0/me/accounts?access_token=${FB_USER_OR_PAGE_TOKEN}`);
+    const accountsResponse = await fetch(`https://graph.facebook.com/v18.0/me/accounts?access_token=${token}`);
     const accountsData = await accountsResponse.json();
     
     if (accountsData.data && accountsData.data.length > 0) {
       // Find the matching page by ID, or use the first one
-      const targetPage = FB_PAGE_ID 
-        ? accountsData.data.find((p: any) => p.id === FB_PAGE_ID)
+      const targetPage = pageId 
+        ? accountsData.data.find((p: any) => p.id === pageId)
         : accountsData.data[0];
         
       if (targetPage && targetPage.access_token) {
         console.log(`[FB] Found Page Access Token for page: ${targetPage.name} (${targetPage.id})`);
         cachedPageAccessToken = targetPage.access_token;
-        return cachedPageAccessToken as string;
+        cachedPageId = pageId;
+        return targetPage.access_token;
       }
     }
     
     // If we couldn't get a page token, use the original token
     console.log('[FB] Could not find Page Access Token, using original token');
-    cachedPageAccessToken = FB_USER_OR_PAGE_TOKEN;
+    cachedPageAccessToken = token;
+    cachedPageId = pageId;
     return cachedPageAccessToken;
   } catch (error) {
     console.error('[FB] Error determining token type:', error);
-    cachedPageAccessToken = FB_USER_OR_PAGE_TOKEN;
+    cachedPageAccessToken = token;
+    cachedPageId = pageId;
     return cachedPageAccessToken;
   }
 }
@@ -94,14 +125,15 @@ function generateId(prefix: string): string {
   return `${prefix}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 }
 
-export async function syncLeadForms(): Promise<LeadForm[]> {
-  if (!FB_USER_OR_PAGE_TOKEN || !FB_PAGE_ID) {
-    throw new Error('Facebook credentials not configured. Please set FB_PAGE_ACCESS_TOKEN and FB_PAGE_ID.');
+export async function syncLeadForms(userId: string = 'system'): Promise<LeadForm[]> {
+  const creds = await getFacebookCredentials(userId);
+  if (!creds) {
+    throw new Error('Facebook credentials not configured. Please connect Facebook in Settings > Connected Apps.');
   }
 
   try {
-    const pageToken = await getPageAccessToken();
-    const url = `https://graph.facebook.com/v18.0/${FB_PAGE_ID}/leadgen_forms?access_token=${pageToken}`;
+    const pageToken = await getPageAccessToken(userId);
+    const url = `https://graph.facebook.com/v18.0/${creds.pageId}/leadgen_forms?access_token=${pageToken}`;
     const response = await fetch(url);
     
     if (!response.ok) {
@@ -121,7 +153,7 @@ export async function syncLeadForms(): Promise<LeadForm[]> {
         fbFormId: fbForm.id,
         name: fbForm.name || 'Unnamed Form',
         status: fbForm.status || 'ACTIVE',
-        pageId: FB_PAGE_ID,
+        pageId: creds.pageId,
         createdTime: fbForm.created_time || now,
         syncedAt: now,
       };

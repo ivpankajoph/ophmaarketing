@@ -338,7 +338,7 @@ export default function WebhookAPI() {
                 </div>
               </CardContent>
               <CardFooter className="flex justify-between bg-muted/50 border-t p-6">
-                <Button 
+                {/* <Button 
                   variant="outline"
                   onClick={() => testWhatsAppMutation.mutate()}
                   disabled={testWhatsAppMutation.isPending || !status.hasWhatsApp}
@@ -349,7 +349,7 @@ export default function WebhookAPI() {
                     <Activity className="mr-2 h-4 w-4" />
                   )}
                   Test Connection
-                </Button>
+                </Button> */}
                 <Button 
                   onClick={handleSaveWhatsApp}
                   disabled={saveMutation.isPending}

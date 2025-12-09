@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { StatsCard } from "@/components/ui/stats-card";
@@ -101,11 +101,50 @@ const COLORS = ['#22c55e', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'
 
 export default function Dashboard() {
   const [period, setPeriod] = useState<string>("week");
+  const [selectedHour, setSelectedHour] = useState<string | null>(null);
+
+  // Generate hour options (0–23)
+  const hourOptions = useMemo(() => {
+    const formatHour = (hour: number): string => {
+      if (hour === 0) return '12 AM';
+      if (hour < 12) return `${hour} AM`;
+      if (hour === 12) return '12 PM';
+      return `${hour - 12} PM`;
+    };
+
+    return Array.from({ length: 24 }, (_, i) => {
+      const startHour = i;
+      const endHour = (i + 1) % 24;
+
+      const startLabel = formatHour(startHour);
+      const endLabel = formatHour(endHour);
+
+      return {
+        value: String(startHour), // represents the starting hour (0–23)
+        label: `${startLabel} – ${endLabel}`,
+      };
+    });
+  }, []);
+
+  // Reset hour when period changes away from "today"
+  const handlePeriodChange = (newPeriod: string) => {
+    setPeriod(newPeriod);
+    if (newPeriod !== "today") {
+      setSelectedHour(null);
+    }
+  };
+
+  const queryKey = ["/api/reports/enhanced-dashboard", period, selectedHour];
+  const queryParams = new URLSearchParams();
+  queryParams.set("period", period);
+  if (selectedHour !== null) {
+    queryParams.set("hour", selectedHour);
+  }
 
   const { data: stats, isLoading } = useQuery<EnhancedDashboardStats>({
-    queryKey: ["/api/reports/enhanced-dashboard", period],
+    queryKey,
     queryFn: async () => {
-      const res = await fetch(`/api/reports/enhanced-dashboard?period=${period}`);
+      const res = await fetch(`/api/reports/enhanced-dashboard?${queryParams.toString()}`);
       if (!res.ok) throw new Error("Failed to fetch stats");
       return res.json();
     },
@@ -113,9 +152,9 @@ export default function Dashboard() {
   });
 
   const { data: messages } = useQuery({
-    queryKey: ["/api/messages"],
+    queryKey: ["/api/messages", period, selectedHour],
     queryFn: async () => {
-      const res = await fetch("/api/messages");
+      const res = await fetch(`/api/messages?${queryParams.toString()}`);
       if (!res.ok) throw new Error("Failed to fetch messages");
       return res.json();
     },
@@ -134,7 +173,7 @@ export default function Dashboard() {
   }
 
   const chartData = stats?.dayWise || [];
-  
+
   const aiVsHumanData = [
     { name: 'AI Responses', value: stats?.summary.totalAiResponses || 0, color: '#3b82f6' },
     { name: 'Human Responses', value: stats?.summary.totalHumanResponses || 0, color: '#22c55e' },
@@ -152,11 +191,19 @@ export default function Dashboard() {
   };
 
   const getPeriodLabel = () => {
+    if (period === "today" && selectedHour !== null) {
+      const hourLabel = hourOptions.find(h => h.value === selectedHour)?.label || selectedHour;
+      return `today at ${hourLabel}`;
+    }
     switch (period) {
+      case 'hour': return 'in the last hour';
       case 'today': return 'today';
+      case 'today_hourly': return 'today (hourly)';
       case 'yesterday': return 'yesterday';
+      case 'yesterday_hourly': return 'yesterday (hourly)';
       case 'week': return 'this week';
       case 'month': return 'this month';
+      case 'year': return 'this year';
       default: return 'selected period';
     }
   };
@@ -169,23 +216,45 @@ export default function Dashboard() {
             <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
             <p className="text-muted-foreground">Complete overview of your messaging performance {getPeriodLabel()}.</p>
           </div>
-   
-          <div className="flex items-center gap-2">
-          
-            <Select value={period} onValueChange={setPeriod}>
-              <SelectTrigger className="w-[140px]">
+
+          <div className="flex items-center gap-2 flex-wrap">
+            <Select value={period} onValueChange={handlePeriodChange}>
+              <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Select period" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="today">Today</SelectItem>
+         
                 <SelectItem value="yesterday">Yesterday</SelectItem>
+   
                 <SelectItem value="week">Last 7 Days</SelectItem>
                 <SelectItem value="month">Last 30 Days</SelectItem>
+                <SelectItem value="year">Last Year</SelectItem>
               </SelectContent>
             </Select>
+
+            {period === "today" && (
+              <Select value={selectedHour ?? undefined} onValueChange={(v) => setSelectedHour(v)}>
+                <SelectTrigger className="w-[140px]">
+                  <SelectValue placeholder="Select hour" />
+                </SelectTrigger>
+                <SelectContent>
+                  {hourOptions.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
           </div>
         </div>
-         <h1>ACTIVITY REPORT</h1>
+
+        {/* Activity Report Section */}
+        <div className="flex items-center gap-2 mt-2">
+          <MessageCircle className="h-5 w-5 text-primary" />
+          <h3 className="text-lg font-semibold text-foreground">Activity Report</h3>
+        </div>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <StatsCard 
             title="Total Messages" 
@@ -212,9 +281,13 @@ export default function Dashboard() {
             trend={{ value: stats?.changes.deliveredChange || 0, label: "from previous period" }}
           />
         </div>
-        <h1>AI REPORT</h1>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
 
+        {/* AI Report Section */}
+        <div className="flex items-center gap-2 mt-2">
+          <Bot className="h-5 w-5 text-blue-500" />
+          <h3 className="text-lg font-semibold text-foreground">AI Report</h3>
+        </div>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <Card className="border-blue-200 bg-gradient-to-br from-blue-50 to-white dark:from-blue-950/20 dark:to-background">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">AI Responses</CardTitle>
@@ -284,7 +357,12 @@ export default function Dashboard() {
             </CardContent>
           </Card>
         </div>
-        <h1>PERFORMANCE REPORT</h1>
+
+        {/* Performance Report Section */}
+        <div className="flex items-center gap-2 mt-2">
+          <TrendingUp className="h-5 w-5 text-green-500" />
+          <h3 className="text-lg font-semibold text-foreground">Performance Report</h3>
+        </div>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -296,7 +374,7 @@ export default function Dashboard() {
               <Progress value={stats?.summary.deliveryRate || 0} className="h-2 mt-2" />
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Read Rate</CardTitle>

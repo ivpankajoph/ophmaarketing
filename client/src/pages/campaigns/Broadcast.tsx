@@ -18,7 +18,9 @@ import {
   Plus,
   Search,
   AlertCircle,
+  Smartphone,
 } from "lucide-react";
+import { PhonePreview } from "@/components/ui/phone-preview";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -651,9 +653,15 @@ export default function Broadcast() {
                     </Select>
                   </div>
                   {selectedTemplateId && (
-                    <div className="p-3 bg-muted rounded-lg">
-                      <p className="text-sm font-medium mb-1">Template: {selectedTemplateName}</p>
-                      <p className="text-sm text-muted-foreground">{message}</p>
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2 text-sm font-medium">
+                        <Smartphone className="h-4 w-4" />
+                        Preview: {selectedTemplateName}
+                      </div>
+                      <PhonePreview
+                        body={message}
+                        className="py-2"
+                      />
                     </div>
                   )}
                 </TabsContent>
@@ -663,7 +671,7 @@ export default function Broadcast() {
                     <Label>Message Text</Label>
                     <Textarea
                       placeholder="Type your message here... Use {{name}} for personalization"
-                      className="min-h-[150px]"
+                      className="min-h-[120px]"
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
                     />
@@ -671,6 +679,18 @@ export default function Broadcast() {
                       Note: Custom messages require the recipient to have messaged you first (24-hour window rule).
                     </p>
                   </div>
+                  {message && (
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2 text-sm font-medium">
+                        <Smartphone className="h-4 w-4" />
+                        Preview
+                      </div>
+                      <PhonePreview
+                        body={message}
+                        className="py-2"
+                      />
+                    </div>
+                  )}
                 </TabsContent>
 
                 <TabsContent value="ai_agent" className="space-y-4 mt-4">

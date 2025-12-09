@@ -6,7 +6,7 @@ export interface DateRange {
 }
 
 export interface TimeFilter {
-  period: 'today' | 'yesterday' | 'week' | 'month' | 'custom';
+  period: 'hour' | 'today' | 'today_hourly' | 'yesterday' | 'yesterday_hourly' | 'week' | 'month' | 'year' | 'custom';
   startDate?: string;
   endDate?: string;
 }
@@ -17,10 +17,15 @@ export function getDateRange(filter: TimeFilter): DateRange {
   let endDate = new Date(now);
   
   switch (filter.period) {
+    case 'hour':
+      startDate = new Date(now.getTime() - 60 * 60 * 1000);
+      break;
     case 'today':
+    case 'today_hourly':
       startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
       break;
     case 'yesterday':
+    case 'yesterday_hourly':
       startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
       endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
       break;
@@ -29,6 +34,9 @@ export function getDateRange(filter: TimeFilter): DateRange {
       break;
     case 'month':
       startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+      break;
+    case 'year':
+      startDate = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
       break;
     case 'custom':
       startDate = filter.startDate ? new Date(filter.startDate) : new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
@@ -694,7 +702,8 @@ export async function get24HourWindowStats(filter: TimeFilter, userId?: string) 
   const totalAiResponses = outbound.filter(m => m.agentId && m.agentId !== 'manual').length;
   const totalHumanResponses = outbound.filter(m => !m.agentId || m.agentId === 'manual').length;
   
-  const delivered = outbound.filter(m => ['delivered', 'read'].includes(m.status)).length;
+  // Count sent, delivered, read statuses - 'sent' means successfully sent to WhatsApp
+  const delivered = outbound.filter(m => ['sent', 'delivered', 'read'].includes(m.status)).length;
   const read = outbound.filter(m => m.status === 'read').length;
   
   const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -702,33 +711,65 @@ export async function get24HourWindowStats(filter: TimeFilter, userId?: string) 
   
   const duration = endDate.getTime() - startDate.getTime();
   const days = Math.ceil(duration / (24 * 60 * 60 * 1000));
+  const hours = Math.ceil(duration / (60 * 60 * 1000));
   
-  for (let d = 0; d < Math.min(days, 30); d++) {
-    const dayStart = new Date(startDate.getTime() + d * 24 * 60 * 60 * 1000);
-    dayStart.setHours(0, 0, 0, 0);
-    const dayEnd = new Date(dayStart.getTime() + 24 * 60 * 60 * 1000);
-    
-    const dayMessages = filteredMessages.filter(m => {
-      const timestamp = new Date(m.timestamp || m.createdAt);
-      return timestamp >= dayStart && timestamp < dayEnd;
-    });
-    
-    const dayOutbound = dayMessages.filter(m => m.direction === 'outbound');
-    const dayInbound = dayMessages.filter(m => m.direction === 'inbound');
-    const dayDelivered = dayOutbound.filter(m => ['delivered', 'read'].includes(m.status));
-    const dayRead = dayOutbound.filter(m => m.status === 'read');
-    const dayAi = dayOutbound.filter(m => m.agentId && m.agentId !== 'manual');
-    const dayHuman = dayOutbound.filter(m => !m.agentId || m.agentId === 'manual');
-    
-    dayWise.push({
-      day: days <= 7 ? dayNames[dayStart.getDay()] : `${dayStart.getDate()}/${dayStart.getMonth() + 1}`,
-      sent: dayOutbound.length,
-      delivered: dayDelivered.length,
-      read: dayRead.length,
-      inbound: dayInbound.length,
-      ai: dayAi.length,
-      human: dayHuman.length
-    });
+  // If hourly period, show hourly breakdown (24 hours)
+  const isHourlyView = filter.period === 'hour' || filter.period === 'today_hourly' || filter.period === 'yesterday_hourly';
+  if (isHourlyView) {
+    for (let h = 0; h < 24; h++) {
+      const hourStart = new Date(startDate.getTime() + h * 60 * 60 * 1000);
+      const hourEnd = new Date(hourStart.getTime() + 60 * 60 * 1000);
+      
+      const hourMessages = filteredMessages.filter(m => {
+        const timestamp = new Date(m.timestamp || m.createdAt);
+        return timestamp >= hourStart && timestamp < hourEnd;
+      });
+      
+      const hourOutbound = hourMessages.filter(m => m.direction === 'outbound');
+      const hourInbound = hourMessages.filter(m => m.direction === 'inbound');
+      const hourDelivered = hourOutbound.filter(m => ['sent', 'delivered', 'read'].includes(m.status));
+      const hourRead = hourOutbound.filter(m => m.status === 'read');
+      const hourAi = hourOutbound.filter(m => m.agentId && m.agentId !== 'manual');
+      const hourHuman = hourOutbound.filter(m => !m.agentId || m.agentId === 'manual');
+      
+      dayWise.push({
+        day: `${hourStart.getHours().toString().padStart(2, '0')}:00`,
+        sent: hourOutbound.length,
+        delivered: hourDelivered.length,
+        read: hourRead.length,
+        inbound: hourInbound.length,
+        ai: hourAi.length,
+        human: hourHuman.length
+      });
+    }
+  } else {
+    for (let d = 0; d < Math.min(days, 30); d++) {
+      const dayStart = new Date(startDate.getTime() + d * 24 * 60 * 60 * 1000);
+      dayStart.setHours(0, 0, 0, 0);
+      const dayEnd = new Date(dayStart.getTime() + 24 * 60 * 60 * 1000);
+      
+      const dayMessages = filteredMessages.filter(m => {
+        const timestamp = new Date(m.timestamp || m.createdAt);
+        return timestamp >= dayStart && timestamp < dayEnd;
+      });
+      
+      const dayOutbound = dayMessages.filter(m => m.direction === 'outbound');
+      const dayInbound = dayMessages.filter(m => m.direction === 'inbound');
+      const dayDelivered = dayOutbound.filter(m => ['sent', 'delivered', 'read'].includes(m.status));
+      const dayRead = dayOutbound.filter(m => m.status === 'read');
+      const dayAi = dayOutbound.filter(m => m.agentId && m.agentId !== 'manual');
+      const dayHuman = dayOutbound.filter(m => !m.agentId || m.agentId === 'manual');
+      
+      dayWise.push({
+        day: days <= 7 ? dayNames[dayStart.getDay()] : `${dayStart.getDate()}/${dayStart.getMonth() + 1}`,
+        sent: dayOutbound.length,
+        delivered: dayDelivered.length,
+        read: dayRead.length,
+        inbound: dayInbound.length,
+        ai: dayAi.length,
+        human: dayHuman.length
+      });
+    }
   }
   
   return {

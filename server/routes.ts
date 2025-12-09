@@ -25,6 +25,8 @@ import reportsRoutes from "./modules/reports/reports.routes";
 import usersRoutes from "./modules/users/users.routes";
 import contactAnalyticsRoutes from "./modules/contactAnalytics/contactAnalytics.controller";
 import leadManagementRoutes from "./modules/leadManagement/leadManagement.routes";
+import integrationRoutes from "./modules/integrations/integration.routes";
+import automationRoutes from "./modules/automation/automation.routes";
 import * as broadcastService from "./modules/broadcast/broadcast.service";
 import * as agentService from "./modules/aiAgents/agent.service";
 import * as openaiService from "./modules/openai/openai.service";
@@ -1527,6 +1529,8 @@ export async function registerRoutes(
   app.use("/api/users", usersRoutes);
   app.use("/api/contact-analytics", contactAnalyticsRoutes);
   app.use("/api/lead-management", leadManagementRoutes);
+  app.use("/api/integrations", integrationRoutes);
+  app.use("/api/automation", automationRoutes);
 
   app.get("/api/chats/whatsapp-leads", async (req, res) => {
     try {
