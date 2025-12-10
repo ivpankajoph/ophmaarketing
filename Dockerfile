@@ -36,9 +36,7 @@ ENV PORT=8080
 # Expose the port (GCP Cloud Run uses PORT env variable)
 EXPOSE 8080
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:${PORT}/api/health || exit 1
+
 
 # Start the application
 CMD ["node", "dist/index.cjs"]
