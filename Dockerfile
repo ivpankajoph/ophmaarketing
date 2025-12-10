@@ -12,6 +12,8 @@ RUN npm ci
 # Copy source code
 COPY . .
 
+
+
 # Build the application
 RUN npm run build
 
@@ -19,6 +21,8 @@ RUN npm run build
 FROM node:20-alpine AS production
 
 WORKDIR /app
+
+
 
 # Copy package files
 COPY package*.json ./
@@ -28,6 +32,11 @@ RUN npm ci --omit=dev
 
 # Copy built files from builder stage
 COPY --from=builder /app/dist ./dist
+
+
+COPY server/keys ./keys
+
+
 
 # Set environment variables
 ENV NODE_ENV=production
