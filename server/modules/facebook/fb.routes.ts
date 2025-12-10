@@ -37,13 +37,15 @@ router.post("/flow", async (req, res) => {
     });
 
     // 4. Create Response
-    const responseBody = {
-      screen: "FINAL_SCREEN",
-      data: {
-        message: "Your flow has been processed successfully 🎉",
-        echo: decrypted.data
-      }
-    };
+   const responseBody = {
+  version: "1.0",
+  screen: "FINAL_SCREEN",
+  data: {
+    message: "Your flow has been processed successfully 🎉",
+    echo: decrypted.data
+  }
+};
+
 
     // 5. Encrypt response
     const encryptedResponse = encryptResponse(responseBody, aesKey, Buffer.from(initial_vector, "base64"));
