@@ -1,4 +1,4 @@
-import { DripCampaign, IDripCampaign, IDripStep, DripRun, IDripRun } from './drip.model';
+import { DripCampaign, IDripCampaign, IDripStep, DripRun, IDripRun, AutoTriggerSource } from './drip.model';
 
 export async function createCampaign(userId: string, data: Partial<IDripCampaign>): Promise<IDripCampaign> {
   const campaign = new DripCampaign({
@@ -229,7 +229,13 @@ export async function enrollContact(userId: string, campaignId: string, contactI
 
 function calculateNextStepTime(campaign: IDripCampaign, step: IDripStep, baseDate: Date): Date {
   const result = new Date(baseDate);
-  result.setDate(result.getDate() + step.dayOffset);
+  const totalDays = (step.dayOffset || 0) + (step.delayDays || 0);
+  const totalHours = step.delayHours || 0;
+  const totalMinutes = step.delayMinutes || 0;
+  
+  result.setDate(result.getDate() + totalDays);
+  result.setHours(result.getHours() + totalHours);
+  result.setMinutes(result.getMinutes() + totalMinutes);
   
   if (step.timeOfDay) {
     const [hours, minutes] = step.timeOfDay.split(':').map(Number);
@@ -468,4 +474,83 @@ export async function getCampaignStats(userId: string): Promise<{
     overallReplyRate: totals.read > 0 ? Math.round((totals.replied / totals.read) * 100) : 0,
     overallConversionRate: totals.enrolled > 0 ? Math.round((totals.converted / totals.enrolled) * 100) : 0
   };
+}
+
+export async function getAutoTriggerCampaigns(userId: string, triggerSource: AutoTriggerSource): Promise<IDripCampaign[]> {
+  return DripCampaign.find({
+    userId,
+    status: 'active',
+    'autoTrigger.enabled': true,
+    'autoTrigger.sources': triggerSource
+  });
+}
+
+export async function autoEnrollContact(
+  userId: string,
+  contactId: string,
+  contactPhone: string,
+  triggerSource: AutoTriggerSource,
+  variables?: Record<string, any>
+): Promise<{ enrolled: string[]; skipped: string[]; errors: string[] }> {
+  const campaigns = await getAutoTriggerCampaigns(userId, triggerSource);
+  
+  const results = {
+    enrolled: [] as string[],
+    skipped: [] as string[],
+    errors: [] as string[]
+  };
+
+  for (const campaign of campaigns) {
+    try {
+      const existingRun = await DripRun.findOne({ 
+        campaignId: campaign._id, 
+        contactId 
+      });
+
+      if (existingRun && !campaign.settings.allowReEntry) {
+        results.skipped.push(campaign.name);
+        continue;
+      }
+
+      if (existingRun && campaign.settings.allowReEntry) {
+        const daysSinceExit = existingRun.exitedAt 
+          ? (Date.now() - existingRun.exitedAt.getTime()) / (1000 * 60 * 60 * 24)
+          : 0;
+        if (daysSinceExit < campaign.settings.reEntryDelayDays) {
+          results.skipped.push(campaign.name);
+          continue;
+        }
+      }
+
+      await enrollContact(
+        userId, 
+        campaign._id.toString(), 
+        contactId, 
+        contactPhone, 
+        { ...variables, triggerSource }
+      );
+      
+      results.enrolled.push(campaign.name);
+      console.log(`[Drip] Auto-enrolled contact ${contactPhone} in campaign "${campaign.name}" via ${triggerSource}`);
+    } catch (error: any) {
+      console.error(`[Drip] Failed to auto-enroll in "${campaign.name}":`, error.message);
+      results.errors.push(`${campaign.name}: ${error.message}`);
+    }
+  }
+
+  return results;
+}
+
+export async function getActiveCampaignsForInterest(userId: string, interestLevel: string): Promise<IDripCampaign[]> {
+  const triggerSource = `interest_${interestLevel}` as AutoTriggerSource;
+  return getAutoTriggerCampaigns(userId, triggerSource);
+}
+
+export async function getCampaignsWithAutoTrigger(userId: string): Promise<IDripCampaign[]> {
+  return DripCampaign.find({
+    userId,
+    status: 'active',
+    'autoTrigger.enabled': true,
+    'autoTrigger.sources': { $exists: true, $ne: [] }
+  });
 }

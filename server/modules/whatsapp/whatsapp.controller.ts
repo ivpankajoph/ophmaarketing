@@ -6,6 +6,7 @@ import { getAllLeads } from '../facebook/fb.service';
 import { storage } from '../../storage';
 import * as aiAnalytics from '../aiAnalytics/aiAnalytics.service';
 import * as broadcastService from '../broadcast/broadcast.service';
+import * as campaignService from '../broadcast/campaign.service';
 import * as contactAgentService from '../contactAgent/contactAgent.service';
 import * as prefilledTextService from '../prefilledText/prefilledText.service';
 import { credentialsService } from '../credentials/credentials.service';
@@ -13,6 +14,7 @@ import * as whatsappService from './whatsapp.service';
 import { isContactBlocked, isPhoneBlocked, listAllBlockedContacts } from '../contacts/contacts.routes';
 import { getUserId } from '../auth/auth.routes';
 import { contactAnalyticsService } from '../contactAnalytics/contactAnalytics.service';
+import { interestClassificationService } from '../automation/interest/interest.service';
 
 const WHATSAPP_TOKEN = process.env.WHATSAPP_TOKEN_NEW || process.env.WHATSAPP_TOKEN;
 const PHONE_NUMBER_ID = process.env.PHONE_NUMBER_ID;
@@ -38,6 +40,27 @@ interface ConversationHistory {
 }
 
 const conversationHistory: ConversationHistory = {};
+
+async function handleStatusUpdates(statuses: any[]): Promise<void> {
+  for (const status of statuses) {
+    const messageId = status.id;
+    const statusType = status.status;
+    const recipientPhone = status.recipient_id;
+    const timestamp = status.timestamp ? new Date(parseInt(status.timestamp) * 1000) : new Date();
+
+    console.log(`[Webhook Status] Message ${messageId} status: ${statusType} for ${recipientPhone}`);
+
+    try {
+      if (statusType === 'delivered') {
+        await campaignService.updateCampaignContactStatus(messageId, 'delivered', timestamp);
+      } else if (statusType === 'read') {
+        await campaignService.updateCampaignContactStatus(messageId, 'read', timestamp);
+      }
+    } catch (error) {
+      console.error(`[Webhook Status] Error updating campaign status:`, error);
+    }
+  }
+}
 
 export async function verifyWebhook(req: Request, res: Response) {
   const mode = req.query['hub.mode'];
@@ -68,6 +91,13 @@ export async function handleWebhook(req: Request, res: Response) {
     const changes = entry?.changes?.[0];
     const value = changes?.value;
     const messages = value?.messages;
+    const statuses = value?.statuses;
+
+    // Handle message status updates (delivered, read, sent)
+    if (statuses && statuses.length > 0) {
+      await handleStatusUpdates(statuses);
+      return res.sendStatus(200);
+    }
 
     if (!messages || messages.length === 0) {
       return res.sendStatus(200);
@@ -203,6 +233,24 @@ export async function handleWebhook(req: Request, res: Response) {
     if (!savedMessage) {
       console.log(`[Webhook] Duplicate message detected (${whatsappMessageId}), skipping AI processing`);
       return res.sendStatus(200);
+    }
+
+    // Classify contact interest level based on message content
+    if (savedMessage && savedMessage.contactId && (messageText || buttonPayload)) {
+      try {
+        const classificationResult = await interestClassificationService.classifyAndUpdateContact(
+          messageText || buttonPayload,
+          savedMessage.contactId,
+          from,
+          resolvedUserId || 'system'
+        );
+        console.log(`[Webhook] Interest classification for ${from}: ${classificationResult.classification.status} (${classificationResult.classification.confidence})`);
+        if (classificationResult.triggeredCampaigns.length > 0) {
+          console.log(`[Webhook] Triggered drip campaigns: ${classificationResult.triggeredCampaigns.join(', ')}`);
+        }
+      } catch (classifyError) {
+        console.error('[Webhook] Error classifying interest:', classifyError);
+      }
     }
 
     // For media messages, we still save them but don't process with AI
@@ -438,6 +486,13 @@ async function saveInboundMessage(from: string, content: string, type: string, b
       }
     } catch (err) {
       console.error('[Webhook] Error marking broadcast as replied:', err);
+    }
+    
+    // Mark campaign contacts as replied
+    try {
+      await campaignService.markCampaignContactAsReplied(from, content);
+    } catch (err) {
+      console.error('[Webhook] Error marking campaign as replied:', err);
     }
     
     const contacts = await storage.getContacts();

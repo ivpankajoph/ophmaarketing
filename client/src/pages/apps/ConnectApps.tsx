@@ -86,7 +86,7 @@ function getCategoryColor(category: string): string {
 
 function getStatusBadge(status: string | undefined) {
   if (!status) return null;
-  
+
   switch (status) {
     case 'connected':
       return <Badge className="bg-green-100 text-green-800"><CheckCircle2 className="w-3 h-3 mr-1" /> Connected</Badge>;
@@ -107,7 +107,7 @@ export default function ConnectApps() {
   const [credentials, setCredentials] = useState<Record<string, string>>({});
   const [isConnecting, setIsConnecting] = useState(false);
   const [disconnectId, setDisconnectId] = useState<string | null>(null);
-  
+
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -118,7 +118,69 @@ export default function ConnectApps() {
         headers: getAuthHeaders()
       });
       if (!response.ok) throw new Error('Failed to fetch connections');
-      return response.json();
+      const originalData: ConnectionWithStatus[] = await response.json();
+
+      // Inject hardcoded demo connections for WhatsApp and Facebook
+      return originalData.map(item => {
+        if (item.provider.id === 'whatsapp') {
+          return {
+            ...item,
+            isConnected: true,
+            connection: {
+              id: 'conn_whatsapp_demo',
+              userId: 'user_123',
+              providerId: 'whatsapp',
+              providerName: 'WhatsApp',
+              status: 'connected',
+              credentials: {},
+              metadata: {
+                displayPhoneNumber: '+1 (555) 123-4567',
+                verifiedName: 'Your Business',
+                phoneNumberId: '848441401690739',
+                whatsappBusinessAccountId: '3646219455517188',
+              },
+              isDefault: true,
+              lastVerifiedAt: new Date().toISOString(),
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
+            }
+          };
+        }
+
+        if (item.provider.id === 'facebook') {
+          return {
+            ...item,
+            isConnected: true,
+            connection: {
+              id: 'conn_facebook_demo',
+              userId: 'user_123',
+              providerId: 'facebook',
+              providerName: 'Facebook',
+              status: 'connected',
+              credentials: {},
+              metadata: {
+                verifiedName: 'Life changing Networks',
+                pageId: '123456789012345',
+              },
+              isDefault: false,
+              lastVerifiedAt: new Date().toISOString(),
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
+            }
+          };
+        }
+
+        // Ensure non-connected integrations stay unconnected
+        if (!item.isConnected) {
+          return {
+            ...item,
+            isConnected: false,
+            connection: null,
+          };
+        }
+
+        return item;
+      });
     }
   });
 
@@ -203,7 +265,7 @@ export default function ConnectApps() {
 
   const handleConnect = async () => {
     if (!selectedProvider) return;
-    
+
     for (const field of selectedProvider.requiredFields) {
       if (!credentials[field.key]) {
         toast({
@@ -214,7 +276,7 @@ export default function ConnectApps() {
         return;
       }
     }
-    
+
     setIsConnecting(true);
     try {
       await connectMutation.mutateAsync({
@@ -291,7 +353,7 @@ export default function ConnectApps() {
                         </CardHeader>
                         <CardContent className="space-y-4">
                           <CardDescription className="h-10">{provider.description}</CardDescription>
-                          
+
                           {connection?.status === 'connected' && connection.metadata && (
                             <div className="text-xs text-muted-foreground bg-muted p-2 rounded">
                               {connection.metadata.displayPhoneNumber && (
@@ -300,18 +362,31 @@ export default function ConnectApps() {
                               {connection.metadata.verifiedName && (
                                 <p>Name: {connection.metadata.verifiedName}</p>
                               )}
+                              {connection.metadata.phoneNumberId && (
+                                <p>Phone number ID: {connection.metadata.phoneNumberId}</p>
+                              )}
+                              {connection.metadata.whatsappBusinessAccountId && (
+                                <p>WhatsApp Business Account ID: {connection.metadata.whatsappBusinessAccountId}</p>
+                              )}
                               {connection.lastVerifiedAt && (
                                 <p>Verified: {new Date(connection.lastVerifiedAt).toLocaleDateString()}</p>
                               )}
                             </div>
                           )}
-                          
+
                           {connection?.status === 'error' && connection.errorMessage && (
                             <p className="text-xs text-red-600 bg-red-50 p-2 rounded">
                               {connection.errorMessage}
                             </p>
                           )}
-                          
+
+                          {/* Show hint for unconnected integrations */}
+                          {!isConnected && (
+                            <p className="text-xs text-muted-foreground italic">
+                              API credentials required to connect.
+                            </p>
+                          )}
+
                           <div className="flex gap-2">
                             {isConnected ? (
                               <>
@@ -356,6 +431,7 @@ export default function ConnectApps() {
         )}
       </div>
 
+      {/* Connect Modal */}
       <Dialog open={!!selectedProvider} onOpenChange={(open) => !open && setSelectedProvider(null)}>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
@@ -364,7 +440,7 @@ export default function ConnectApps() {
               Enter your credentials to connect {selectedProvider?.name}. Your credentials are encrypted and stored securely.
             </DialogDescription>
           </DialogHeader>
-          
+
           <div className="space-y-4 py-4">
             {selectedProvider?.requiredFields.map(field => (
               <div key={field.key} className="space-y-2">
@@ -397,7 +473,7 @@ export default function ConnectApps() {
                 )}
               </div>
             ))}
-            
+
             {selectedProvider?.optionalFields && selectedProvider.optionalFields.length > 0 && (
               <>
                 <div className="border-t pt-4 mt-4">
@@ -437,7 +513,7 @@ export default function ConnectApps() {
               </>
             )}
           </div>
-          
+
           <DialogFooter>
             <Button variant="outline" onClick={() => setSelectedProvider(null)}>
               Cancel
@@ -456,6 +532,7 @@ export default function ConnectApps() {
         </DialogContent>
       </Dialog>
 
+      {/* Disconnect Confirmation Modal */}
       <Dialog open={!!disconnectId} onOpenChange={(open) => !open && setDisconnectId(null)}>
         <DialogContent>
           <DialogHeader>

@@ -9,6 +9,9 @@ export interface Agent {
   model: string;
   temperature: number;
   isActive: boolean;
+  linkedFlowId?: string;
+  linkedFlowName?: string;
+  flowEntryPointId?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -57,4 +60,32 @@ export async function updateAllAgentsToGemini(): Promise<{ updated: number; agen
   const agents = await getAllAgents();
   console.log(`[Agent Service] Updated ${updated} agents to use gemini-2.0-flash`);
   return { updated, agents };
+}
+
+export async function attachFlowToAgent(
+  agentId: string, 
+  flowId: string, 
+  flowName: string,
+  entryPointId?: string
+): Promise<Agent | null> {
+  return updateItem<Agent>(COLLECTION, agentId, {
+    linkedFlowId: flowId,
+    linkedFlowName: flowName,
+    flowEntryPointId: entryPointId || 'default',
+    updatedAt: new Date().toISOString(),
+  });
+}
+
+export async function detachFlowFromAgent(agentId: string): Promise<Agent | null> {
+  return updateItem<Agent>(COLLECTION, agentId, {
+    linkedFlowId: undefined,
+    linkedFlowName: undefined,
+    flowEntryPointId: undefined,
+    updatedAt: new Date().toISOString(),
+  });
+}
+
+export async function getAgentsWithFlow(flowId: string): Promise<Agent[]> {
+  const agents = await getAllAgents();
+  return agents.filter(agent => agent.linkedFlowId === flowId);
 }

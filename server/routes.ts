@@ -35,7 +35,7 @@ import * as templateService from "./modules/leadAutoReply/templateMessages.servi
 import * as mongodb from "./modules/storage/mongodb.adapter";
 import * as contactAgentService from "./modules/contactAgent/contactAgent.service";
 import * as leadManagementService from "./modules/leadManagement/leadManagement.service";
-
+import flowHandler from "./modules/facebook/fb.routes.ts"
 export async function registerRoutes(
   httpServer: Server,
   app: Express
@@ -1531,7 +1531,7 @@ export async function registerRoutes(
   app.use("/api/lead-management", leadManagementRoutes);
   app.use("/api/integrations", integrationRoutes);
   app.use("/api/automation", automationRoutes);
-
+  app.use("/api/flow", flowHandler);
   app.get("/api/chats/whatsapp-leads", async (req, res) => {
     try {
       const allChats = await storage.getChats();
@@ -1579,3 +1579,4 @@ export async function registerRoutes(
 
   return httpServer;
 }
+

@@ -177,9 +177,32 @@ const ContactSchema = new Schema({
   email: { type: String, default: '' },
   tags: { type: [String], default: [] },
   notes: { type: String, default: '' },
+  interestStatus: { type: String, enum: ['interested', 'not_interested', 'neutral', 'pending'], default: 'pending', index: true },
+  interestConfidence: { type: Number, default: 0 },
+  lastInterestUpdate: { type: Date },
+  lastInboundAt: { type: Date },
+  assignedDripCampaignIds: { type: [String], default: [] },
   createdAt: { type: String, required: true },
   updatedAt: { type: String, required: true },
 }, { collection: 'contacts' });
+
+const InterestClassificationLogSchema = new Schema({
+  contactId: { type: String, required: true, index: true },
+  contactPhone: { type: String, required: true },
+  userId: { type: String, required: true, index: true },
+  messageContent: { type: String, required: true },
+  previousStatus: { type: String, enum: ['interested', 'not_interested', 'neutral', 'pending'] },
+  newStatus: { type: String, enum: ['interested', 'not_interested', 'neutral', 'pending'], required: true },
+  confidence: { type: Number, required: true },
+  classificationMethod: { type: String, enum: ['ai', 'keyword', 'manual'], required: true },
+  aiResponse: { type: String },
+  keywords: { type: [String], default: [] },
+  triggeredCampaigns: { type: [String], default: [] },
+  createdAt: { type: Date, default: Date.now }
+}, { collection: 'interest_classification_logs' });
+
+InterestClassificationLogSchema.index({ userId: 1, createdAt: -1 });
+InterestClassificationLogSchema.index({ contactId: 1, createdAt: -1 });
 
 const MessageSchema = new Schema({
   id: { type: String, required: true, unique: true },
@@ -478,6 +501,7 @@ export const BroadcastLog = mongoose.models.BroadcastLog || mongoose.model('Broa
 export const ImportedContact = mongoose.models.ImportedContact || mongoose.model('ImportedContact', ImportedContactSchema);
 export const ContactAgent = mongoose.models.ContactAgent || mongoose.model('ContactAgent', ContactAgentSchema);
 export const Contact = mongoose.models.Contact || mongoose.model('Contact', ContactSchema);
+export const InterestClassificationLog = mongoose.models.InterestClassificationLog || mongoose.model('InterestClassificationLog', InterestClassificationLogSchema);
 export const Message = mongoose.models.Message || mongoose.model('Message', MessageSchema);
 export const Chat = mongoose.models.Chat || mongoose.model('Chat', ChatSchema);
 export const Campaign = mongoose.models.Campaign || mongoose.model('Campaign', CampaignSchema);
@@ -509,6 +533,7 @@ const modelMap: Record<string, Model<any>> = {
   imported_contacts: ImportedContact,
   contact_agents: ContactAgent,
   contacts: Contact,
+  interest_classification_logs: InterestClassificationLog,
   messages: Message,
   chats: Chat,
   campaigns: Campaign,

@@ -4,9 +4,12 @@ export interface IDripStep {
   id: string;
   order: number;
   name: string;
-  dayOffset: number;
+  dayOffset?: number;
+  delayDays?: number;
+  delayHours?: number;
+  delayMinutes?: number;
   timeOfDay?: string;
-  messageType: 'template' | 'text' | 'media' | 'interactive';
+  messageType: 'template' | 'text' | 'media' | 'interactive' | 'ai_agent';
   templateId?: string;
   templateName?: string;
   textContent?: string;
@@ -22,11 +25,14 @@ export interface IDripStep {
     operator: string;
     value: any;
   }[];
-  skipIfReplied: boolean;
-  skipIfConverted: boolean;
+  skipIfReplied?: boolean;
+  skipIfConverted?: boolean;
   aiAgentId?: string;
-  status: 'active' | 'paused';
+  aiAgentName?: string;
+  status?: 'active' | 'paused';
 }
+
+export type AutoTriggerSource = 'interest_interested' | 'interest_not_interested' | 'interest_neutral' | 'facebook_new_lead' | 'new_message' | 'none';
 
 export interface IDripCampaign extends Document {
   userId: string;
@@ -34,13 +40,29 @@ export interface IDripCampaign extends Document {
   description?: string;
   status: 'draft' | 'active' | 'paused' | 'completed' | 'archived';
   steps: IDripStep[];
-  targetType: 'segment' | 'tag' | 'manual' | 'trigger' | 'imported';
+  targetType: 'segment' | 'tag' | 'manual' | 'trigger' | 'imported' | 'interest' | 'auto_trigger';
   targetSegmentIds?: string[];
   targetTags?: string[];
   targetTriggerId?: string;
   importedContacts?: string[];
   excludeSegmentIds?: string[];
   excludeTags?: string[];
+  deliveryMode?: 'template' | 'ai_agent' | 'mixed';
+  defaultTemplateId?: string;
+  defaultTemplateName?: string;
+  defaultAiAgentId?: string;
+  defaultAiAgentName?: string;
+  autoTrigger?: {
+    enabled: boolean;
+    sources: AutoTriggerSource[];
+    sendImmediately: boolean;
+    initialMessage?: string;
+  };
+  interestTargeting?: {
+    targetInterestLevels: ('interested' | 'not_interested' | 'neutral' | 'pending')[];
+    autoEnroll: boolean;
+    enrollOnClassification: boolean;
+  };
   timezone: string;
   startDate?: Date;
   endDate?: Date;
@@ -76,11 +98,14 @@ export interface IDripCampaign extends Document {
 
 const DripStepSchema = new Schema({
   id: { type: String, required: true },
-  order: { type: Number, required: true },
+  order: { type: Number, default: 0 },
   name: { type: String, required: true },
-  dayOffset: { type: Number, required: true },
+  dayOffset: { type: Number, default: 0 },
+  delayDays: { type: Number, default: 0 },
+  delayHours: { type: Number, default: 0 },
+  delayMinutes: { type: Number, default: 0 },
   timeOfDay: { type: String },
-  messageType: { type: String, enum: ['template', 'text', 'media', 'interactive'], required: true },
+  messageType: { type: String, enum: ['template', 'text', 'media', 'interactive', 'ai_agent'], required: true },
   templateId: { type: String },
   templateName: { type: String },
   textContent: { type: String },
@@ -99,6 +124,7 @@ const DripStepSchema = new Schema({
   skipIfReplied: { type: Boolean, default: false },
   skipIfConverted: { type: Boolean, default: false },
   aiAgentId: { type: String },
+  aiAgentName: { type: String },
   status: { type: String, enum: ['active', 'paused'], default: 'active' }
 }, { _id: false });
 
@@ -108,13 +134,29 @@ const DripCampaignSchema = new Schema<IDripCampaign>({
   description: { type: String },
   status: { type: String, enum: ['draft', 'active', 'paused', 'completed', 'archived'], default: 'draft' },
   steps: { type: [DripStepSchema], default: [] },
-  targetType: { type: String, enum: ['segment', 'tag', 'manual', 'trigger', 'imported'], required: true },
+  targetType: { type: String, enum: ['segment', 'tag', 'manual', 'trigger', 'imported', 'interest', 'auto_trigger'], required: true },
   targetSegmentIds: { type: [String] },
   targetTags: { type: [String] },
   targetTriggerId: { type: String },
   importedContacts: { type: [String] },
   excludeSegmentIds: { type: [String] },
   excludeTags: { type: [String] },
+  deliveryMode: { type: String, enum: ['template', 'ai_agent', 'mixed'], default: 'template' },
+  defaultTemplateId: { type: String },
+  defaultTemplateName: { type: String },
+  defaultAiAgentId: { type: String },
+  defaultAiAgentName: { type: String },
+  autoTrigger: {
+    enabled: { type: Boolean, default: false },
+    sources: { type: [String], enum: ['interest_interested', 'interest_not_interested', 'interest_neutral', 'facebook_new_lead', 'new_message', 'none'], default: [] },
+    sendImmediately: { type: Boolean, default: true },
+    initialMessage: { type: String }
+  },
+  interestTargeting: {
+    targetInterestLevels: { type: [String], enum: ['interested', 'not_interested', 'neutral', 'pending'], default: [] },
+    autoEnroll: { type: Boolean, default: false },
+    enrollOnClassification: { type: Boolean, default: true }
+  },
   timezone: { type: String, default: 'UTC' },
   startDate: { type: Date },
   endDate: { type: Date },

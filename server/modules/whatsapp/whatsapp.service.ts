@@ -483,3 +483,103 @@ export async function getUserByPhoneNumberId(phoneNumberId: string): Promise<str
     return null;
   }
 }
+
+export interface SendFlowOptions {
+  to: string;
+  flowId: string;
+  flowName: string;
+  entryPointId?: string;
+  headerText?: string;
+  bodyText?: string;
+  footerText?: string;
+  ctaText?: string;
+  flowToken?: string;
+  flowActionPayload?: Record<string, any>;
+}
+
+export async function sendFlowMessage(
+  userId: string,
+  options: SendFlowOptions
+): Promise<{ success: boolean; messageId?: string; error?: string }> {
+  const credentials = await getWhatsAppCredentialsForUser(userId);
+  
+  if (!credentials) {
+    return { success: false, error: 'WhatsApp credentials not configured' };
+  }
+
+  try {
+    const payload: any = {
+      messaging_product: 'whatsapp',
+      recipient_type: 'individual',
+      to: options.to,
+      type: 'interactive',
+      interactive: {
+        type: 'flow',
+        header: options.headerText ? {
+          type: 'text',
+          text: options.headerText
+        } : undefined,
+        body: {
+          text: options.bodyText || `Please complete the ${options.flowName} flow`
+        },
+        footer: options.footerText ? {
+          text: options.footerText
+        } : undefined,
+        action: {
+          name: 'flow',
+          parameters: {
+            flow_message_version: '3',
+            flow_token: options.flowToken || `flow_${Date.now()}`,
+            flow_id: options.flowId,
+            flow_cta: options.ctaText || 'Start',
+            flow_action: 'navigate',
+            flow_action_payload: options.flowActionPayload ? {
+              screen: options.entryPointId || '0',
+              data: options.flowActionPayload
+            } : {
+              screen: options.entryPointId || '0'
+            }
+          }
+        }
+      }
+    };
+
+    if (!payload.interactive.header) {
+      delete payload.interactive.header;
+    }
+    if (!payload.interactive.footer) {
+      delete payload.interactive.footer;
+    }
+
+    const response = await fetch(
+      `https://graph.facebook.com/v18.0/${credentials.phoneNumberId}/messages`,
+      {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${credentials.token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      }
+    );
+    
+    const data = await response.json();
+    
+    if (response.ok && data.messages?.[0]?.id) {
+      console.log(`[WhatsApp Service] Flow message sent to ${options.to}, messageId: ${data.messages[0].id}`);
+      return { success: true, messageId: data.messages[0].id };
+    }
+    
+    console.error('[WhatsApp Service] Flow send failed:', data.error);
+    return { 
+      success: false, 
+      error: data.error?.message || 'Failed to send flow message' 
+    };
+  } catch (error) {
+    console.error('[WhatsApp Service] Error sending flow message:', error);
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : 'Unknown error' 
+    };
+  }
+}

@@ -1,6 +1,8 @@
 import { readCollection, writeCollection, findById, findByField } from '../storage';
 import * as leadAutoReply from '../leadAutoReply/leadAutoReply.service';
 import * as integrationService from '../integrations/integration.service';
+import { autoEnrollContact } from '../automation/drips/drip.service';
+import { Contact } from '../storage/mongodb.adapter';
 
 // Facebook tokens - we can use either a Page Access Token directly
 // or derive it from a User Access Token + Page ID
@@ -296,6 +298,10 @@ export async function syncLeadsForForm(formId: string): Promise<Lead[]> {
         }).catch(err => {
           console.error(`[FB Service] Auto-reply failed for lead ${lead.id}:`, err);
         });
+
+        triggerDripCampaignsForLead(lead).catch(err => {
+          console.error(`[FB Service] Drip campaign trigger failed for lead ${lead.id}:`, err);
+        });
       }
     }
     
@@ -317,4 +323,59 @@ export async function getLeadsByFormId(formId: string): Promise<Lead[]> {
 
 export async function getLeadById(id: string): Promise<Lead | null> {
   return findById<Lead>(LEADS_COLLECTION, id);
+}
+
+async function triggerDripCampaignsForLead(lead: Lead): Promise<void> {
+  if (!lead.phone) {
+    console.log(`[FB Service] Lead ${lead.id} has no phone number, skipping drip campaigns`);
+    return;
+  }
+
+  try {
+    let contact = await Contact.findOne({ phone: lead.phone });
+    
+    if (!contact) {
+      contact = await Contact.create({
+        id: `contact-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        name: lead.name || 'Facebook Lead',
+        phone: lead.phone,
+        email: lead.email || '',
+        source: 'facebook_lead',
+        tags: ['facebook-lead', lead.formName || 'unknown-form'],
+        status: 'active',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        metadata: {
+          fbLeadId: lead.fbLeadId,
+          formId: lead.formId,
+          formName: lead.formName,
+          fieldData: lead.fieldData
+        }
+      });
+      console.log(`[FB Service] Created new contact for Facebook lead: ${contact.phone}`);
+    }
+
+    const result = await autoEnrollContact(
+      'system',
+      contact.id,
+      contact.phone,
+      'facebook_new_lead',
+      {
+        contactName: contact.name,
+        source: 'facebook_lead',
+        formName: lead.formName,
+        leadId: lead.id
+      }
+    );
+
+    if (result.enrolled.length > 0) {
+      console.log(`[FB Service] Enrolled lead ${lead.id} in drip campaigns: ${result.enrolled.join(', ')}`);
+    }
+    if (result.skipped.length > 0) {
+      console.log(`[FB Service] Skipped campaigns for lead ${lead.id}: ${result.skipped.join(', ')}`);
+    }
+  } catch (error) {
+    console.error(`[FB Service] Error triggering drip campaigns for lead ${lead.id}:`, error);
+    throw error;
+  }
 }

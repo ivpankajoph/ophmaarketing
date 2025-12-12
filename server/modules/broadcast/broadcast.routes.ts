@@ -2,6 +2,8 @@ import { Router, Request, Response } from 'express';
 import multer from 'multer';
 import * as XLSX from 'xlsx';
 import * as broadcastService from './broadcast.service';
+import * as campaignController from './campaign.controller';
+import { requireAuth } from '../auth/auth.routes';
 
 const router = Router();
 const upload = multer({ storage: multer.memoryStorage() });
@@ -440,5 +442,16 @@ router.delete('/imported-contacts/:id', async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Failed to delete imported contact' });
   }
 });
+
+router.get('/campaigns/contacts/all', requireAuth, campaignController.getAllContacts);
+router.get('/campaigns/contacts/available', requireAuth, campaignController.getAvailableContacts);
+router.get('/campaigns', requireAuth, campaignController.getCampaigns);
+router.post('/campaigns', requireAuth, campaignController.createCampaign);
+router.get('/campaigns/:id', requireAuth, campaignController.getCampaignById);
+router.post('/campaigns/:id/execute', requireAuth, campaignController.executeCampaign);
+router.get('/campaigns/:id/interested', requireAuth, campaignController.getInterestedContacts);
+router.get('/campaigns/:id/not-interested', requireAuth, campaignController.getNotInterestedContacts);
+router.post('/campaigns/:id/send-to-list', requireAuth, campaignController.sendToInterestList);
+router.delete('/campaigns/:id', requireAuth, campaignController.deleteCampaign);
 
 export default router;

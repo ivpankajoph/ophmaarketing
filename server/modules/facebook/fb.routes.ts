@@ -1,71 +1,63 @@
-import { Router } from "express";
-import * as controller from "./fb.controller";
-import {
-  decryptAESKey,
-  decryptPayload,
-  encryptResponse,
-} from "server/flow-utils.ts";
-import FlowSession from "server/models/FlowSession.ts";
-
+import { Router } from 'express';
+import * as controller from './fb.controller';
+import FlowLog from './flow.model.ts'
 const router = Router();
 
-router.post("/forms/sync", controller.syncForms);
-router.get("/forms", controller.listForms);
-router.get("/forms/:id", controller.getForm);
-router.post("/forms/:formId/sync-leads", controller.syncLeads);
-router.get("/leads", controller.listLeads);
-router.get("/leads/:id", controller.getLead);
+router.post('/forms/sync', controller.syncForms);
+router.get('/forms', controller.listForms);
+router.get('/forms/:id', controller.getForm);
+router.post('/forms/:formId/sync-leads', controller.syncLeads);
+router.get('/leads', controller.listLeads);
+router.get('/leads/:id', controller.getLead);
 
-router.get("/flow", (req, res) => {
-  return res.json({ status: "active" });
-});
-
-router.post("/flow", async (req, res) => {
+router.post("/flow-handler", async (req, res) => {
   try {
-    const { encrypted_flow_data, encrypted_aes_key, initial_vector } = req.body;
+    const flowData = req.body;
 
-    // 1. Decrypt AES Key
-    const aesKey = decryptAESKey(encrypted_aes_key);
+    // Extract useful fields
+    const wa_id = flowData?.user?.wa_id || null;
+    const phone = flowData?.user?.phone || null;
+    const flow_id = flowData?.flow_id || "unknown_flow";
+    const step = flowData?.step || "unknown_step";
 
-    // 2. Decrypt WhatsApp Encrypted Data
-    const decrypted = decryptPayload(
-      aesKey,
-      encrypted_flow_data,
-      initial_vector
-    );
+    const input =
+      flowData?.step_data?.selected_option ||
+      flowData?.step_data?.input_text ||
+      null;
 
-    console.log("📥 Incoming Flow Data:", decrypted);
-
-    // 3. Save to DB
-    await FlowSession.create({
-      flow_token: decrypted.flow_token,
-      action: decrypted.action,
-      screen: decrypted.screen,
-      data: decrypted.data,
+    // ---- Save to MongoDB ----
+    await FlowLog.create({
+      wa_id,
+      phone,
+      flow_id,
+      step,
+      input,
+      raw_data: flowData,
     });
 
-    // 4. Create Response
-    const responseBody = {
-      // version: "1.0",
-      // screen: "FINAL_SCREEN",
-      // data: {
-      //   message: "Your flow has been processed successfully 🎉",
-      //   echo: decrypted.data,
-      // },
-      data: { status: "active" },
-    };
+    console.log("Saved Flow Entry:", input);
 
-    // 5. Encrypt response
-    const encryptedResponse = encryptResponse(
-      responseBody,
-      aesKey,
-      Buffer.from(initial_vector, "base64")
-    );
+    // ---- Response back to WhatsApp Flow ----
+    return res.json({
+      version: "1.0",
+      data: {
+        message: `Stored successfully! You entered: ${input}`,
+        next_step: "SUCCESS_SCREEN",
+      },
+    });
 
-    res.send(encryptedResponse);
   } catch (err) {
-    console.error("❌ Flow Error", err);
-    return res.status(421).send("Unable to decrypt payload");
+    console.error("Flow Error:", err);
+
+    return res.status(500).json({
+      version: "1.0",
+      data: {
+        message: "Database Error! Try again.",
+        next_step: "ERROR_SCREEN",
+      },
+    });
   }
 });
+
+
 export default router;

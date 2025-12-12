@@ -29,6 +29,7 @@ import SelectedContacts from "@/pages/campaigns/SelectedContacts";
 import Schedule from "@/pages/campaigns/Schedule";
 import Single from "@/pages/campaigns/Single";
 import Report from "@/pages/campaigns/Report";
+import CampaignPage from "@/pages/campaigns/CampaignPage";
 
 import AutoLeads from "@/pages/automation/AutoLeads";
 import Keywords from "@/pages/automation/Keywords";
@@ -42,6 +43,7 @@ import FlowEditor from "@/pages/automation/FlowEditor";
 import CampaignsPage from "@/pages/automation/CampaignsPage";
 import SegmentsPage from "@/pages/automation/SegmentsPage";
 import AnalyticsPage from "@/pages/automation/AnalyticsPage";
+import InterestLists from "@/pages/automation/InterestLists";
 
 import ConnectApps from "@/pages/apps/ConnectApps";
 
@@ -58,6 +60,7 @@ import PrefilledTextMappings from "@/pages/ai/PrefilledTextMappings";
 
 import LeadForms from "@/pages/facebook/LeadForms";
 import Leads from "@/pages/facebook/Leads";
+import WhatsAppFlowsPage from "@/pages/whatsapp/FlowsPage";
 
 import DeliveryReport from "@/pages/reports/DeliveryReport";
 import CampaignPerformance from "@/pages/reports/CampaignPerformance";
@@ -96,6 +99,7 @@ function Router() {
       
       {/* Campaigns */}
       <Route path="/campaigns">{() => <ProtectedRoute component={Campaigns} />}</Route>
+      <Route path="/campaigns/manager">{() => <ProtectedRoute component={CampaignPage} />}</Route>
       <Route path="/campaigns/broadcast">{() => <ProtectedRoute component={Broadcast} />}</Route>
       <Route path="/campaigns/selected-contacts">{() => <ProtectedRoute component={SelectedContacts} />}</Route>
       <Route path="/campaigns/schedule">{() => <ProtectedRoute component={Schedule} />}</Route>
@@ -113,6 +117,7 @@ function Router() {
       <Route path="/automation/campaigns">{() => <ProtectedRoute component={CampaignsPage} />}</Route>
       <Route path="/automation/segments">{() => <ProtectedRoute component={SegmentsPage} />}</Route>
       <Route path="/automation/analytics">{() => <ProtectedRoute component={AnalyticsPage} />}</Route>
+      <Route path="/automation/interest">{() => <ProtectedRoute component={InterestLists} />}</Route>
       <Route path="/automation/leads">{() => <ProtectedRoute component={AutoLeads} />}</Route>
       <Route path="/automation/keywords">{() => <ProtectedRoute component={Keywords} />}</Route>
       <Route path="/automation/follow-up">{() => <ProtectedRoute component={FollowUp} />}</Route>
@@ -140,6 +145,9 @@ function Router() {
       {/* Facebook */}
       <Route path="/facebook/forms">{() => <ProtectedRoute component={LeadForms} />}</Route>
       <Route path="/facebook/leads">{() => <ProtectedRoute component={Leads} />}</Route>
+
+      {/* WhatsApp */}
+      <Route path="/whatsapp/flows">{() => <ProtectedRoute component={WhatsAppFlowsPage} />}</Route>
 
       {/* Reports */}
       <Route path="/reports">{() => <ProtectedRoute component={DeliveryReport} />}</Route>

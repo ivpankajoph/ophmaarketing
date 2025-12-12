@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
@@ -22,7 +22,8 @@ import {
   Facebook,
   Clock,
   UserPlus,
-  UserCog
+  UserCog,
+  Workflow
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -122,9 +123,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         { label: "Triggers", href: "/automation/triggers" },
         { label: "Flows", href: "/automation/flows" },
         { label: "Drip Campaigns", href: "/automation/campaigns" },
-        { label: "Segments", href: "/automation/segments" },
+        // { label: "Segments", href: "/automation/segments" },
         { label: "Analytics", href: "/automation/analytics" },
-        { label: "Builder", href: "/automation" },
+        { label: "Interest Lists", href: "/automation/interest" },
+        // { label: "Builder", href: "/automation" },
         // { label: "Auto Leads", href: "/automation/leads" },
         { label: "Follow-up", href: "/automation/follow-up" },
         // { label: "New Lead Alert", href: "/automation/new-leads" },
@@ -180,6 +182,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         { label: "Lead Forms", href: "/facebook/forms" },
         { label: "Leads", href: "/facebook/leads" },
       ]
+    },
+    {
+      icon: Workflow,
+      label: "WhatsApp Flows",
+      href: "/whatsapp/flows",
+      pageId: "whatsapp-flows",
     },
     {
       icon: BarChart3,
@@ -250,45 +258,57 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const NavItem = ({ item }: { item: any }) => {
     const isActive = location === item.href || (item.subItems && item.subItems.some((sub: any) => location === sub.href));
     const [isOpen, setIsOpen] = useState(isActive);
+    const itemRef = useRef<HTMLDivElement>(null);
+
+    const handleToggle = (open: boolean) => {
+      setIsOpen(open);
+      if (open && itemRef.current) {
+        setTimeout(() => {
+          itemRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 50);
+      }
+    };
 
     if (item.subItems) {
       return (
-        <Collapsible open={isOpen} onOpenChange={setIsOpen} className="space-y-1">
-          <CollapsibleTrigger asChild>
-            <div 
-              className={`
-                flex items-center justify-between px-3 py-2.5 rounded-md text-sm font-medium transition-colors cursor-pointer select-none
-                ${isActive 
-                  ? "bg-sidebar-accent/50 text-sidebar-accent-foreground"
-                  : "text-black hover:bg-sidebar-accent/30 hover:text-sidebar-foreground"
-                }
-              `}
-            >
-              <div className="flex items-center gap-3">
-                <item.icon className="h-4 w-4" />
-                {item.label}
-              </div>
-              {isOpen ? <ChevronDown className="h-3 w-3 opacity-50" /> : <ChevronRight className="h-3 w-3 opacity-50" />}
-            </div>
-          </CollapsibleTrigger>
-          <CollapsibleContent className="pl-9 space-y-1 animate-in slide-in-from-top-2 duration-200">
-            {item.subItems.map((sub: any) => (
-              <Link key={sub.href} href={sub.href}>
-                <div 
-                  className={`
-                    block px-3 py-2 rounded-md text-xs font-medium transition-colors cursor-pointer
-                    ${location === sub.href 
-                      ? "bg-sidebar-accent text-sidebar-accent-foreground" 
-                      : "text-black hover:bg-sidebar-accent/30 hover:text-sidebar-foreground"
-                    }
-                  `}
-                >
-                  {sub.label}
+        <div ref={itemRef}>
+          <Collapsible open={isOpen} onOpenChange={handleToggle} className="space-y-1">
+            <CollapsibleTrigger asChild>
+              <div 
+                className={`
+                  flex items-center justify-between px-3 py-2.5 rounded-md text-sm font-medium transition-colors cursor-pointer select-none
+                  ${isActive 
+                    ? "bg-sidebar-accent/50 text-sidebar-accent-foreground"
+                    : "text-black hover:bg-sidebar-accent/30 hover:text-sidebar-foreground"
+                  }
+                `}
+              >
+                <div className="flex items-center gap-3">
+                  <item.icon className="h-4 w-4" />
+                  {item.label}
                 </div>
-              </Link>
-            ))}
-          </CollapsibleContent>
-        </Collapsible>
+                {isOpen ? <ChevronDown className="h-3 w-3 opacity-50" /> : <ChevronRight className="h-3 w-3 opacity-50" />}
+              </div>
+            </CollapsibleTrigger>
+            <CollapsibleContent className="pl-9 space-y-1 animate-in slide-in-from-top-2 duration-200">
+              {item.subItems.map((sub: any) => (
+                <Link key={sub.href} href={sub.href}>
+                  <div 
+                    className={`
+                      block px-3 py-2 rounded-md text-xs font-medium transition-colors cursor-pointer
+                      ${location === sub.href 
+                        ? "bg-sidebar-accent text-sidebar-accent-foreground" 
+                        : "text-black hover:bg-sidebar-accent/30 hover:text-sidebar-foreground"
+                      }
+                    `}
+                  >
+                    {sub.label}
+                  </div>
+                </Link>
+              ))}
+            </CollapsibleContent>
+          </Collapsible>
+        </div>
       );
     }
 
